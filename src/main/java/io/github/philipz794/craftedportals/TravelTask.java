@@ -179,16 +179,30 @@ final class TravelTask extends BukkitRunnable {
     /** Full-screen frost without damage: vanilla hurts at 140, so stay below. */
     private static final int MAX_FROST = 130;
 
+    /**
+     * The configured travel effect, except that VANILLA only exists with nether portal blocks: the
+     * client draws that overlay by itself when standing in them. With END or PARTICLE visuals there
+     * is nothing to draw, so VANILLA falls back to NAUSEA, the closest look.
+     */
+    private CraftedPortals.TravelEffect activeEffect() {
+        CraftedPortals.TravelEffect e = plugin.travelSettings().effect();
+        if (e == CraftedPortals.TravelEffect.VANILLA && plugin.effect() != CraftedPortals.Effect.NETHER) {
+            return CraftedPortals.TravelEffect.NAUSEA;
+        }
+        return e;
+    }
+
     /** Called every tick while a survival player waits inside a portal (t of delay ticks done). */
     private void showWaiting(Player p, Portal portal, int t, int delay) {
         CraftedPortals.TravelSettings ts = plugin.travelSettings();
+        CraftedPortals.TravelEffect effect = activeEffect();
         double progress = delay <= 0 ? 1.0 : Math.min(1.0, t / (double) delay);
         // The client draws vanilla's purple overlay on its own while touching nether portal blocks.
         // VANILLA wants exactly that; every other value hides the touched blocks from the player.
-        if (ts.effect() != CraftedPortals.TravelEffect.VANILLA && plugin.effect() == CraftedPortals.Effect.NETHER) {
+        if (effect != CraftedPortals.TravelEffect.VANILLA && plugin.effect() == CraftedPortals.Effect.NETHER) {
             hiddenInterior.computeIfAbsent(p.getUniqueId(), k -> new Hidden(portal, new HashSet<>()));
         }
-        switch (ts.effect()) {
+        switch (effect) {
             case VANILLA -> { }
             case NAUSEA -> p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0, true, false, false));
             case DARKNESS -> p.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 100, 0, true, false, false));
@@ -216,7 +230,7 @@ final class TravelTask extends BukkitRunnable {
         CraftedPortals.TravelSettings ts = plugin.travelSettings();
         Hidden h = hiddenInterior.remove(p.getUniqueId());
         if (h != null) revealAll(p, h);
-        switch (ts.effect()) {
+        switch (activeEffect()) {
             case VANILLA -> { }
             case NAUSEA -> p.removePotionEffect(PotionEffectType.NAUSEA);
             case DARKNESS -> p.removePotionEffect(PotionEffectType.DARKNESS);

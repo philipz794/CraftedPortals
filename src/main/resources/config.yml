@@ -72,7 +72,9 @@ player-delay-ticks: 80
 # What a survival player sees while waiting inside a portal:
 #   VANILLA  - the purple nether portal overlay with its wobble, exactly as
 #              in vanilla (default). The game client draws it by itself as
-#              soon as the player stands in nether portal blocks.
+#              soon as the player stands in nether portal blocks, so it only
+#              exists with effect: NETHER. With END or PARTICLE visuals,
+#              VANILLA behaves like NAUSEA.
 #   NAUSEA   - only the wobble, without the purple tint (nausea effect)
 #   FROST    - icy screen border like powder snow, no damage
 #   DARKNESS - pulsing darkness like the Warden's

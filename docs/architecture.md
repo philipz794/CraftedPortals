@@ -83,6 +83,8 @@ Applied every tick to a survival player waiting inside a portal with a destinati
 player travels or steps out (`endWaiting`, also for players who vanished from the portal):
 
 - `VANILLA`: nothing is applied; the client's own overlay shows because the portal blocks stay visible.
+  Without nether portal blocks (END, PARTICLE) there is nothing to show, so `activeEffect()` maps
+  VANILLA to NAUSEA.
 - Every other value first hides the touched portal blocks (same mechanism as on arrival), so the
   vanilla overlay never builds up.
 - `NAUSEA`: potion effect refreshed with 100 ticks, no icon or particles, removed at the end; the client
