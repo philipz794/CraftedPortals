@@ -87,7 +87,9 @@ final class PortalListener implements Listener {
         e.setCancelled(true);
         switch (r.error()) {
             case NONE -> {
-                Portal portal = mgr.create(name, clicked.getWorld(), r);
+                // Arrivals face the compass direction the activating player looks in now
+                Portal portal = mgr.create(name, clicked.getWorld(), r,
+                        Portal.throughDirection(r.axis(), p.getLocation().getYaw()));
                 if (plugin.consumeItem() && p.getGameMode() != GameMode.CREATIVE) {
                     item.setAmount(item.getAmount() - 1);
                 }

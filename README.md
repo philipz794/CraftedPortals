@@ -20,6 +20,7 @@ plugin without dependencies.
 - **A named item is the key.** Rename a clock (or any item you configure) on an anvil and right-click the
   frame. The item's name becomes the network name. Portals with the same name form a loop: 1 → 2 → 3 → 1.
   Add a hex colour, `Home #3366FF`, and that network gets its own colour.
+  The compass direction you face while clicking becomes the exit direction: travellers arrive looking that way.
 - **Cross-dimensional.** Overworld ↔ Nether ↔ End, no portal generation, no vanilla portal logic.
 - **Everyone travels.** Players, mobs, thrown items and leashed animals (they follow their owner). Each
   can be switched off.
@@ -75,6 +76,21 @@ plugin without dependencies.
 5. Walk through. Survival players wait three seconds, creative players travel instantly.
 
 A frame with a dividing pillar encloses two openings and therefore gives two portals.
+
+### Exit direction
+
+The compass direction you face while right-clicking (F3 "Facing", looking up or down does not matter)
+becomes the portal's exit direction, snapped to one of the two directions perpendicular to the portal.
+Everyone arriving at that portal looks that way. Portals created by `/cp create` or by versions before
+this feature have no exit direction; arrivals simply keep their own facing.
+
+To set or change it later:
+
+- **Re-activate the portal:** break a frame block, put it back and right-click with the named item again.
+  The portal moves to the end of its network, since numbering follows activation order.
+- **Edit `plugins/CraftedPortals/portals.yml`** with the server stopped: add `exit: NORTH` (or `SOUTH`,
+  `EAST`, `WEST`) to the portal's entry and start the server. The network order stays. An `axis: X`
+  portal accepts `NORTH`/`SOUTH`, an `axis: Z` portal `EAST`/`WEST`; other values are ignored.
 
 ## Commands
 

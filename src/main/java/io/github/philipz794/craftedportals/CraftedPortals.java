@@ -266,7 +266,8 @@ public final class CraftedPortals extends JavaPlugin {
                     int i = 1;
                     for (Portal p : net) {
                         sender.sendMessage(Component.text("  " + i++ + ". " + p.worldName + " "
-                                + p.minX + " " + p.minY + " " + p.minZ));
+                                + p.minX + " " + p.minY + " " + p.minZ
+                                + (p.exit != null ? " exit " + p.exit.name().toLowerCase(Locale.ROOT) : "")));
                     }
                 }
             }
@@ -312,7 +313,7 @@ public final class CraftedPortals extends JavaPlugin {
         FrameDetector.Result r = detector.detect(clicked);
         return switch (r.error()) {
             case NONE -> {
-                Portal p = manager.create(name, clicked.getWorld(), r);
+                Portal p = manager.create(name, clicked.getWorld(), r, null);
                 yield portalMsg("activated", p);
             }
             case TOO_SMALL -> msg("too-small");

@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.BoundingBox;
 
 import java.util.ArrayList;
@@ -20,6 +21,11 @@ import java.util.List;
  *
  * axis = X: portal lies in the X-Y plane (constant z), you walk through along Z.
  * axis = Z: portal lies in the Z-Y plane (constant x), you walk through along X.
+ *
+ * exit: the horizontal direction arriving entities face, one of the two directions perpendicular
+ * to the plane (NORTH/SOUTH for axis X, EAST/WEST for axis Z). It is the compass direction the
+ * activating player looked in. null for portals created by command or by older versions: those
+ * keep the traveller's own facing.
  */
 public final class Portal {
 
@@ -28,15 +34,18 @@ public final class Portal {
     final String worldName;
     final Axis axis;
     final int minX, minY, minZ, maxX, maxY, maxZ; // interior bounding box, inclusive
+    final BlockFace exit;      // arrival facing, perpendicular to the plane, or null (legacy)
     /** Interior mask, indexed by (u - minU) * height + (y - minY); u = x for axis X, z for axis Z. */
     private final boolean[] mask;
 
     Portal(String networkKey, String displayName, String worldName, Axis axis,
-           int minX, int minY, int minZ, int maxX, int maxY, int maxZ, boolean[] mask) {
+           int minX, int minY, int minZ, int maxX, int maxY, int maxZ, boolean[] mask, BlockFace exit) {
         this.networkKey = networkKey;
         this.displayName = displayName;
         this.worldName = worldName;
         this.axis = axis;
+        // Only directions perpendicular to the plane make sense; anything else means "keep facing"
+        this.exit = isHorizontal(exit) && exit == throughDirection(axis, yawOf(exit)) ? exit : null;
         this.minX = minX; this.minY = minY; this.minZ = minZ;
         this.maxX = maxX; this.maxY = maxY; this.maxZ = maxZ;
         int size = width() * height();
@@ -51,6 +60,34 @@ public final class Portal {
 
     World world() {
         return Bukkit.getWorld(worldName);
+    }
+
+    // ------------------------------------------------------------ Facing
+
+    /**
+     * The direction perpendicular to a portal plane of the given axis that lies closest to the
+     * yaw (Bukkit: 0 = south, 90 = west, 180 = north, 270 = east). Used to snap the activating
+     * player's facing to an exit direction, and to tell on which way a traveller walks through.
+     */
+    static BlockFace throughDirection(Axis axis, float yaw) {
+        double rad = Math.toRadians(yaw);
+        if (axis == Axis.X) return Math.cos(rad) >= 0 ? BlockFace.SOUTH : BlockFace.NORTH;
+        return -Math.sin(rad) >= 0 ? BlockFace.EAST : BlockFace.WEST;
+    }
+
+    static boolean isHorizontal(BlockFace face) {
+        return face == BlockFace.NORTH || face == BlockFace.SOUTH || face == BlockFace.EAST || face == BlockFace.WEST;
+    }
+
+    /** Bukkit yaw for a horizontal block face. */
+    static float yawOf(BlockFace face) {
+        return switch (face) {
+            case SOUTH -> 0f;
+            case WEST -> 90f;
+            case NORTH -> 180f;
+            case EAST -> -90f;
+            default -> throw new IllegalArgumentException("Not horizontal: " + face);
+        };
     }
 
     // ------------------------------------------------------------ Geometry

@@ -8,7 +8,7 @@ Package: `io.github.philipz794.craftedportals`
 |---|---|
 | `CraftedPortals` | Main class: load config, command, `activate()`, `destroyWithMessage()`, `msg()` (action bar) |
 | `FrameDetector` | Detects the frame via flood fill of the air in the portal plane, starting from the neighbours of the clicked block (including diagonals so clicking a corner works). Any closed shape is accepted. Checks the 2-high column minimum, `max-blocks` (hard limit 1000) and the 64-block span cap, full frame blocks, key blocks. `key(x,y,z)` returns the long block key used by the index maps. |
-| `Portal` | Interior bounding box (min/max inclusive) plus a boolean mask of the interior cells, axis, world. `contains()`, `intersects(BoundingBox)`, `frame()` (edge neighbours plus diagonal-only corners, derived from the mask), `interior()`, `box()`, `arrival()` (lowest 2-high column nearest the centre), `isLoaded()`, `maskRows()`/`parseMask()` for persistence. |
+| `Portal` | Interior bounding box (min/max inclusive) plus a boolean mask of the interior cells, axis, world, `exit` (arrival facing perpendicular to the plane, or null). `contains()`, `intersects(BoundingBox)`, `frame()` (edge neighbours plus diagonal-only corners, derived from the mask), `interior()`, `box()`, `arrival()` (lowest 2-high column nearest the centre), `isLoaded()`, `maskRows()`/`parseMask()` for persistence, static `throughDirection(axis, yaw)` / `yawOf(face)`. |
 | `PortalManager` | Networks (`LinkedHashMap` name → list), index world → block → portal for interior and frame. `create/destroy/fill/next`. Persistence in `plugins/CraftedPortals/portals.yml`. |
 | `PortalListener` | Clock click, destruction, protection (pistons, fluids), suppression of vanilla teleports, piglin spawns, `WorldLoadEvent` → reindex. |
 | `ConfigUpdater` | On startup, brings an existing `config.yml` up to date from the bundled template: appends missing options with their comment block, inserts missing keys inside existing sections (e.g. `messages`), converts renamed options in place (`RENAMED` map + `convert()`). Never touches values or comments the owner wrote. Pure `merge()` for testing. |
@@ -38,7 +38,11 @@ So that vanilla does not treat the portal blocks as its own nether/end portals, 
    depends on block types.
 2. Players: count delay (survival), creative instant. Mobs/items instant (if enabled).
 3. Destination = `PortalManager.next()` in the network; destination must be loaded (`isLoaded()`).
-4. `teleportAsync` to the `arrival()` position. Different axis: rotate yaw by 90°, convert velocity.
+4. `teleportAsync` to the `arrival()` position. With an `exit` direction on the destination: yaw is set
+   to that direction and the velocity is rotated by (exit − entry), where the entry direction is the
+   perpendicular direction the entity moves in (`entryDirection()`: velocity sign for mobs/items, since a
+   player's server-side velocity does not reflect walking; facing as the fallback). Without `exit`
+   (legacy, command-created): keep yaw, rotated by 90° for a different axis, convert velocity.
 5. Leashed animals: unleash → teleport animal → re-leash after 2 ticks.
 6. Set `justArrived`; cleared only once the entity has left the box (at least 20 ticks).
 
@@ -150,7 +154,9 @@ portals are unaffected.
 `portals.yml` stores networks in order; on startup and on `WorldLoadEvent` the indexes are rebuilt
 (worlds may load after the plugin).
 
-Per portal the interior bounding box is stored (`minX`…`maxZ`). Non-rectangular portals additionally
+Per portal the interior bounding box is stored (`minX`…`maxZ`) and, if set, `exit` (`NORTH`, `SOUTH`,
+`EAST` or `WEST`; absent for entries written before this feature and for command-created portals, in
+which case arrivals keep their facing). Non-rectangular portals additionally
 carry `cells`, a list of strings from top to bottom with `#` for interior and `.` for not, e.g.
 `["#..", "#..", "###"]` for an L. Entries without `cells` are full rectangles, which also makes
 files written by version 1.0.0 load unchanged.

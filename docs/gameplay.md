@@ -31,9 +31,22 @@ Update it alongside behaviour changes in the code.
 - A trailing hex colour in the item name (`Home #3366FF`) is stripped from the name and stored as the
   network's colour. It recolours the PARTICLE sheet and DUST particles of every portal in that network,
   also existing ones. A name that is only a colour stays a plain name.
+- The **compass direction the player faces while clicking** (yaw only, pitch is ignored; F3 "Facing")
+  becomes the portal's **exit direction**: it is snapped to the one of the two directions perpendicular
+  to the portal plane that lies closest (north/south for an X-axis portal, east/west for a Z-axis one).
+  Arriving travellers face that way.
+- **Changing or adding an exit direction** (e.g. for portals from before this feature or from the
+  command), two ways:
+  1. Re-activate: break a frame block, replace it and right-click with the named item again. The portal
+     then moves to the end of its network, since numbering follows activation order.
+  2. Edit `plugins/CraftedPortals/portals.yml` while the server is stopped: add `exit: NORTH` (or `SOUTH`,
+     `EAST`, `WEST`) to the portal's entry and start the server. The network order is kept. Only the two
+     directions perpendicular to the plane are valid (`axis: X` → `NORTH`/`SOUTH`, `axis: Z` →
+     `EAST`/`WEST`); any other value is ignored with a warning and the portal keeps the traveller's facing.
 - Right-click an already active portal with a named item → info only ("name, #X of Y"), no renaming.
 - Unnamed item on a valid frame → hint to rename it (`messages.no-name`, placeholder `%item%`).
 - Admin alternative without a clock: `/craftedportals create <name> <x> <y> <z> [world]` (also from console).
+  Command-created portals have no exit direction (arrivals keep their facing).
 
 ## Networks & Travel
 
@@ -41,8 +54,12 @@ Update it alongside behaviour changes in the code.
 - Travel in a loop 1 → 2 → 3 → 1. A network with a single portal → `messages.no-target`.
 - Works across dimensions (Overworld ↔ Nether ↔ End).
 - Arrival in the lowest two-block-high column closest to the centre of the destination shape, standing
-  in the middle of that block. For a rectangle this is the bottom centre. Different axes → rotate yaw
-  by 90°, convert velocity.
+  in the middle of that block. For a rectangle this is the bottom centre.
+- Facing on arrival: the destination's exit direction (see Activation). The traveller is turned so that
+  "forward" (the way they walked in) becomes the exit direction; pitch is kept and velocity of mobs and
+  items is turned by the same angle, so they keep flying out of the portal. Portals without an exit
+  direction (created by command or by versions before this feature) keep the traveller's own facing;
+  different axes → rotate yaw by 90°, convert velocity.
 - After arrival a lock (`justArrived`) applies until the entity has left the portal (at least 20 ticks).
 
 ## Delays and the waiting effect

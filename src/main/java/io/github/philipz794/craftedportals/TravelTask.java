@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Boss;
@@ -266,19 +267,28 @@ final class TravelTask extends BukkitRunnable {
 
         Location dest = to.arrival(tw);
         Location cur = e.getLocation();
-        boolean rotate = from.axis != to.axis;
-        float yaw = cur.getYaw();
-        if (rotate) yaw += from.axis == Axis.X ? -90f : 90f;
-        dest.setYaw(yaw);
-        dest.setPitch(cur.getPitch());
-
-        // Convert velocity (the component perpendicular to the portal is preserved)
         Vector v = e.getVelocity();
         Vector nv = v.clone();
-        if (rotate) {
-            if (from.axis == Axis.X) nv = new Vector(v.getZ(), v.getY(), -v.getX());
-            else nv = new Vector(-v.getZ(), v.getY(), v.getX());
+        if (to.exit != null) {
+            // Fixed arrival facing: turn the entity so that "forward" (the way it walked in)
+            // becomes the exit direction, and turn its velocity by the same angle.
+            float exitYaw = Portal.yawOf(to.exit);
+            float delta = exitYaw - Portal.yawOf(entryDirection(e, from, v));
+            dest.setYaw(exitYaw);
+            nv = v.clone().rotateAroundY(Math.toRadians(-delta));
+        } else {
+            // Legacy portal: keep the traveller's facing, rotated by 90° for a different axis
+            boolean rotate = from.axis != to.axis;
+            float yaw = cur.getYaw();
+            if (rotate) yaw += from.axis == Axis.X ? -90f : 90f;
+            dest.setYaw(yaw);
+            // Convert velocity (the component perpendicular to the portal is preserved)
+            if (rotate) {
+                if (from.axis == Axis.X) nv = new Vector(v.getZ(), v.getY(), -v.getX());
+                else nv = new Vector(-v.getZ(), v.getY(), v.getX());
+            }
         }
+        dest.setPitch(cur.getPitch());
         final Vector outVel = nv;
 
         // Collect the player's leashed animals
@@ -310,6 +320,23 @@ final class TravelTask extends BukkitRunnable {
                 }
             }
         });
+    }
+
+    /**
+     * The direction in which the entity passes through the origin portal: for mobs and items the
+     * sign of their velocity perpendicular to the plane, for players (whose server-side velocity
+     * does not reflect walking) and for resting entities the perpendicular direction closest to
+     * their facing.
+     */
+    private static BlockFace entryDirection(Entity e, Portal from, Vector v) {
+        if (!(e instanceof Player)) {
+            double through = from.axis == Axis.X ? v.getZ() : v.getX();
+            if (Math.abs(through) > 1e-3) {
+                if (from.axis == Axis.X) return through > 0 ? BlockFace.SOUTH : BlockFace.NORTH;
+                return through > 0 ? BlockFace.EAST : BlockFace.WEST;
+            }
+        }
+        return Portal.throughDirection(from.axis, e.getLocation().getYaw());
     }
 
     // ------------------------------------------------------------ Arrival portal overlay

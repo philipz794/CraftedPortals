@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.EndGateway;
 import org.bukkit.block.data.Orientable;
@@ -111,11 +112,12 @@ final class PortalManager {
 
     // ------------------------------------------------------------ Mutation
 
-    Portal create(String rawName, World w, FrameDetector.Result r) {
+    /** @param exit arrival facing (perpendicular to the plane) or null to keep the traveller's facing */
+    Portal create(String rawName, World w, FrameDetector.Result r, BlockFace exit) {
         ParsedName pn = parseName(rawName);
         String key = pn.name().toLowerCase();
         Portal p = new Portal(key, pn.name(), w.getName(), r.axis(),
-                r.minX(), r.minY(), r.minZ(), r.maxX(), r.maxY(), r.maxZ(), r.mask());
+                r.minX(), r.minY(), r.minZ(), r.maxX(), r.maxY(), r.maxZ(), r.mask(), exit);
         networks.computeIfAbsent(key, k -> new ArrayList<>()).add(p);
         if (pn.color() != null) {
             // A colour on the item recolours the whole network
@@ -233,8 +235,14 @@ final class PortalManager {
                         mask = Portal.parseMask(list2, width, maxY - minY + 1);
                         if (mask == null) plugin.getLogger().warning("Ignoring unreadable cell mask of a portal in network " + key);
                     }
+                    // "exit" is absent for entries written by older versions and command-created portals
+                    BlockFace exit = null;
+                    if (m.get("exit") instanceof String ex) {
+                        try { exit = BlockFace.valueOf(ex); }
+                        catch (IllegalArgumentException e) { plugin.getLogger().warning("Ignoring unknown exit '" + ex + "' of a portal in network " + key); }
+                    }
                     Portal p = new Portal(key, name, (String) m.get("world"), axis,
-                            minX, minY, minZ, maxX, maxY, maxZ, mask);
+                            minX, minY, minZ, maxX, maxY, maxZ, mask, exit);
                     list.add(p);
                     n++;
                 } catch (Exception e) {
@@ -264,6 +272,7 @@ final class PortalManager {
                 m.put("minX", p.minX); m.put("minY", p.minY); m.put("minZ", p.minZ);
                 m.put("maxX", p.maxX); m.put("maxY", p.maxY); m.put("maxZ", p.maxZ);
                 if (!p.isRectangle()) m.put("cells", p.maskRows());
+                if (p.exit != null) m.put("exit", p.exit.name());
                 list.add(m);
             }
             yml.set(base + ".name", e.getValue().get(0).displayName);

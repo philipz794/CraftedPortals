@@ -8,7 +8,7 @@ real name anywhere.
 
 ## Commands
 
-- Build: `mvn package` → `target/craftedportals-1.0.0.jar`. Needs JDK 25+ on `JAVA_HOME`
+- Build: `mvn package` → `target/craftedportals-1.0.1.jar`. Needs JDK 25+ on `JAVA_HOME`
   (Homebrew on macOS: `JAVA_HOME=/opt/homebrew/opt/openjdk mvn package`). See docs/build.md.
 - There are no automated tests. Verification happens on a Paper test server (docs/testing.md).
 - Releases: see docs/release.md. A GitHub release triggers the Modrinth publish workflow.

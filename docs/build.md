@@ -19,7 +19,7 @@ JAVA_HOME=/opt/homebrew/opt/openjdk mvn package
 mvn package
 ```
 
-Output: `target/craftedportals-1.0.0.jar`. `target/` is gitignored.
+Output: `target/craftedportals-1.0.1.jar`. `target/` is gitignored.
 
 ## Dependencies
 

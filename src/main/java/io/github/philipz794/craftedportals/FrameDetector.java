@@ -139,7 +139,7 @@ final class FrameDetector {
         if (!column2) return fail(Error.TOO_SMALL);
         if (cells > maxBlocks) return fail(Error.TOO_BIG);
 
-        Portal tmp = new Portal("", "", w.getName(), axis, minX, minY, minZ, maxX, maxY, maxZ, mask);
+        Portal tmp = new Portal("", "", w.getName(), axis, minX, minY, minZ, maxX, maxY, maxZ, mask, null);
         boolean clickedIsFrame = false;
         int keys = 0;
         for (Block f : tmp.frame(w)) {

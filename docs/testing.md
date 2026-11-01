@@ -47,6 +47,11 @@ There are no unit tests. Verification happens on a Paper 26.3 test server, prefe
   standing in a notch does not teleport, arrival in the tall column, `cells` in portals.yml,
   `too-small` for a horizontal slit, `too-big` above `max-blocks`, legacy `max-size` conversion.
 
+- Exit direction: activate a portal while facing e.g. east (F3), looking down at the frame → `exit: EAST`
+  in portals.yml and in `/cp list`; arriving players look east regardless of how they entered, a
+  thrown item flies out east. Activate while facing almost parallel to the plane → still one of the two
+  perpendicular directions. Portals from `/cp create` and from an old portals.yml keep the traveller's
+  facing as before (rotated for a different axis).
 - Leashed animals travelling along (`leashed-follow`).
 - Bedrock players via Geyser/Floodgate (action bar, right-click, teleport).
 - `piglin-spawn: true` actually allowing spawns (vanilla spawn chance is low; never on peaceful).
