@@ -27,6 +27,7 @@ import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
 import io.papermc.paper.event.entity.EntityInsideBlockEvent;
 import io.papermc.paper.event.entity.EntityPortalReadyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -56,7 +57,7 @@ final class PortalListener implements Listener {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getHand() != EquipmentSlot.HAND) return;
         Block clicked = e.getClickedBlock();
         ItemStack item = e.getItem();
-        if (clicked == null || item == null || item.getType() != Material.CLOCK) return;
+        if (clicked == null || item == null || item.getType() != plugin.activationItem()) return;
         Player p = e.getPlayer();
 
         ItemMeta meta = item.getItemMeta();
@@ -78,7 +79,7 @@ final class PortalListener implements Listener {
             // Unnamed clock: only respond if this really is a frame
             if (r.ok() || r.error() == FrameDetector.Error.MISSING_KEYS) {
                 e.setCancelled(true);
-                p.sendActionBar(plugin.msg("no-name"));
+                p.sendActionBar(plugin.msg("no-name", "%item%", plugin.activationItemName()));
             }
             return;
         }
@@ -248,6 +249,16 @@ final class PortalListener implements Listener {
     public void onCreatureSpawn(CreatureSpawnEvent e) {
         if (e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NETHER_PORTAL) return;
         if (!plugin.piglinSpawn() && inOurPortal(e.getLocation())) e.setCancelled(true);
+    }
+
+    /** Admins learn about config problems when they join (a little delayed, after the join spam). */
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        Player p = e.getPlayer();
+        if (!p.hasPermission("clockportals.admin")) return;
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            if (p.isOnline()) plugin.sendConfigWarnings(p);
+        }, 40L);
     }
 
     @EventHandler

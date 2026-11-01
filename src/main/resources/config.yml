@@ -10,9 +10,16 @@
 #     of type 'key-block'.
 #   - Interior empty (air), at least two blocks of air stacked
 #     vertically somewhere so that a player fits through.
-#   - Right-click the frame with a clock renamed on an anvil.
+#   - Right-click the frame with the activation item (a clock by
+#     default) renamed on an anvil.
 #   - Portals with the same clock name form a network and are
 #     visited in a loop (1 -> 2 -> 3 -> 1 ...).
+
+# Item that activates a portal when renamed on an anvil and right-clicked
+# on the frame. Any item name from the Minecraft registry, e.g. CLOCK,
+# COMPASS, RECOVERY_COMPASS, AMETHYST_SHARD, NETHER_STAR.
+# Unknown names fall back to CLOCK and admins are warned.
+activation-item: CLOCK
 
 # Block that must be part of the frame
 key-block: EMERALD_BLOCK
@@ -52,7 +59,7 @@ messages:
   activated: "&aPortal &f%name% &aactivated &7(#%pos% of %count%)"
   info: "&7Portal &f%name% &7- #%pos% of %count%"
   destroyed: "&cPortal &f%name% &chas been destroyed"
-  no-name: "&eRename the clock on an anvil first - its name becomes the portal name."
+  no-name: "&eRename the %item% on an anvil first - its name becomes the portal name."
   invalid-frame: "&cNo valid portal frame found."
   too-small: "&cThe portal needs at least two blocks of air stacked vertically."
   too-big: "&cThe portal is too big (max. %max% blocks of air inside)."

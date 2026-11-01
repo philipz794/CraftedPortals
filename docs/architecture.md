@@ -80,6 +80,13 @@ carry `cells`, a list of strings from top to bottom with `#` for interior and `.
 `["#..", "#..", "###"]` for an L. Entries without `cells` are full rectangles, which also makes
 files written by version 1.0.0 load unchanged.
 
+### Config warnings
+
+`loadSettings()` collects problems (unknown `key-block`, unknown `activation-item`, clamped
+`max-blocks`) in `configWarnings`. They are logged immediately, sent to the command sender after
+`/clockportals reload`, and to players with `clockportals.admin` two seconds after they join. Values
+always fall back to safe defaults so the plugin keeps working.
+
 ### Config updates
 
 `ConfigUpdater.update()` runs in `onEnable()` right after `saveDefaultConfig()`. It works on the file as

@@ -20,11 +20,14 @@ Update it alongside behaviour changes in the code.
 
 ## Activation
 
-- Right-click a frame block with a **clock renamed on an anvil** → portal becomes active.
-- The clock is consumed (`consume-clock`, default true), never in creative mode.
-- Clock name = network name. Key is case-insensitive, display name as typed.
-- Right-click an already active portal with a named clock → info only ("name, #X of Y"), no renaming.
-- Unnamed clock on a valid frame → hint to rename the clock (`messages.no-name`).
+- Right-click a frame block with the **activation item renamed on an anvil** → portal becomes active.
+  The item is `activation-item` (default `CLOCK`, any item from the registry). An unknown name falls
+  back to `CLOCK`; the problem is logged and shown to admins (`clockportals.admin`) on join and after
+  `/clockportals reload`.
+- The item is consumed (`consume-clock`, default true), never in creative mode.
+- Item name = network name. Key is case-insensitive, display name as typed.
+- Right-click an already active portal with a named item → info only ("name, #X of Y"), no renaming.
+- Unnamed item on a valid frame → hint to rename it (`messages.no-name`, placeholder `%item%`).
 - Admin alternative without a clock: `/clockportals create <name> <x> <y> <z> [world]` (also from console).
 
 ## Networks & Travel

@@ -1,6 +1,7 @@
 package io.github.philipz794.clockportals;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -26,6 +27,9 @@ public final class ClockPortals extends JavaPlugin {
     private int playerDelay;
     private boolean consumeClock, teleportMobs, teleportItems, leashedFollow, piglinSpawn;
     private int maxBlocks;
+    private Material activationItem = Material.CLOCK;
+    /** Problems found in config.yml, shown to admins on join and after reload. */
+    private final List<String> configWarnings = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -54,11 +58,20 @@ public final class ClockPortals extends JavaPlugin {
 
     void loadSettings() {
         reloadConfig();
-        Material key = Material.matchMaterial(getConfig().getString("key-block", "EMERALD_BLOCK"));
+        configWarnings.clear();
+        String keyName = getConfig().getString("key-block", "EMERALD_BLOCK");
+        Material key = Material.matchMaterial(keyName);
         if (key == null || !key.isBlock()) {
-            getLogger().warning("Unknown key-block, falling back to EMERALD_BLOCK");
+            warn("Unknown key-block '" + keyName + "', using EMERALD_BLOCK");
             key = Material.EMERALD_BLOCK;
         }
+        String itemName = getConfig().getString("activation-item", "CLOCK");
+        Material item = Material.matchMaterial(itemName);
+        if (item == null || !item.isItem() || item.isAir()) {
+            warn("Unknown activation-item '" + itemName + "', using CLOCK");
+            item = Material.CLOCK;
+        }
+        activationItem = item;
         int wanted;
         if (!getConfig().contains("max-blocks") && getConfig().contains("max-size")) {
             // Config from 1.0.0: outer frame size -> interior cell count of the equivalent rectangle
@@ -70,10 +83,9 @@ public final class ClockPortals extends JavaPlugin {
             wanted = getConfig().getInt("max-blocks", 200);
         }
         if (wanted > FrameDetector.HARD_MAX_BLOCKS) {
-            getLogger().warning("max-blocks=" + wanted + " exceeds the hard limit, using "
-                    + FrameDetector.HARD_MAX_BLOCKS + ".");
+            warn("max-blocks=" + wanted + " exceeds the hard limit, using " + FrameDetector.HARD_MAX_BLOCKS);
         } else if (wanted < 2) {
-            getLogger().warning("max-blocks=" + wanted + " is too small, using 2.");
+            warn("max-blocks=" + wanted + " is too small, using 2");
         }
         detector = new FrameDetector(key, Math.max(0, getConfig().getInt("key-block-count", 2)), wanted);
         maxBlocks = detector.maxBlocks();
@@ -85,6 +97,22 @@ public final class ClockPortals extends JavaPlugin {
         leashedFollow = getConfig().getBoolean("leashed-follow", true);
         piglinSpawn = getConfig().getBoolean("piglin-spawn", false);
     }
+
+    private void warn(String problem) {
+        configWarnings.add(problem);
+        getLogger().warning("config.yml: " + problem);
+    }
+
+    /** Sends all config problems to an admin (empty list = nothing is sent). */
+    void sendConfigWarnings(CommandSender to) {
+        for (String w : configWarnings) {
+            to.sendMessage(Component.text("[Clock-Portals] config.yml: " + w, NamedTextColor.YELLOW));
+        }
+    }
+
+    Material activationItem() { return activationItem; }
+    /** Lower-case item name for messages, e.g. "clock" or "recovery compass". */
+    String activationItemName() { return activationItem.name().toLowerCase(Locale.ROOT).replace('_', ' '); }
 
     PortalManager manager() { return manager; }
     FrameDetector detector() { return detector; }
@@ -135,6 +163,7 @@ public final class ClockPortals extends JavaPlugin {
                 loadSettings();
                 manager.all().forEach(manager::fill);
                 sender.sendMessage(Component.text("Clock-Portals: config reloaded."));
+                sendConfigWarnings(sender);
             }
             case "list" -> {
                 if (manager.networks().isEmpty()) {
