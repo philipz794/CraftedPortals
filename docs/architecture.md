@@ -119,7 +119,9 @@ empty text and a translucent background colour, one per rectangle of `Portal.rec
 row-run merge, so a rectangular portal is a single seamless quad). Text displays render 40 px per block;
 the background of a text of `SPACES` spaces is `(4 * SPACES + BG_PAD) × BG_HEIGHT` px (measured in game:
 pad 1, height 10), which the transformation scales onto the rectangle. The quad is back-face culled, so
-each rectangle gets two displays rotated 180° to each other. Z-axis portals are rotated 90° around Y. Displays are
+each rectangle gets two displays rotated 180° to each other. Sides that border frame blocks are extended
+by 0.1 blocks into the frame (hidden there) to swallow rounding gaps; sides that border another
+rectangle of the same portal stay exact so no double-alpha seam appears. Z-axis portals are rotated 90° around Y. Displays are
 non-persistent, tagged `craftedportals_sheet` (strays are removed on startup), removed on destroy /
 effect switch / disable, and recreated by `maintain()` when a chunk reloads. Colour: the network colour
 (item name suffix, persisted as `networks.<key>.color`) or `particles.sheet.color`. Geyser does not

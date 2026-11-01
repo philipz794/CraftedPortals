@@ -173,6 +173,9 @@ public final class Portal {
         return new Location(w, x, bestY, z);
     }
 
+    /** Is the cell (u, y) interior? Package-visible for the sheet renderer. */
+    boolean cell(int u, int y) { return containsUY(u, y); }
+
     /**
      * Greedy decomposition of the interior into rectangles {u0, u1, y0, y1} (inclusive, u = x or z
      * depending on the axis). Rows are split into runs; runs with identical u-range in consecutive rows

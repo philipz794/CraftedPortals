@@ -35,6 +35,8 @@ final class SheetRenderer {
     static final String TAG = "craftedportals_sheet";
 
     private static final int SPACES = 10;
+    /** How far a sheet reaches into neighbouring frame blocks (hidden there), to swallow rounding gaps. */
+    private static final double MARGIN = 0.1;
     private static final float PX_PER_BLOCK = 40f;
     private static final float BG_PAD = 1f;
     private static final float BG_HEIGHT = 10f;  // measured: an 11 left the top 1/11 of the sheet empty
@@ -95,10 +97,16 @@ final class SheetRenderer {
 
     private TextDisplay spawn(World w, Portal p, int[] r, Color argb, boolean back) {
         int u0 = r[0], u1 = r[1], y0 = r[2], y1 = r[3];
-        float width = u1 - u0 + 1, height = y1 - y0 + 1;
-        double uCentre = (u0 + u1 + 1) / 2.0;
+        // Extend each side into the frame unless an interior cell (another rectangle) lies beyond it
+        double extL = sideIsFrame(p, u0 - 1, u0 - 1, y0, y1) ? MARGIN : 0;
+        double extR = sideIsFrame(p, u1 + 1, u1 + 1, y0, y1) ? MARGIN : 0;
+        double extB = sideIsFrame(p, u0, u1, y0 - 1, y0 - 1) ? MARGIN : 0;
+        double extT = sideIsFrame(p, u0, u1, y1 + 1, y1 + 1) ? MARGIN : 0;
+        float width = (float) (u1 - u0 + 1 + extL + extR), height = (float) (y1 - y0 + 1 + extB + extT);
+        double uCentre = (u0 - extL + u1 + 1 + extR) / 2.0;
+        double yBottom = y0 - extB;
         boolean axisX = p.axis == org.bukkit.Axis.X;
-        Location loc = axisX ? new Location(w, uCentre, y0, p.minZ + 0.5) : new Location(w, p.minX + 0.5, y0, uCentre);
+        Location loc = axisX ? new Location(w, uCentre, yBottom, p.minZ + 0.5) : new Location(w, p.minX + 0.5, yBottom, uCentre);
         return w.spawn(loc, TextDisplay.class, d -> {
             d.text(Component.text(" ".repeat(SPACES)));
             d.setBackgroundColor(argb);
@@ -125,6 +133,14 @@ final class SheetRenderer {
     void forget(Portal p) {
         remove(p);
         logged.remove(p);
+    }
+
+    /** True if none of the cells in the given range is interior, i.e. the side borders frame blocks. */
+    private static boolean sideIsFrame(Portal p, int ua, int ub, int ya, int yb) {
+        for (int u = ua; u <= ub; u++)
+            for (int y = ya; y <= yb; y++)
+                if (p.cell(u, y)) return false;
+        return true;
     }
 
     void remove(Portal p) {
