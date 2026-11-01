@@ -47,7 +47,7 @@ Update it alongside behaviour changes in the code.
 
 ## Delays and the waiting effect
 
-- Survival players: `player-delay-ticks` (default 80, like a vanilla nether portal).
+- Survival players: `player-delay-ticks` (default 60; a vanilla nether portal takes 80).
 - Creative: instant. Mobs and items: instant.
 - `effect: END`: always instant.
 - A portal without destination tells the player immediately (`messages.no-target`), no waiting.
@@ -69,6 +69,7 @@ Update it alongside behaviour changes in the code.
 ## Visuals
 
 - `effect: NETHER` → nether portal blocks in the interior.
+- Default is `effect: PARTICLE` with a royal-blue sheet at 50 % and PORTAL particles.
 - `effect: END` → end gateway blocks, teleport always instant.
 - `effect: PARTICLE` → the interior stays air and is filled with particles (`particles.*`: any type of
   the game with its options `color`, `color-to`, `block`, `item`, `value`; density, interval, ambient sound) plus, if `particles.sheet.enabled`, a translucent coloured

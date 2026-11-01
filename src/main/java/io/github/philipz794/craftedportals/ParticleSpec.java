@@ -64,8 +64,8 @@ record ParticleSpec(Particle type, Color color, Color colorTo, BlockData block, 
     }
 
     /** Reads a spec from a config section; problems go to {@code warn} and fall back to safe values. */
-    static ParticleSpec load(ConfigurationSection sec, String path, Consumer<String> warn) {
-        String typeName = sec == null ? "PORTAL" : sec.getString("type", "PORTAL");
+    static ParticleSpec load(ConfigurationSection sec, String path, String defaultType, Consumer<String> warn) {
+        String typeName = sec == null ? defaultType : sec.getString("type", defaultType);
         Particle type;
         try {
             type = Particle.valueOf(typeName.toUpperCase(Locale.ROOT).replace('-', '_'));

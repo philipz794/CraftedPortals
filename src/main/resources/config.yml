@@ -39,7 +39,7 @@ max-blocks: 200
 # Portal visuals: NETHER (purple nether portal blocks), END (end gateway
 # blocks) or PARTICLE (the interior stays air and is filled with particles).
 # Switch at any time with /craftedportals reload.
-effect: NETHER
+effect: PARTICLE
 
 # ---------------------------------------------------------------------------
 # Particle types (all 128 of Minecraft 26.3 work, for 'type' here and in
@@ -115,14 +115,14 @@ particles:
     enabled: true
     # Hex colour; an item named e.g. 'HomePortal #ff00ff' overrides it for
     # that network (see activation-item above)
-    color: "#9B30FF"
+    color: "#4169E1"
     # Opacity in percent (5-100); below about 15 the sheet is hard to see
-    opacity: 20
+    opacity: 50
 
 # How long a survival player has to stand in the portal (in ticks,
 # 20 ticks = 1 second). Vanilla nether portal: 80. Creative: always instant.
 # With the END effect teleportation is always instant.
-player-delay-ticks: 80
+player-delay-ticks: 60
 
 # Screen effect a survival player sees while waiting inside a portal.
 # Works the same with every portal look (effect: NETHER, END, PARTICLE).
@@ -140,14 +140,14 @@ travel-particles:
   enabled: true
   # Same options as under particles (type, color, color-to, block, item,
   # value); see the particle list above
-  type: PORTAL
+  type: ENCHANT
   color: "#9B30FF"
   color-to: "#FFFFFF"
   block: EMERALD_BLOCK
   item: EMERALD
   value: 1.0
   # Particles per tick at full progress (1-30)
-  amount: 6
+  amount: 10
 
 # Play the swelling nether portal trigger sound when the wait starts
 travel-sound: true
