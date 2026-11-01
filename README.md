@@ -18,6 +18,23 @@ and link them with a **named clock**. No client mods required; works for Java an
   the rest of the network keeps its order.
 - Optional: suppress zombified piglin spawns from portal blocks (default: suppressed).
 
+## Why Clock-Portals?
+
+The idea of building gates from any blocks and linking them with a named clock comes from
+[CreativeGates](https://github.com/JeremyFail/CreativeGates) by MassiveCraft, a classic that is being
+continued today. Clock-Portals is an independent, from-scratch implementation of that concept with a
+different focus:
+
+- **Lightweight.** One jar, no library plugin required, six classes.
+- **Zero dependencies.** Public Paper API only, no NMS, so updates to new Minecraft versions are cheap.
+- **Bedrock friendly.** Everything players see is a right-click and an action bar message, which works
+  through Geyser/Floodgate. No chat UIs or dialogs.
+- **Server owner first.** A single `config.yml` with comments, updated automatically when new options
+  arrive; portals survive restarts in a plain YAML file.
+
+If you need per-player permissions, management dialogs or many gate fill types, CreativeGates is the
+more complete choice. If you want portals that just work on a small or medium server, this is for you.
+
 ## Requirements
 
 - Paper 26.3 or newer (API version 1.21)
