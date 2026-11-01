@@ -1,0 +1,63 @@
+# Publishes the jar of a GitHub release to Modrinth.
+#
+# Runs automatically when a release is published. To (re)publish an existing
+# release by hand, use "Run workflow" and enter its tag, e.g. v1.0.0.
+#
+# Needs the repository secret MODRINTH_TOKEN: a Modrinth personal access token
+# with the scopes "Read projects", "Create versions" and "Write versions".
+# Keep the game-versions list below in sync with what has actually been tested.
+name: Publish to Modrinth
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish (e.g. v1.0.0)
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  modrinth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve release tag
+        id: tag
+        run: echo "tag=${{ github.event.inputs.tag || github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+
+      - name: Download the release jar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "${{ steps.tag.outputs.tag }}" --repo "${{ github.repository }}" \
+            --pattern 'craftedportals-*.jar' --dir dist
+          ls -la dist
+
+      - name: Read the release notes as changelog
+        id: notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "${{ steps.tag.outputs.tag }}" --repo "${{ github.repository }}" --json body -q .body > changelog.md
+          wc -c changelog.md
+
+      - name: Publish
+        uses: Kir-Antipov/mc-publish@v3.3.2
+        with:
+          modrinth-id: craftedplugins          # project slug or ID
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-featured: true
+          files: dist/craftedportals-*.jar
+          name: CraftedPortals ${{ steps.tag.outputs.tag }}
+          version: ${{ steps.tag.outputs.tag }}   # mc-publish strips the leading "v"
+          version-type: release
+          changelog-file: changelog.md
+          loaders: paper
+          game-versions: |
+            26.3
+          java: 21
+          retry-attempts: 2
+          retry-delay: 10000

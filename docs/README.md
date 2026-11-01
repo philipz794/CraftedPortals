@@ -7,6 +7,7 @@
 | [architecture.md](architecture.md) | Classes, data flow, Paper API quirks |
 | [testing.md](testing.md) | Test status and test procedure on a Paper server |
 | [particles.md](particles.md) | Usable particle types for `effect: PARTICLE`, generated from the API |
+| [release.md](release.md) | Release steps, Modrinth publishing workflow |
 | [open-issues.md](open-issues.md) | Known edge cases, untested areas, ideas |
 
 Add new topics as separate files and list them here.
