@@ -183,11 +183,12 @@ public final class Portal {
         List<int[]> done = new ArrayList<>();
         for (int y = minY; y <= maxY; y++) {
             List<int[]> runs = new ArrayList<>();
-            int start = -1;
+            boolean inRun = false;
+            int start = 0;
             for (int u = minU(); u <= maxU() + 1; u++) {
                 boolean in = u <= maxU() && containsUY(u, y);
-                if (in && start < 0) start = u;
-                if (!in && start >= 0) { runs.add(new int[]{start, u - 1}); start = -1; }
+                if (in && !inRun) { start = u; inRun = true; }
+                if (!in && inRun) { runs.add(new int[]{start, u - 1}); inRun = false; }
             }
             List<int[]> stillOpen = new ArrayList<>();
             for (int[] run : runs) {

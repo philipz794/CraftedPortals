@@ -69,7 +69,13 @@ final class SheetRenderer {
             return;
         }
         long invalid = list.stream().filter(d -> !d.isValid()).count();
-        if (invalid > 0) {
+        if (rects.isEmpty()) {
+            if (!logged.contains(p)) {
+                plugin.getLogger().warning("Colour sheet for portal " + p.displayName + ": interior has " + p.cells()
+                        + " cells but no rectangles could be derived; please report this");
+                logged.add(p);
+            }
+        } else if (invalid > 0) {
             plugin.getLogger().warning("Colour sheet for portal " + p.displayName + ": " + invalid + " of " + list.size()
                     + " display entities were not added to the world (spawn cancelled by the server or another plugin?)");
         } else if (!logged.contains(p)) {
@@ -110,8 +116,13 @@ final class SheetRenderer {
         });
     }
 
-    void remove(Portal p) {
+    /** Forget a portal entirely (destroyed); its sheet creation may be logged again if it comes back. */
+    void forget(Portal p) {
+        remove(p);
         logged.remove(p);
+    }
+
+    void remove(Portal p) {
         List<TextDisplay> list = sheets.remove(p);
         if (list != null) for (TextDisplay d : list) if (d.isValid()) d.remove();
     }

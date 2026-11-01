@@ -135,7 +135,7 @@ final class PortalManager {
             if (list.isEmpty()) { networks.remove(p.networkKey); colors.remove(p.networkKey); }
         }
         unindex(p);
-        sheets.remove(p);
+        sheets.forget(p);
         World w = p.world();
         if (w != null) {
             for (Block b : p.interior(w)) {
