@@ -1,4 +1,4 @@
-package io.github.philipz794.clockportals;
+package io.github.philipz794.craftedportals;
 
 import org.bukkit.Axis;
 import org.bukkit.GameMode;
@@ -29,14 +29,14 @@ import java.util.UUID;
 /** Checks every tick who is standing in a portal and teleports them. */
 final class TravelTask extends BukkitRunnable {
 
-    private final ClockPortals plugin;
+    private final CraftedPortals plugin;
     /** Player -> ticks spent in the portal. */
     private final Map<UUID, Integer> waiting = new HashMap<>();
     /** Just arrived: may travel again only after leaving the portal. */
     private final Map<UUID, Long> justArrived = new HashMap<>();
     private long tick;
 
-    TravelTask(ClockPortals plugin) {
+    TravelTask(CraftedPortals plugin) {
         this.plugin = plugin;
     }
 
@@ -45,7 +45,7 @@ final class TravelTask extends BukkitRunnable {
         tick++;
         PortalManager mgr = plugin.manager();
         if (tick % 10 == 0) maintain(mgr);
-        if (plugin.effect() == ClockPortals.Effect.PARTICLE) emitParticles(mgr);
+        if (plugin.effect() == CraftedPortals.Effect.PARTICLE) emitParticles(mgr);
         Set<UUID> inside = new HashSet<>();
 
         for (Portal portal : mgr.all()) {
@@ -116,7 +116,7 @@ final class TravelTask extends BukkitRunnable {
      * kept thin perpendicular to it, so the portal reads as a flat sheet.
      */
     private void emitParticles(PortalManager mgr) {
-        ClockPortals.ParticleSettings ps = plugin.particles();
+        CraftedPortals.ParticleSettings ps = plugin.particles();
         if (tick % ps.intervalTicks() != 0 || ps.perBlock() == 0) return;
         boolean ambient = ps.sound() && tick % 100 == 0;
         for (Portal p : mgr.all()) {

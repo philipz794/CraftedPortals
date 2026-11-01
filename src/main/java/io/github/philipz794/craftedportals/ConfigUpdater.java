@@ -1,4 +1,4 @@
-package io.github.philipz794.clockportals;
+package io.github.philipz794.craftedportals;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;

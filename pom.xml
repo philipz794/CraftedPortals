@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.philipz794</groupId>
-  <artifactId>clockportals</artifactId>
+  <artifactId>craftedportals</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
   <properties>
@@ -26,7 +26,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>clockportals-${project.version}</finalName>
+    <finalName>craftedportals-${project.version}</finalName>
     <resources>
       <resource>
         <directory>src/main/resources</directory>

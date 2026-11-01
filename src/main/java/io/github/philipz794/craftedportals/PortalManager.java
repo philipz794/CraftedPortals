@@ -1,4 +1,4 @@
-package io.github.philipz794.clockportals;
+package io.github.philipz794.craftedportals;
 
 import org.bukkit.Axis;
 import org.bukkit.Location;
@@ -24,7 +24,7 @@ import java.util.logging.Level;
 /** Manages all portals, networks and persistence in portals.yml. */
 final class PortalManager {
 
-    private final ClockPortals plugin;
+    private final CraftedPortals plugin;
     private final File file;
 
     /** Network key -> portals in order. */
@@ -34,7 +34,7 @@ final class PortalManager {
     /** World name -> block key -> portal (frame). */
     private final Map<String, Map<Long, Portal>> frameIndex = new HashMap<>();
 
-    PortalManager(ClockPortals plugin) {
+    PortalManager(CraftedPortals plugin) {
         this.plugin = plugin;
         this.file = new File(plugin.getDataFolder(), "portals.yml");
     }
@@ -118,13 +118,13 @@ final class PortalManager {
     void fill(Portal p) {
         World w = p.world();
         if (w == null) return;
-        ClockPortals.Effect effect = plugin.effect();
+        CraftedPortals.Effect effect = plugin.effect();
         for (Block b : p.interior(w)) {
-            if (effect == ClockPortals.Effect.PARTICLE) {
+            if (effect == CraftedPortals.Effect.PARTICLE) {
                 // Interior stays air; only remove portal blocks left over from another effect
                 Material t = b.getType();
                 if (t == Material.NETHER_PORTAL || t == Material.END_GATEWAY) b.setType(Material.AIR, false);
-            } else if (effect == ClockPortals.Effect.END) {
+            } else if (effect == CraftedPortals.Effect.END) {
                 if (b.getType() != Material.END_GATEWAY) b.setType(Material.END_GATEWAY, false);
                 BlockState st = b.getState();
                 if (st instanceof EndGateway gw) {

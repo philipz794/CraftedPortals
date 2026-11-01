@@ -22,13 +22,13 @@ Update it alongside behaviour changes in the code.
 
 - Right-click a frame block with the **activation item renamed on an anvil** → portal becomes active.
   The item is `activation-item` (default `CLOCK`, any item from the registry). An unknown name falls
-  back to `CLOCK`; the problem is logged and shown to admins (`clockportals.admin`) on join and after
-  `/clockportals reload`.
+  back to `CLOCK`; the problem is logged and shown to admins (`craftedportals.admin`) on join and after
+  `/craftedportals reload`.
 - The item is consumed (`consume-clock`, default true), never in creative mode.
 - Item name = network name. Key is case-insensitive, display name as typed.
 - Right-click an already active portal with a named item → info only ("name, #X of Y"), no renaming.
 - Unnamed item on a valid frame → hint to rename it (`messages.no-name`, placeholder `%item%`).
-- Admin alternative without a clock: `/clockportals create <name> <x> <y> <z> [world]` (also from console).
+- Admin alternative without a clock: `/craftedportals create <name> <x> <y> <z> [world]` (also from console).
 
 ## Networks & Travel
 
@@ -52,7 +52,7 @@ Update it alongside behaviour changes in the code.
 - `teleport-mobs`: animals, villagers and monsters walk through on their own.
 - `teleport-items`: thrown items fly through.
 - `piglin-spawn` (default **false**): may zombified piglins spawn from the nether portal blocks of a
-  Clock-Portal? Only affects Clock-Portals; vanilla nether portals are unchanged.
+  CraftedPortal? Only affects CraftedPortals; vanilla nether portals are unchanged.
 
 ## Visuals
 
@@ -61,7 +61,7 @@ Update it alongside behaviour changes in the code.
 - `effect: PARTICLE` → the interior stays air and is filled with particles (`particles.*`: type, colour
   for DUST, density, interval, ambient sound). Players cannot place blocks into the interior. Normal
   player delay applies. No vanilla portal logic is involved at all.
-- All effects can be switched live with `/clockportals reload`.
+- All effects can be switched live with `/craftedportals reload`.
 
 ## Destruction & Protection
 
@@ -74,5 +74,5 @@ Update it alongside behaviour changes in the code.
 
 - All messages are shown in the action bar, texts in `config.yml` (`&` colour codes). Config,
   player-facing texts and log output are English; server admins can translate the messages.
-- Command `/clockportals list | reload | create <name> <x> <y> <z> [world]`.
-- Permission `clockportals.admin` (default: op).
+- Command `/craftedportals list | reload | create <name> <x> <y> <z> [world]`.
+- Permission `craftedportals.admin` (default: op).

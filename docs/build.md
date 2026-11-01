@@ -19,7 +19,7 @@ JAVA_HOME=/opt/homebrew/opt/openjdk mvn package
 mvn package
 ```
 
-Output: `target/clockportals-1.0.0.jar`. `target/` is gitignored.
+Output: `target/craftedportals-1.0.0.jar`. `target/` is gitignored.
 
 ## Dependencies
 
@@ -29,14 +29,14 @@ Output: `target/clockportals-1.0.0.jar`. `target/` is gitignored.
 
 ## plugin.yml
 
-- `name: Clock-Portals` → data folder `plugins/Clock-Portals/`
+- `name: CraftedPortals` → data folder `plugins/CraftedPortals/`
 - `api-version: '1.21'`
-- Main class: `io.github.philipz794.clockportals.ClockPortals`
+- Main class: `io.github.philipz794.craftedportals.CraftedPortals`
 - Resources are filtered by Maven (`${project.version}` in plugin.yml).
 
 ## Deployment
 
 1. Copy the jar into `plugins/` on a Paper 26.3 server.
-2. Start the server; `config.yml` is written to `plugins/Clock-Portals/`.
-3. Portals are persisted in `plugins/Clock-Portals/portals.yml`.
-4. After config changes: `/clockportals reload`.
+2. Start the server; `config.yml` is written to `plugins/CraftedPortals/`.
+3. Portals are persisted in `plugins/CraftedPortals/portals.yml`.
+4. After config changes: `/craftedportals reload`.

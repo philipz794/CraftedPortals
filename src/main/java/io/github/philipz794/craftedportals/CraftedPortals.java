@@ -1,4 +1,4 @@
-package io.github.philipz794.clockportals;
+package io.github.philipz794.craftedportals;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,13 +14,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 
-public final class ClockPortals extends JavaPlugin {
+public final class CraftedPortals extends JavaPlugin {
 
     private PortalManager manager;
     private FrameDetector detector;
@@ -43,6 +45,7 @@ public final class ClockPortals extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        migrateDataFolder();
         saveDefaultConfig();
         try {
             ConfigUpdater.Result upd = ConfigUpdater.update(this);
@@ -64,6 +67,18 @@ public final class ClockPortals extends JavaPlugin {
     @Override
     public void onDisable() {
         if (manager != null) manager.save();
+    }
+
+    /** The plugin was called Clock-Portals before its first public release; move that data folder. */
+    private void migrateDataFolder() {
+        File old = new File(getDataFolder().getParentFile(), "Clock-Portals");
+        if (!old.isDirectory() || getDataFolder().exists()) return;
+        try {
+            Files.move(old.toPath(), getDataFolder().toPath());
+            getLogger().info("Moved data folder Clock-Portals/ to " + getDataFolder().getName() + "/");
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Could not move the old data folder Clock-Portals/", e);
+        }
     }
 
     void loadSettings() {
@@ -154,7 +169,7 @@ public final class ClockPortals extends JavaPlugin {
     /** Sends all config problems to an admin (empty list = nothing is sent). */
     void sendConfigWarnings(CommandSender to) {
         for (String w : configWarnings) {
-            to.sendMessage(Component.text("[Clock-Portals] config.yml: " + w, NamedTextColor.YELLOW));
+            to.sendMessage(Component.text("[CraftedPortals] config.yml: " + w, NamedTextColor.YELLOW));
         }
     }
 
@@ -212,7 +227,7 @@ public final class ClockPortals extends JavaPlugin {
             case "reload" -> {
                 loadSettings();
                 manager.all().forEach(manager::fill);
-                sender.sendMessage(Component.text("Clock-Portals: config reloaded."));
+                sender.sendMessage(Component.text("CraftedPortals: config reloaded."));
                 sendConfigWarnings(sender);
             }
             case "list" -> {
@@ -231,9 +246,9 @@ public final class ClockPortals extends JavaPlugin {
                 }
             }
             case "create" -> {
-                // /clockportals create <name> <x> <y> <z> [world]  -> activates the frame at block x y z
+                // /craftedportals create <name> <x> <y> <z> [world]  -> activates the frame at block x y z
                 if (args.length < 5) {
-                    sender.sendMessage(Component.text("/clockportals create <name> <x> <y> <z> [world]"));
+                    sender.sendMessage(Component.text("/craftedportals create <name> <x> <y> <z> [world]"));
                     return true;
                 }
                 World w = args.length >= 6 ? Bukkit.getWorld(args[5])
@@ -250,7 +265,7 @@ public final class ClockPortals extends JavaPlugin {
                     sender.sendMessage(Component.text("Invalid coordinates."));
                 }
             }
-            default -> sender.sendMessage(Component.text("/clockportals <list|reload|create>"));
+            default -> sender.sendMessage(Component.text("/craftedportals <list|reload|create>"));
         }
         return true;
     }

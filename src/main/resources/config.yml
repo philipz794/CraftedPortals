@@ -1,5 +1,5 @@
 # ============================================================
-#  Clock-Portals - Configuration
+#  CraftedPortals - Configuration
 # ============================================================
 #
 # Building a portal:
@@ -33,7 +33,7 @@ max-blocks: 200
 
 # Portal visuals: NETHER (purple nether portal blocks), END (end gateway
 # blocks) or PARTICLE (the interior stays air and is filled with particles).
-# Switch at any time with /clockportals reload.
+# Switch at any time with /craftedportals reload.
 effect: NETHER
 
 # Settings for effect: PARTICLE
@@ -66,8 +66,8 @@ teleport-items: true
 leashed-follow: true
 
 # May zombified piglins spawn from the nether portal blocks of a
-# Clock-Portal (like a vanilla nether portal in the overworld)?
-# Only affects Clock-Portals, regular nether portals are unchanged.
+# CraftedPortal (like a vanilla nether portal in the overworld)?
+# Only affects CraftedPortals, regular nether portals are unchanged.
 piglin-spawn: false
 
 # Messages (& for color codes)

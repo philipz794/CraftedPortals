@@ -1,15 +1,15 @@
 # Architecture & Classes
 
-Package: `io.github.philipz794.clockportals`
+Package: `io.github.philipz794.craftedportals`
 
 ## Classes
 
 | Class | Responsibility |
 |---|---|
-| `ClockPortals` | Main class: load config, command, `activate()`, `destroyWithMessage()`, `msg()` (action bar) |
+| `CraftedPortals` | Main class: load config, command, `activate()`, `destroyWithMessage()`, `msg()` (action bar) |
 | `FrameDetector` | Detects the frame via flood fill of the air in the portal plane, starting from the neighbours of the clicked block (including diagonals so clicking a corner works). Any closed shape is accepted. Checks the 2-high column minimum, `max-blocks` (hard limit 1000) and the 64-block span cap, full frame blocks, key blocks. `key(x,y,z)` returns the long block key used by the index maps. |
 | `Portal` | Interior bounding box (min/max inclusive) plus a boolean mask of the interior cells, axis, world. `contains()`, `intersects(BoundingBox)`, `frame()` (edge neighbours plus diagonal-only corners, derived from the mask), `interior()`, `box()`, `arrival()` (lowest 2-high column nearest the centre), `isLoaded()`, `maskRows()`/`parseMask()` for persistence. |
-| `PortalManager` | Networks (`LinkedHashMap` name → list), index world → block → portal for interior and frame. `create/destroy/fill/next`. Persistence in `plugins/Clock-Portals/portals.yml`. |
+| `PortalManager` | Networks (`LinkedHashMap` name → list), index world → block → portal for interior and frame. `create/destroy/fill/next`. Persistence in `plugins/CraftedPortals/portals.yml`. |
 | `PortalListener` | Clock click, destruction, protection (pistons, fluids), suppression of vanilla teleports, piglin spawns, `WorldLoadEvent` → reindex. |
 | `ConfigUpdater` | On startup, brings an existing `config.yml` up to date from the bundled template: appends missing options with their comment block, inserts missing keys inside existing sections (e.g. `messages`), converts renamed options in place (`RENAMED` map + `convert()`). Never touches values or comments the owner wrote. Pure `merge()` for testing. |
 | `TravelTask` | Runs every tick: `getNearbyEntities(portal.box())`, per-player delay, `justArrived` lock, `teleportAsync`, yaw/velocity conversion for different axes, leash handling. Every 10 ticks `maintain()`. |
@@ -89,11 +89,17 @@ carry `cells`, a list of strings from top to bottom with `#` for interior and `.
 `["#..", "#..", "###"]` for an L. Entries without `cells` are full rectangles, which also makes
 files written by version 1.0.0 load unchanged.
 
+### Data folder migration
+
+Before the first public release the plugin was named Clock-Portals. `migrateDataFolder()` in
+`onEnable()` moves `plugins/Clock-Portals/` to `plugins/CraftedPortals/` if the new folder does not
+exist yet, so config and portals survive the rename.
+
 ### Config warnings
 
 `loadSettings()` collects problems (unknown `key-block`, unknown `activation-item`, clamped
 `max-blocks`) in `configWarnings`. They are logged immediately, sent to the command sender after
-`/clockportals reload`, and to players with `clockportals.admin` two seconds after they join. Values
+`/craftedportals reload`, and to players with `craftedportals.admin` two seconds after they join. Values
 always fall back to safe defaults so the plugin keeps working.
 
 ### Config updates

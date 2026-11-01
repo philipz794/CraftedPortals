@@ -1,4 +1,4 @@
-package io.github.philipz794.clockportals;
+package io.github.philipz794.craftedportals;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -43,10 +43,10 @@ import java.util.Set;
 
 final class PortalListener implements Listener {
 
-    private final ClockPortals plugin;
+    private final CraftedPortals plugin;
     private final PortalManager mgr;
 
-    PortalListener(ClockPortals plugin) {
+    PortalListener(CraftedPortals plugin) {
         this.plugin = plugin;
         this.mgr = plugin.manager();
     }
@@ -266,7 +266,7 @@ final class PortalListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        if (!p.hasPermission("clockportals.admin")) return;
+        if (!p.hasPermission("craftedportals.admin")) return;
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             if (p.isOnline()) plugin.sendConfigWarnings(p);
         }, 40L);

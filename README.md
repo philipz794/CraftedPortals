@@ -1,6 +1,6 @@
-# Clock-Portals
+# CraftedPortals
 
-<img src="assets/icon.png" alt="Clock-Portals icon" width="128" align="right">
+<img src="assets/icon.png" alt="CraftedPortals icon" width="128" align="right">
 
 A server-side [Paper](https://papermc.io) plugin that lets players build portals out of **any full blocks**
 and link them with a **named clock**. No client mods required; works for Java and Bedrock players
@@ -19,11 +19,11 @@ and link them with a **named clock**. No client mods required; works for Java an
   the rest of the network keeps its order.
 - Optional: suppress zombified piglin spawns from portal blocks (default: suppressed).
 
-## Why Clock-Portals?
+## Why CraftedPortals?
 
 The idea of building gates from any blocks and linking them with a named clock comes from
 [CreativeGates](https://github.com/JeremyFail/CreativeGates) by MassiveCraft, a classic that is being
-continued today. Clock-Portals is an independent, from-scratch implementation of that concept with a
+continued today. CraftedPortals is an independent, from-scratch implementation of that concept with a
 different focus:
 
 - **Lightweight.** One jar, no library plugin required, six classes.
@@ -43,9 +43,9 @@ more complete choice. If you want portals that just work on a small or medium se
 
 ## Installation
 
-1. Download `clockportals-<version>.jar` or build it yourself (see below).
+1. Download `craftedportals-<version>.jar` or build it yourself (see below).
 2. Drop it into your server's `plugins/` folder and start the server.
-3. Adjust `plugins/Clock-Portals/config.yml` as needed, then run `/clockportals reload`.
+3. Adjust `plugins/CraftedPortals/config.yml` as needed, then run `/craftedportals reload`.
 
 ## Usage
 
@@ -59,11 +59,11 @@ more complete choice. If you want portals that just work on a small or medium se
 
 | Command | Description |
 |---|---|
-| `/clockportals list` | List all networks and portals |
-| `/clockportals reload` | Reload the configuration |
-| `/clockportals create <name> <x> <y> <z> [world]` | Activate the frame at the given block without a clock (also from console) |
+| `/craftedportals list` | List all networks and portals |
+| `/craftedportals reload` | Reload the configuration |
+| `/craftedportals create <name> <x> <y> <z> [world]` | Activate the frame at the given block without a clock (also from console) |
 
-Permission: `clockportals.admin` (default: op)
+Permission: `craftedportals.admin` (default: op)
 
 ## Configuration
 

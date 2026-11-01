@@ -1,15 +1,16 @@
-name: Clock-Portals
+name: CraftedPortals
 version: '${project.version}'
-main: io.github.philipz794.clockportals.ClockPortals
+main: io.github.philipz794.craftedportals.CraftedPortals
 api-version: '1.21'
-description: Portals made of any blocks, activated with a named clock.
+description: Portals made of any blocks in any shape, activated with a named item.
 author: philipz794
 commands:
-  clockportals:
+  craftedportals:
     description: List portals / reload config / create a portal
-    usage: /clockportals <list|reload|create>
-    permission: clockportals.admin
+    usage: /craftedportals <list|reload|create>
+    permission: craftedportals.admin
+    aliases: [cp]
 permissions:
-  clockportals.admin:
-    description: Access to /clockportals
+  craftedportals.admin:
+    description: Access to /craftedportals
     default: op

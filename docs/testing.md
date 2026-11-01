@@ -5,9 +5,9 @@ There are no unit tests. Verification happens on a Paper 26.3 test server, prefe
 
 ## Useful commands
 
-- `/clockportals create <name> <x> <y> <z> [world]` – activate a portal without a clock (also from console).
-- `/clockportals list` – all networks and portals.
-- `/clockportals reload` – reload the config.
+- `/craftedportals create <name> <x> <y> <z> [world]` – activate a portal without a clock (also from console).
+- `/craftedportals list` – all networks and portals.
+- `/craftedportals reload` – reload the config.
 - `/summon`, `/setblock`, `/fill`, TNT – for mob, frame and destruction tests.
 
 ## Verified (RCON, Paper 26.3)
