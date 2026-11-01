@@ -41,14 +41,68 @@ max-blocks: 200
 # Switch at any time with /craftedportals reload.
 effect: NETHER
 
+# ---------------------------------------------------------------------------
+# Particle types (all 128 of Minecraft 26.3 work, for 'type' here and in
+# travel-particles). Names in upper case.
+#
+# No extra options needed (106):
+#   ANGRY_VILLAGER, ASH, BUBBLE, BUBBLE_COLUMN_UP, BUBBLE_POP,
+#   CAMPFIRE_COSY_SMOKE, CAMPFIRE_SIGNAL_SMOKE, CHERRY_LEAVES, CLOUD,
+#   COMPOSTER, COPPER_FIRE_FLAME, CRIMSON_SPORE, CRIT, CURRENT_DOWN,
+#   DAMAGE_INDICATOR, DOLPHIN, DRIPPING_DRIPSTONE_LAVA,
+#   DRIPPING_DRIPSTONE_WATER, DRIPPING_HONEY, DRIPPING_LAVA,
+#   DRIPPING_OBSIDIAN_TEAR, DRIPPING_WATER, DUST_PLUME, EGG_CRACK,
+#   ELDER_GUARDIAN, ELECTRIC_SPARK, ENCHANT, ENCHANTED_HIT, END_ROD,
+#   EXPLOSION, EXPLOSION_EMITTER, FALLING_DRIPSTONE_LAVA,
+#   FALLING_DRIPSTONE_WATER, FALLING_HONEY, FALLING_LAVA, FALLING_NECTAR,
+#   FALLING_OBSIDIAN_TEAR, FALLING_SPORE_BLOSSOM, FALLING_WATER, FIREFLY,
+#   FIREWORK, FISHING, FLAME, GLOW, GLOW_SQUID_INK, GUST,
+#   GUST_EMITTER_LARGE, GUST_EMITTER_SMALL, HAPPY_VILLAGER, HEART, INFESTED,
+#   ITEM_COBWEB, ITEM_SLIME, ITEM_SNOWBALL, LANDING_HONEY, LANDING_LAVA,
+#   LANDING_OBSIDIAN_TEAR, LARGE_SMOKE, LAVA, MYCELIUM, NAUTILUS, NOTE,
+#   NOXIOUS_GAS, NOXIOUS_GAS_CLOUD, OMINOUS_SPAWNING, ORANGE_POPLAR_LEAVES,
+#   PALE_OAK_LEAVES, PAUSE_MOB_GROWTH, POOF, PORTAL, RAID_OMEN, RAIN,
+#   RED_POPLAR_LEAVES, RESET_MOB_GROWTH, REVERSE_PORTAL, SCRAPE,
+#   SCULK_CHARGE_POP, SCULK_SOUL, SMALL_FLAME, SMALL_GUST, SMOKE, SNEEZE,
+#   SNOWFLAKE, SONIC_BOOM, SOUL, SOUL_FIRE_FLAME, SPIT, SPLASH,
+#   SPORE_BLOSSOM_AIR, SQUID_INK, SULFUR_BUBBLES, SULFUR_CUBE_GOO,
+#   SWEEP_ATTACK, TOTEM_OF_UNDYING, TRIAL_OMEN, TRIAL_SPAWNER_DETECTION,
+#   TRIAL_SPAWNER_DETECTION_OMINOUS, UNDERWATER, VAULT_CONNECTION,
+#   WARPED_SPORE, WAX_OFF, WAX_ON, WHITE_ASH, WHITE_SMOKE, WITCH,
+#   YELLOW_POPLAR_LEAVES
+#
+# Colourable via 'color' (and the network colour from the item name):
+#   DUST, DUST_COLOR_TRANSITION, ENTITY_EFFECT, FLASH, TINTED_LEAVES, TRAIL,
+#   EFFECT, INSTANT_EFFECT
+#   DUST_COLOR_TRANSITION fades from 'color' to 'color-to'. TRAIL flies to
+#   the portal centre (or the waiting player) within 'value' seconds.
+#   EFFECT / INSTANT_EFFECT use 'value' as power.
+#
+# Need a block via 'block' (e.g. block: EMERALD_BLOCK):
+#   BLOCK, FALLING_DUST, DUST_PILLAR, BLOCK_CRUMBLE, BLOCK_MARKER
+#
+# Need an item via 'item' (e.g. item: EMERALD):
+#   ITEM
+#
+# Use 'value' (default 1.0): DRAGON_BREATH power, SCULK_CHARGE roll,
+#   SHRIEK delay in ticks, GEYSER* water blocks, VIBRATION travel seconds.
+#   For DUST and DUST_COLOR_TRANSITION 'value' is the particle size.
+# ---------------------------------------------------------------------------
+
 # Settings for effect: PARTICLE
 particles:
-  # Any particle name that needs no extra data, e.g. PORTAL, REVERSE_PORTAL,
-  # END_ROD, SOUL, SOUL_FIRE_FLAME, WITCH, ENCHANT, ELECTRIC_SPARK, DUST.
-  # Full list with descriptions: docs/particles.md in the repository.
+  # Particle type, see the list above. Good portal looks: PORTAL,
+  # REVERSE_PORTAL, END_ROD, SOUL, SOUL_FIRE_FLAME, WITCH, ENCHANT,
+  # ELECTRIC_SPARK, DUST (own colour), TRAIL (streaks into the centre)
   type: PORTAL
-  # Only used by DUST (hex color)
+  # Hex colour for colourable types
   color: "#9B30FF"
+  # Second colour for DUST_COLOR_TRANSITION
+  color-to: "#FFFFFF"
+  # Block for block-based types, item for ITEM, value for the rest (see list)
+  block: EMERALD_BLOCK
+  item: EMERALD
+  value: 1.0
   # Particles per interior block and interval (0-10)
   per-block: 2
   # Ticks between particle bursts (1-40); lower = denser, more traffic
@@ -84,10 +138,14 @@ travel-effect: NAUSEA
 # Particles around the waiting player, independent of the portal visuals
 travel-particles:
   enabled: true
-  # Same names as particles.type (see docs/particles.md)
+  # Same options as under particles (type, color, color-to, block, item,
+  # value); see the particle list above
   type: PORTAL
-  # Only used by DUST (hex color)
   color: "#9B30FF"
+  color-to: "#FFFFFF"
+  block: EMERALD_BLOCK
+  item: EMERALD
+  value: 1.0
   # Particles per tick at full progress (1-30)
   amount: 6
 

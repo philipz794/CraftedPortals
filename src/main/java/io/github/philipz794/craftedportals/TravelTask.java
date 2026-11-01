@@ -162,13 +162,11 @@ final class TravelTask extends BukkitRunnable {
             Location centre = p.box().getCenter().toLocation(w);
             if (w.getNearbyPlayers(centre, PARTICLE_RANGE).isEmpty()) continue;
             double dx = p.axis == Axis.X ? 0.3 : 0.05, dz = p.axis == Axis.X ? 0.05 : 0.3;
-            Object data = ps.data();
-            if (data instanceof Particle.DustOptions dust && mgr.colorOf(p) != null) {
-                data = new Particle.DustOptions(mgr.colorOf(p), dust.getSize()); // network colour wins
-            }
+            ParticleSpec spec = ps.spec().withColor(mgr.colorOf(p)); // network colour wins for colourable types
+            Object data = spec.data(centre);                          // TRAIL / VIBRATION head for the centre
             for (Block b : p.interior(w)) {
                 Location c = b.getLocation().add(0.5, 0.5, 0.5);
-                w.spawnParticle(ps.type(), c, ps.perBlock(), dx, 0.3, dz, 0.0, data);
+                w.spawnParticle(spec.type(), c, ps.perBlock(), dx, 0.3, dz, 0.0, data);
             }
             if (ambient) w.playSound(centre, Sound.BLOCK_PORTAL_AMBIENT, 0.3f, 1.0f);
         }
@@ -197,7 +195,7 @@ final class TravelTask extends BukkitRunnable {
         if (ts.particles()) {
             int count = 1 + (int) (ts.particleAmount() * progress);
             Location c = p.getLocation().add(0, 1, 0);
-            p.getWorld().spawnParticle(ts.particleType(), c, count, 0.4, 0.6, 0.4, 0.0, ts.particleData());
+            p.getWorld().spawnParticle(ts.spec().type(), c, count, 0.4, 0.6, 0.4, 0.0, ts.spec().data(c));
         }
         if (ts.sound() && t == 1) {
             // The vanilla trigger sound swells over about four seconds, matching the default delay

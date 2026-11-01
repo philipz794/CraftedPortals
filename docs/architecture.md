@@ -101,8 +101,15 @@ player travels or steps out (`endWaiting`, also for players who vanished from th
 every `interval-ticks` and, for each loaded portal with a player within 48 blocks, spawns `per-block`
 particles per interior cell, spread 0.3 in the portal plane and 0.05 perpendicular so the sheet looks
 flat. `maintain()` skips the refill check for this effect. `BlockPlaceEvent` into the interior is
-cancelled. Particle types that need data other than `DustOptions` (e.g. `BLOCK`, `ITEM`) fall back to
-`PORTAL` with a config warning.
+cancelled. Particle data comes from `ParticleSpec`, see above.
+
+### Particle specs (ParticleSpec)
+
+`ParticleSpec.load()` reads `type`, `color`, `color-to`, `block`, `item` and `value` from a section and
+builds the data object spawnParticle needs for that type (`DustOptions`, `DustTransition`, `Color`,
+`Spell`, `BlockData`, `ItemStack`, `Float`, `Integer`, `Trail`, `Vibration`, `Geyser`, `GeyserBase`), so
+every particle of the game is usable. `withColor()` applies the network colour to colourable types.
+`data(target)` takes the location that TRAIL and VIBRATION fly to (portal centre or waiting player).
 
 ### Coloured sheet (SheetRenderer)
 

@@ -32,15 +32,15 @@ public final class CraftedPortals extends JavaPlugin {
     enum Effect { NETHER, END, PARTICLE }
 
     /** Settings of the PARTICLE effect. */
-    record ParticleSettings(Particle type, Object data, int perBlock, int intervalTicks, boolean sound,
+    record ParticleSettings(ParticleSpec spec, int perBlock, int intervalTicks, boolean sound,
                             boolean sheet, Color sheetColor, int sheetOpacity) {}
 
     /** Screen effect shown to a waiting survival player. */
     enum TravelEffect { NAUSEA, FROST, DARKNESS, NONE }
 
     /** Everything a waiting player sees and hears. */
-    record TravelSettings(TravelEffect effect, boolean particles, Particle particleType,
-                          Object particleData, int particleAmount, boolean sound, boolean bar) {}
+    record TravelSettings(TravelEffect effect, boolean particles, ParticleSpec spec,
+                          int particleAmount, boolean sound, boolean bar) {}
 
     private Effect effect = Effect.NETHER;
     private ParticleSettings particles;
@@ -145,55 +145,18 @@ public final class CraftedPortals extends JavaPlugin {
         piglinSpawn = getConfig().getBoolean("piglin-spawn", false);
     }
 
-    /** Particle type plus optional dust colour from a config section; falls back to PORTAL. */
-    private Object[] loadParticleType(String path) {
-        ConfigurationSection sec = getConfig().getConfigurationSection(path);
-        String typeName = sec == null ? "PORTAL" : sec.getString("type", "PORTAL");
-        Particle type;
-        try {
-            type = Particle.valueOf(typeName.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException ex) {
-            warn("Unknown " + path + ".type '" + typeName + "', using PORTAL");
-            type = Particle.PORTAL;
-        }
-        Object data = null;
-        if (type.getDataType() == Particle.DustOptions.class) {
-            String hex = sec == null ? "#9B30FF" : sec.getString("color", "#9B30FF");
-            Color color;
-            try {
-                color = Color.fromRGB(Integer.parseInt(hex.replace("#", ""), 16));
-            } catch (NumberFormatException ex) {
-                warn("Invalid " + path + ".color '" + hex + "', using #9B30FF");
-                color = Color.fromRGB(0x9B30FF);
-            }
-            data = new Particle.DustOptions(color, 1.0f);
-        } else if (type.getDataType() != Void.class) {
-            warn(path + ".type " + type + " needs extra data the plugin cannot provide, using PORTAL");
-            type = Particle.PORTAL;
-        }
-        return new Object[]{type, data};
-    }
-
     private ParticleSettings loadParticles() {
         ConfigurationSection sec = getConfig().getConfigurationSection("particles");
-        Object[] t = loadParticleType("particles");
+        ParticleSpec spec = ParticleSpec.load(sec, "particles", this::warn);
         int perBlock = sec == null ? 2 : Math.max(0, Math.min(10, sec.getInt("per-block", 2)));
         int interval = sec == null ? 2 : Math.max(1, Math.min(40, sec.getInt("interval-ticks", 2)));
         boolean sound = sec == null || sec.getBoolean("sound", true);
         ConfigurationSection sh = sec == null ? null : sec.getConfigurationSection("sheet");
         boolean sheet = sh == null || sh.getBoolean("enabled", true);
-        Color sheetColor = parseColor(sh == null ? "#9B30FF" : sh.getString("color", "#9B30FF"), "particles.sheet.color");
+        Color sheetColor = ParticleSpec.parseColor(sh == null ? null : sh.getString("color"),
+                ParticleSpec.DEFAULT_COLOR, "particles.sheet.color", this::warn);
         int opacity = sh == null ? 20 : Math.max(5, Math.min(100, sh.getInt("opacity", 20)));
-        return new ParticleSettings((Particle) t[0], t[1], perBlock, interval, sound, sheet, sheetColor, opacity);
-    }
-
-    private Color parseColor(String hex, String path) {
-        try {
-            return Color.fromRGB(Integer.parseInt(hex.replace("#", ""), 16));
-        } catch (NumberFormatException ex) {
-            warn("Invalid " + path + " '" + hex + "', using #9B30FF");
-            return Color.fromRGB(0x9B30FF);
-        }
+        return new ParticleSettings(spec, perBlock, interval, sound, sheet, sheetColor, opacity);
     }
 
     private TravelSettings loadTravelSettings() {
@@ -207,11 +170,11 @@ public final class CraftedPortals extends JavaPlugin {
         }
         ConfigurationSection tp = getConfig().getConfigurationSection("travel-particles");
         boolean particlesOn = tp != null && tp.getBoolean("enabled", true);
-        Object[] t = loadParticleType("travel-particles");
+        ParticleSpec spec = ParticleSpec.load(tp, "travel-particles", this::warn);
         int amount = tp == null ? 6 : Math.max(1, Math.min(30, tp.getInt("amount", 6)));
         boolean sound = getConfig().getBoolean("travel-sound", true);
         boolean bar = getConfig().getBoolean("travel-bar", true);
-        return new TravelSettings(eff, particlesOn, (Particle) t[0], t[1], amount, sound, bar);
+        return new TravelSettings(eff, particlesOn, spec, amount, sound, bar);
     }
 
     private void warn(String problem) {
