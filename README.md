@@ -69,8 +69,9 @@ plugin without dependencies.
 1. Build a vertical frame from solid blocks in any closed shape. Somewhere inside there must be two blocks
    of air stacked vertically so a player fits through.
 2. Include at least 2 emerald blocks in the frame (block type and count are configurable).
-3. Rename a clock on an anvil, e.g. `Home`, and right-click the frame with it. The clock is consumed.
-4. Build a second frame anywhere, activate it with a clock named `Home` too.
+3. Rename the activation item, a clock by default, on an anvil, e.g. `Home`, and right-click the frame
+   with it. The item is consumed.
+4. Build a second frame anywhere, activate it with an item named `Home` too.
 5. Walk through. Survival players wait three seconds, creative players travel instantly.
 
 A frame with a dividing pillar encloses two openings and therefore gives two portals.
