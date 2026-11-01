@@ -1,6 +1,6 @@
 # CraftedPortals
 
-[![Modrinth](https://img.shields.io/badge/Modrinth-CraftedPortals-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/project/craftedplugins)
+[![Modrinth downloads](https://img.shields.io/modrinth/dt/craftedplugins?logo=modrinth&logoColor=white&label=Modrinth%20downloads&color=1bd96a)](https://modrinth.com/project/craftedplugins)
 [![GitHub release](https://img.shields.io/github/v/release/philipz794/CraftedPortals?label=release)](https://github.com/philipz794/CraftedPortals/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
