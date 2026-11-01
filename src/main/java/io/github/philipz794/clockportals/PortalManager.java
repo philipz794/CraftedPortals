@@ -87,7 +87,7 @@ final class PortalManager {
     Portal create(String name, World w, FrameDetector.Result r) {
         String key = name.toLowerCase();
         Portal p = new Portal(key, name, w.getName(), r.axis(),
-                r.minX(), r.minY(), r.minZ(), r.maxX(), r.maxY(), r.maxZ());
+                r.minX(), r.minY(), r.minZ(), r.maxX(), r.maxY(), r.maxZ(), r.mask());
         networks.computeIfAbsent(key, k -> new ArrayList<>()).add(p);
         index(p);
         fill(p);
@@ -173,11 +173,21 @@ final class PortalManager {
             List<Portal> list = new ArrayList<>();
             for (Map<?, ?> m : net.getMapList("portals")) {
                 try {
-                    Portal p = new Portal(key, name, (String) m.get("world"),
-                            Axis.valueOf((String) m.get("axis")),
-                            ((Number) m.get("minX")).intValue(), ((Number) m.get("minY")).intValue(),
-                            ((Number) m.get("minZ")).intValue(), ((Number) m.get("maxX")).intValue(),
-                            ((Number) m.get("maxY")).intValue(), ((Number) m.get("maxZ")).intValue());
+                    Axis axis = Axis.valueOf((String) m.get("axis"));
+                    int minX = ((Number) m.get("minX")).intValue(), minY = ((Number) m.get("minY")).intValue(),
+                            minZ = ((Number) m.get("minZ")).intValue(), maxX = ((Number) m.get("maxX")).intValue(),
+                            maxY = ((Number) m.get("maxY")).intValue(), maxZ = ((Number) m.get("maxZ")).intValue();
+                    int width = (axis == Axis.X ? maxX - minX : maxZ - minZ) + 1;
+                    // "cells" is absent for rectangles and for entries written by older versions
+                    boolean[] mask = null;
+                    if (m.get("cells") instanceof List<?> rows) {
+                        List<String> list2 = new ArrayList<>();
+                        for (Object o : rows) list2.add(String.valueOf(o));
+                        mask = Portal.parseMask(list2, width, maxY - minY + 1);
+                        if (mask == null) plugin.getLogger().warning("Ignoring unreadable cell mask of a portal in network " + key);
+                    }
+                    Portal p = new Portal(key, name, (String) m.get("world"), axis,
+                            minX, minY, minZ, maxX, maxY, maxZ, mask);
                     list.add(p);
                     n++;
                 } catch (Exception e) {
@@ -206,6 +216,7 @@ final class PortalManager {
                 m.put("axis", p.axis.name());
                 m.put("minX", p.minX); m.put("minY", p.minY); m.put("minZ", p.minZ);
                 m.put("maxX", p.maxX); m.put("maxY", p.maxY); m.put("maxZ", p.maxZ);
+                if (!p.isRectangle()) m.put("cells", p.maskRows());
                 list.add(m);
             }
             yml.set(base + ".name", e.getValue().get(0).displayName);

@@ -3,11 +3,13 @@
 # ============================================================
 #
 # Building a portal:
-#   - Vertical frame (like a nether portal) made of any full
-#     blocks. Corners may be left out.
+#   - Vertical frame made of any full blocks, in any closed shape:
+#     rectangle, L, cross, heart ... Blocks that touch the interior
+#     only diagonally (corners) may be left out.
 #   - The frame must contain at least 'key-block-count' blocks
 #     of type 'key-block'.
-#   - Interior empty (air), at least 1 wide and 2 high.
+#   - Interior empty (air), at least two blocks of air stacked
+#     vertically somewhere so that a player fits through.
 #   - Right-click the frame with a clock renamed on an anvil.
 #   - Portals with the same clock name form a network and are
 #     visited in a loop (1 -> 2 -> 3 -> 1 ...).
@@ -17,8 +19,10 @@ key-block: EMERALD_BLOCK
 # Minimum number of these blocks in the frame
 key-block-count: 2
 
-# Maximum outer size of the frame (width and height in blocks)
-max-size: 30
+# Maximum number of air blocks inside a portal (hard limit: 1000).
+# 200 is roughly a 14x14 interior. Width and height are additionally
+# capped at 64 blocks each.
+max-blocks: 200
 
 # Portal visuals: NETHER (purple nether portal) or END (end gateway)
 effect: NETHER
@@ -50,6 +54,7 @@ messages:
   destroyed: "&cPortal &f%name% &chas been destroyed"
   no-name: "&eRename the clock on an anvil first - its name becomes the portal name."
   invalid-frame: "&cNo valid portal frame found."
-  too-big: "&cThe frame is too big (max. %max% blocks)."
+  too-small: "&cThe portal needs at least two blocks of air stacked vertically."
+  too-big: "&cThe portal is too big (max. %max% blocks of air inside)."
   missing-keys: "&cThe frame is missing key blocks (%have%/%need% %block%)."
   no-target: "&eThis portal has no destination yet - build a second one named &f%name%&e."

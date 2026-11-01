@@ -97,7 +97,8 @@ final class PortalListener implements Listener {
                     plugin.getServer().getScheduler().runTaskLater(plugin, () -> p.sendActionBar(hint), 50L);
                 }
             }
-            case TOO_BIG -> p.sendActionBar(plugin.msg("too-big", "%max%", plugin.maxSize()));
+            case TOO_SMALL -> p.sendActionBar(plugin.msg("too-small"));
+            case TOO_BIG -> p.sendActionBar(plugin.msg("too-big", "%max%", plugin.maxBlocks()));
             case MISSING_KEYS -> p.sendActionBar(plugin.msg("missing-keys", "%have%", r.keysFound(),
                     "%need%", plugin.keyCount(),
                     "%block%", String.valueOf(plugin.keyBlock()).toLowerCase()));
@@ -114,7 +115,7 @@ final class PortalListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
         Portal p = mgr.byAny(e.getBlock());
-        if (p != null) destroy(p);
+        if (p != null && !p.isCorner(e.getBlock())) destroy(p);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

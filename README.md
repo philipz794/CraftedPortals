@@ -8,7 +8,7 @@ and link them with a **named clock**. No client mods required; works for Java an
 
 ## Features
 
-- Build a vertical frame like a nether portal, but from any full blocks. Corners are optional.
+- Build a vertical frame from any full blocks, in **any closed shape**: rectangle, L, cross, heart ... Corners are optional.
 - Right-click the frame with a clock renamed on an anvil. The clock's name becomes the network name.
 - Portals sharing a name form a network and are visited in a loop: 1 → 2 → 3 → 1.
 - Works across dimensions (Overworld ↔ Nether ↔ End).
@@ -31,7 +31,7 @@ and link them with a **named clock**. No client mods required; works for Java an
 
 ## Usage
 
-1. Build a vertical rectangular frame from full blocks (interior at least 1 wide × 2 high).
+1. Build a vertical frame from full blocks in any closed shape. Somewhere inside there must be two blocks of air stacked vertically so a player fits.
 2. Include at least 2 emerald blocks in the frame (block type and count are configurable).
 3. Rename a clock on an anvil, e.g. `Home`, and right-click the frame with it.
 4. Build a second frame anywhere, activate it with a clock named `Home` too.
@@ -54,7 +54,7 @@ See [`config.yml`](src/main/resources/config.yml) for all options and messages. 
 | Option | Default | Description |
 |---|---|---|
 | `key-block` / `key-block-count` | `EMERALD_BLOCK` / `2` | Block type and minimum count required in the frame |
-| `max-size` | `30` | Maximum outer width and height of the frame |
+| `max-blocks` | `200` | Maximum number of air blocks inside a portal (hard limit 1000) |
 | `effect` | `NETHER` | `NETHER` or `END` visuals |
 | `player-delay-ticks` | `80` | Time a survival player has to stand in the portal |
 | `consume-clock` | `true` | Consume the clock on activation (never in creative) |

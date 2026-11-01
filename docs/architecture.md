@@ -7,8 +7,8 @@ Package: `io.github.philipz794.clockportals`
 | Class | Responsibility |
 |---|---|
 | `ClockPortals` | Main class: load config, command, `activate()`, `destroyWithMessage()`, `msg()` (action bar) |
-| `FrameDetector` | Detects the frame via flood fill of the air in the portal plane, starting from the neighbours of the clicked block (including diagonals so clicking a corner works). Checks rectangle, size, full frame blocks, key blocks. `key(x,y,z)` returns the long block key used by the index maps. |
-| `Portal` | Interior min/max (inclusive), axis, world. `frame()`, `interior()`, `box()`, `arrival()` (bottom centre), `isLoaded()` (all chunks of the frame loaded). |
+| `FrameDetector` | Detects the frame via flood fill of the air in the portal plane, starting from the neighbours of the clicked block (including diagonals so clicking a corner works). Any closed shape is accepted. Checks the 2-high column minimum, `max-blocks` (hard limit 1000) and the 64-block span cap, full frame blocks, key blocks. `key(x,y,z)` returns the long block key used by the index maps. |
+| `Portal` | Interior bounding box (min/max inclusive) plus a boolean mask of the interior cells, axis, world. `contains()`, `intersects(BoundingBox)`, `frame()` (edge neighbours plus diagonal-only corners, derived from the mask), `interior()`, `box()`, `arrival()` (lowest 2-high column nearest the centre), `isLoaded()`, `maskRows()`/`parseMask()` for persistence. |
 | `PortalManager` | Networks (`LinkedHashMap` name → list), index world → block → portal for interior and frame. `create/destroy/fill/next`. Persistence in `plugins/Clock-Portals/portals.yml`. |
 | `PortalListener` | Clock click, destruction, protection (pistons, fluids), suppression of vanilla teleports, piglin spawns, `WorldLoadEvent` → reindex. |
 | `TravelTask` | Runs every tick: `getNearbyEntities(portal.box())`, per-player delay, `justArrived` lock, `teleportAsync`, yaw/velocity conversion for different axes, leash handling. Every 10 ticks `maintain()`. |
@@ -23,7 +23,9 @@ So that vanilla does not treat the portal blocks as its own nether/end portals, 
 
 ## Teleport flow (TravelTask)
 
-1. Per portal `getNearbyEntities(portal.box())`; detection uses the bounding box, not block types.
+1. Per portal `getNearbyEntities(portal.box())` as a coarse filter, then `portal.intersects(entityBox)`
+   so that entities standing in a notch of an L-shaped portal are not teleported. Detection never
+   depends on block types.
 2. Players: count delay (survival), creative instant. Mobs/items instant (if enabled).
 3. Destination = `PortalManager.next()` in the network; destination must be loaded (`isLoaded()`).
 4. `teleportAsync` to the `arrival()` position. Different axis: rotate yaw by 90°, convert velocity.
@@ -66,3 +68,17 @@ portals are unaffected.
 
 `portals.yml` stores networks in order; on startup and on `WorldLoadEvent` the indexes are rebuilt
 (worlds may load after the plugin).
+
+Per portal the interior bounding box is stored (`minX`…`maxZ`). Non-rectangular portals additionally
+carry `cells`, a list of strings from top to bottom with `#` for interior and `.` for not, e.g.
+`["#..", "#..", "###"]` for an L. Entries without `cells` are full rectangles, which also makes
+files written by version 1.0.0 load unchanged.
+
+### Size limits
+
+`max-blocks` counts interior air cells and is clamped to `FrameDetector.HARD_MAX_BLOCKS` (1000) with a
+log warning. Independently, `MAX_SPAN` (64) caps width and height so that a 1×1000 line cannot be
+built; such a portal would span dozens of chunks and never be fully loaded. During the flood fill,
+exceeding either hard limit means the air leaked out of an open frame → `NO_FRAME`. A closed region
+above `max-blocks` → `TOO_BIG`. A legacy `max-size` (outer frame size from 1.0.0) is converted to
+`(max-size - 2)²` when `max-blocks` is absent.

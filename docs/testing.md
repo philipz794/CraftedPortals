@@ -28,6 +28,10 @@ There are no unit tests. Verification happens on a Paper 26.3 test server, prefe
 
 ## Not yet verified
 
+- Free-form portals: L, T, cross and a frame with a dividing pillar (two portals). Check that
+  standing in a notch does not teleport, arrival in the tall column, `cells` in portals.yml,
+  `too-small` for a horizontal slit, `too-big` above `max-blocks`, legacy `max-size` conversion.
+
 - Leashed animals travelling along (`leashed-follow`).
 - Bedrock players via Geyser/Floodgate (action bar, right-click, teleport).
 - `piglin-spawn: true` actually allowing spawns (vanilla spawn chance is low; never on peaceful).

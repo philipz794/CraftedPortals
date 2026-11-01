@@ -5,12 +5,18 @@ Update it alongside behaviour changes in the code.
 
 ## Frame
 
-- Vertical frame like a nether portal, axis X or Z.
-- Any **full 1×1 blocks** (no stairs, slabs, snow, fences etc.).
-- **Corners are optional.**
-- Interior **at least 1 wide × 2 high** (outer frame 3×4).
-- Maximum outer size `max-size` (default 30) in width and height.
+- Vertical frame in one plane, axis X or Z. **Any closed shape**: rectangle, L, T, cross, heart, arrow ...
+- The interior is one connected region of air (connected through edges, not diagonals).
+- Every block that touches the interior **through an edge** must be a **full 1×1 block**
+  (no stairs, slabs, snow, fences etc.). Blocks that touch the interior **only diagonally**
+  ("corners") are optional and may be anything, including air.
+- Minimum: somewhere in the interior **two blocks of air stacked vertically** (a player must fit).
+  A horizontal 2×1 slit is invalid (`messages.too-small`).
+- Maximum: `max-blocks` air blocks inside (default 200, hard limit 1000). Width and height of the
+  interior are additionally capped at 64 blocks each (not configurable).
 - The frame must contain at least `key-block-count` (default 2) blocks of type `key-block` (default `EMERALD_BLOCK`).
+- A frame with a dividing pillar encloses two air regions and therefore forms **two portals**;
+  the clicked side is the one that gets activated.
 
 ## Activation
 
@@ -26,7 +32,9 @@ Update it alongside behaviour changes in the code.
 - Same name = one network. Numbering follows activation order.
 - Travel in a loop 1 → 2 → 3 → 1. A network with a single portal → `messages.no-target`.
 - Works across dimensions (Overworld ↔ Nether ↔ End).
-- Arrival at the bottom centre of the destination portal. Different axes → rotate yaw by 90°, convert velocity.
+- Arrival in the lowest two-block-high column closest to the centre of the destination shape, standing
+  in the middle of that block. For a rectangle this is the bottom centre. Different axes → rotate yaw
+  by 90°, convert velocity.
 - After arrival a lock (`justArrived`) applies until the entity has left the portal (at least 20 ticks).
 
 ## Delays

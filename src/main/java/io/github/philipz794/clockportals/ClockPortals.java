@@ -23,7 +23,7 @@ public final class ClockPortals extends JavaPlugin {
     private boolean endEffect;
     private int playerDelay;
     private boolean consumeClock, teleportMobs, teleportItems, leashedFollow, piglinSpawn;
-    private int maxSize;
+    private int maxBlocks;
 
     @Override
     public void onEnable() {
@@ -50,8 +50,24 @@ public final class ClockPortals extends JavaPlugin {
             getLogger().warning("Unknown key-block, falling back to EMERALD_BLOCK");
             key = Material.EMERALD_BLOCK;
         }
-        maxSize = Math.max(4, getConfig().getInt("max-size", 30));
-        detector = new FrameDetector(key, Math.max(0, getConfig().getInt("key-block-count", 2)), maxSize);
+        int wanted;
+        if (!getConfig().contains("max-blocks") && getConfig().contains("max-size")) {
+            // Config from 1.0.0: outer frame size -> interior cell count of the equivalent rectangle
+            int inner = Math.max(1, getConfig().getInt("max-size") - 2);
+            wanted = inner * inner;
+            getLogger().info("Legacy option max-size=" + getConfig().getInt("max-size")
+                    + " read as max-blocks=" + wanted + ". Please rename it in config.yml.");
+        } else {
+            wanted = getConfig().getInt("max-blocks", 200);
+        }
+        if (wanted > FrameDetector.HARD_MAX_BLOCKS) {
+            getLogger().warning("max-blocks=" + wanted + " exceeds the hard limit, using "
+                    + FrameDetector.HARD_MAX_BLOCKS + ".");
+        } else if (wanted < 2) {
+            getLogger().warning("max-blocks=" + wanted + " is too small, using 2.");
+        }
+        detector = new FrameDetector(key, Math.max(0, getConfig().getInt("key-block-count", 2)), wanted);
+        maxBlocks = detector.maxBlocks();
         endEffect = "END".equalsIgnoreCase(getConfig().getString("effect", "NETHER"));
         playerDelay = Math.max(0, getConfig().getInt("player-delay-ticks", 80));
         consumeClock = getConfig().getBoolean("consume-clock", true);
@@ -71,7 +87,7 @@ public final class ClockPortals extends JavaPlugin {
     boolean teleportItems() { return teleportItems; }
     boolean leashedFollow() { return leashedFollow; }
     boolean piglinSpawn() { return piglinSpawn; }
-    int maxSize() { return maxSize; }
+    int maxBlocks() { return maxBlocks; }
     Material keyBlock() { return Material.matchMaterial(getConfig().getString("key-block", "EMERALD_BLOCK")); }
     int keyCount() { return getConfig().getInt("key-block-count", 2); }
 
@@ -171,7 +187,8 @@ public final class ClockPortals extends JavaPlugin {
                 Portal p = manager.create(name, clicked.getWorld(), r);
                 yield portalMsg("activated", p);
             }
-            case TOO_BIG -> msg("too-big", "%max%", maxSize);
+            case TOO_SMALL -> msg("too-small");
+            case TOO_BIG -> msg("too-big", "%max%", maxBlocks);
             case MISSING_KEYS -> msg("missing-keys", "%have%", r.keysFound(), "%need%", keyCount(),
                     "%block%", String.valueOf(keyBlock()).toLowerCase(Locale.ROOT));
             default -> msg("invalid-frame");

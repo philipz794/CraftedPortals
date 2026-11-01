@@ -52,6 +52,8 @@ final class TravelTask extends BukkitRunnable {
             World w = portal.world();
             for (Entity e : w.getNearbyEntities(portal.box())) {
                 if (!e.isValid()) continue;
+                // The bounding box is only a coarse filter; the shape may have notches
+                if (!portal.intersects(e.getBoundingBox())) continue;
                 UUID id = e.getUniqueId();
                 inside.add(id);
                 if (justArrived.containsKey(id)) continue;

@@ -12,25 +12,37 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Detects a valid portal frame starting from the clicked block. */
+/**
+ * Detects a valid portal frame starting from the clicked block. The interior may have
+ * any closed shape: the air in the portal plane is flood-filled from a neighbour of the
+ * clicked block, and every in-plane neighbour of that air must be a full block.
+ */
 final class FrameDetector {
 
-    enum Error { NONE, NO_FRAME, TOO_BIG, MISSING_KEYS }
+    /** Absolute upper bound for the configurable interior size (cells of air). */
+    static final int HARD_MAX_BLOCKS = 1000;
+    /** Absolute upper bound for width and height of the interior, not configurable. */
+    static final int MAX_SPAN = 64;
+
+    /** Ordered by priority: when several seeds fail, the highest error wins. */
+    enum Error { NONE, NO_FRAME, TOO_SMALL, TOO_BIG, MISSING_KEYS }
 
     record Result(Error error, Axis axis, int minX, int minY, int minZ,
-                  int maxX, int maxY, int maxZ, int keysFound) {
+                  int maxX, int maxY, int maxZ, boolean[] mask, int cells, int keysFound) {
         boolean ok() { return error == Error.NONE; }
     }
 
     private final Material keyBlock;
     private final int keyCount;
-    private final int maxSize;
+    private final int maxBlocks;
 
-    FrameDetector(Material keyBlock, int keyCount, int maxSize) {
+    FrameDetector(Material keyBlock, int keyCount, int maxBlocks) {
         this.keyBlock = keyBlock;
         this.keyCount = keyCount;
-        this.maxSize = Math.max(4, maxSize);
+        this.maxBlocks = Math.min(HARD_MAX_BLOCKS, Math.max(2, maxBlocks));
     }
+
+    int maxBlocks() { return maxBlocks; }
 
     /** Full 1x1x1 block (no stairs, slabs, fences, snow ...). */
     static boolean isFullBlock(Block b) {
@@ -46,7 +58,7 @@ final class FrameDetector {
     }
 
     Result detect(Block clicked) {
-        Result best = new Result(Error.NO_FRAME, null, 0, 0, 0, 0, 0, 0, 0);
+        Result best = fail(Error.NO_FRAME);
         for (Axis axis : new Axis[]{Axis.X, Axis.Z}) {
             int dx = axis == Axis.X ? 1 : 0;
             int dz = axis == Axis.Z ? 1 : 0;
@@ -68,8 +80,6 @@ final class FrameDetector {
 
     private Result tryFrom(Block clicked, Block seed, Axis axis) {
         World w = seed.getWorld();
-        int maxInner = maxSize - 2;
-        int limit = maxInner * maxInner;
         int dx = axis == Axis.X ? 1 : 0;
         int dz = axis == Axis.Z ? 1 : 0;
 
@@ -83,11 +93,12 @@ final class FrameDetector {
 
         while (!queue.isEmpty()) {
             int[] c = queue.poll();
-            // air "leaks out" -> frame is open or far too big
-            if (seen.size() > limit) return fail(Error.NO_FRAME);
             minX = Math.min(minX, c[0]); maxX = Math.max(maxX, c[0]);
             minY = Math.min(minY, c[1]); maxY = Math.max(maxY, c[1]);
             minZ = Math.min(minZ, c[2]); maxZ = Math.max(maxZ, c[2]);
+            // Air "leaks out": frame is open or absurdly large -> no frame at all
+            if (seen.size() > HARD_MAX_BLOCKS || maxX - minX >= MAX_SPAN || maxZ - minZ >= MAX_SPAN
+                    || maxY - minY >= MAX_SPAN) return fail(Error.NO_FRAME);
             int[][] next = {
                     {c[0], c[1] + 1, c[2]}, {c[0], c[1] - 1, c[2]},
                     {c[0] + dx, c[1], c[2] + dz}, {c[0] - dx, c[1], c[2] - dz}
@@ -102,13 +113,25 @@ final class FrameDetector {
             }
         }
 
-        int width = axis == Axis.X ? maxX - minX + 1 : maxZ - minZ + 1;
+        // Closed region found. Build the mask over its bounding box.
+        int minU = axis == Axis.X ? minX : minZ;
+        int width = (axis == Axis.X ? maxX - minX : maxZ - minZ) + 1;
         int height = maxY - minY + 1;
-        if (width > maxInner || height > maxInner) return fail(Error.TOO_BIG);
-        if (width < 1 || height < 2) return fail(Error.NO_FRAME);
-        if (seen.size() != width * height) return fail(Error.NO_FRAME); // not a rectangle
+        boolean[] mask = new boolean[width * height];
+        boolean column2 = false;
+        for (int u = 0; u < width; u++) {
+            for (int y = 0; y < height; y++) {
+                int wx = axis == Axis.X ? minU + u : minX, wz = axis == Axis.X ? minZ : minU + u;
+                boolean in = seen.contains(key(wx, minY + y, wz));
+                mask[u * height + y] = in;
+                if (in && y > 0 && mask[u * height + y - 1]) column2 = true;
+            }
+        }
+        int cells = seen.size();
+        if (!column2) return fail(Error.TOO_SMALL);
+        if (cells > maxBlocks) return fail(Error.TOO_BIG);
 
-        Portal tmp = new Portal("", "", w.getName(), axis, minX, minY, minZ, maxX, maxY, maxZ);
+        Portal tmp = new Portal("", "", w.getName(), axis, minX, minY, minZ, maxX, maxY, maxZ, mask);
         boolean clickedIsFrame = false;
         int keys = 0;
         for (Block f : tmp.frame(w)) {
@@ -119,13 +142,12 @@ final class FrameDetector {
             if (f.equals(clicked) && (full || !corner)) clickedIsFrame = true;
         }
         if (!clickedIsFrame) return fail(Error.NO_FRAME);
-        if (keys < keyCount)
-            return new Result(Error.MISSING_KEYS, axis, minX, minY, minZ, maxX, maxY, maxZ, keys);
-        return new Result(Error.NONE, axis, minX, minY, minZ, maxX, maxY, maxZ, keys);
+        Error err = keys < keyCount ? Error.MISSING_KEYS : Error.NONE;
+        return new Result(err, axis, minX, minY, minZ, maxX, maxY, maxZ, mask, cells, keys);
     }
 
     private static Result fail(Error e) {
-        return new Result(e, null, 0, 0, 0, 0, 0, 0, 0);
+        return new Result(e, null, 0, 0, 0, 0, 0, 0, null, 0, 0);
     }
 
     static long key(int x, int y, int z) {
