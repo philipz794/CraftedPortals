@@ -4,6 +4,7 @@ import org.bukkit.Axis;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -135,7 +136,11 @@ final class TravelTask extends BukkitRunnable {
                 plugin.destroyWithMessage(p);
                 continue;
             }
-            if (want == null) continue;
+            if (want == null) {
+                // PARTICLE: the sheet's display entities vanish with unloaded chunks; recreate them
+                mgr.fill(p);
+                continue;
+            }
             for (Block b : p.interior(w)) {
                 if (b.getType() != want) { mgr.fill(p); break; }
             }
@@ -160,9 +165,13 @@ final class TravelTask extends BukkitRunnable {
             Location centre = p.box().getCenter().toLocation(w);
             if (w.getNearbyPlayers(centre, PARTICLE_RANGE).isEmpty()) continue;
             double dx = p.axis == Axis.X ? 0.3 : 0.05, dz = p.axis == Axis.X ? 0.05 : 0.3;
+            Object data = ps.data();
+            if (data instanceof Particle.DustOptions dust && mgr.colorOf(p) != null) {
+                data = new Particle.DustOptions(mgr.colorOf(p), dust.getSize()); // network colour wins
+            }
             for (Block b : p.interior(w)) {
                 Location c = b.getLocation().add(0.5, 0.5, 0.5);
-                w.spawnParticle(ps.type(), c, ps.perBlock(), dx, 0.3, dz, 0.0, ps.data());
+                w.spawnParticle(ps.type(), c, ps.perBlock(), dx, 0.3, dz, 0.0, data);
             }
             if (ambient) w.playSound(centre, Sound.BLOCK_PORTAL_AMBIENT, 0.3f, 1.0f);
         }

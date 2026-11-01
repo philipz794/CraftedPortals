@@ -19,6 +19,9 @@
 # on the frame. Any item name from the Minecraft registry, e.g. CLOCK,
 # COMPASS, RECOVERY_COMPASS, AMETHYST_SHARD, NETHER_STAR.
 # Unknown names fall back to CLOCK and admins are warned.
+# Tip: a hex colour at the end of the item name, e.g. "Home #3366FF", gives
+# that network its own colour for the PARTICLE effect (sheet and DUST
+# particles). The portal is still called "Home".
 activation-item: CLOCK
 
 # Block that must be part of the frame
@@ -50,6 +53,14 @@ particles:
   interval-ticks: 2
   # Play the quiet nether portal ambient sound every 5 seconds
   sound: true
+  # Translucent coloured sheet filling the portal, built from display
+  # entities. Java clients only; Bedrock players see just the particles.
+  sheet:
+    enabled: true
+    # Hex colour; a colour suffix on the item name overrides it per network
+    color: "#9B30FF"
+    # Opacity in percent (5-100)
+    opacity: 20
 
 # How long a survival player has to stand in the portal (in ticks,
 # 20 ticks = 1 second). Vanilla nether portal: 80. Creative: always instant.

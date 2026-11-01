@@ -26,6 +26,9 @@ Update it alongside behaviour changes in the code.
   `/craftedportals reload`.
 - The item is consumed (`consume-item`, default true), never in creative mode.
 - Item name = network name. Key is case-insensitive, display name as typed.
+- A trailing hex colour in the item name (`Home #3366FF`) is stripped from the name and stored as the
+  network's colour. It recolours the PARTICLE sheet and DUST particles of every portal in that network,
+  also existing ones. A name that is only a colour stays a plain name.
 - Right-click an already active portal with a named item → info only ("name, #X of Y"), no renaming.
 - Unnamed item on a valid frame → hint to rename it (`messages.no-name`, placeholder `%item%`).
 - Admin alternative without a clock: `/craftedportals create <name> <x> <y> <z> [world]` (also from console).
@@ -67,8 +70,9 @@ Update it alongside behaviour changes in the code.
 - `effect: NETHER` → nether portal blocks in the interior.
 - `effect: END` → end gateway blocks, teleport always instant.
 - `effect: PARTICLE` → the interior stays air and is filled with particles (`particles.*`: type, colour
-  for DUST, density, interval, ambient sound). Players cannot place blocks into the interior. Normal
-  player delay applies. No vanilla portal logic is involved at all.
+  for DUST, density, interval, ambient sound) plus, if `particles.sheet.enabled`, a translucent coloured
+  sheet (`color`, `opacity` in percent; Java clients only). Players cannot place blocks into the interior.
+  Normal player delay applies. No vanilla portal logic is involved at all.
 - All effects can be switched live with `/craftedportals reload`.
 
 ## Destruction & Protection

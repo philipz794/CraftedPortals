@@ -17,7 +17,8 @@ plugin without dependencies.
 - **Cross-dimensional.** Overworld ↔ Nether ↔ End, no portal generation, no vanilla portal logic.
 - **Everyone travels.** Players, mobs, thrown items and leashed animals (they follow their owner). Each
   can be switched off.
-- **Three looks.** Nether portal blocks, end gateway blocks or pure particles with configurable type and colour.
+- **Three looks.** Nether portal blocks, end gateway blocks, or particles with a translucent coloured sheet.
+  Name a clock `Home #3366FF` and that network gets its own colour.
 - **Travel effect of your choice.** While a survival player waits: the vanilla purple overlay, nausea,
   frost, darkness, a red vignette or nothing, plus particles, a swelling sound and a progress bar.
   All optional.

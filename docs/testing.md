@@ -34,6 +34,10 @@ There are no unit tests. Verification happens on a Paper 26.3 test server, prefe
 - Waiting effect: survival player in a networked portal gets nausea, particles, sound and progress bar,
   then teleports; stepping out early stops everything. Try FROST, DARKNESS, BORDER and NONE via reload.
   A 1-of-1 portal shows `no-target` immediately without any waiting effect.
+- PARTICLE sheet: with `effect: PARTICLE`, a translucent sheet fills the portal (check: fills the
+  rectangle exactly, no gaps/overlaps between rows of an L-shape, visible from both sides, opacity
+  matches the config). Rename a clock `Test #3366FF`, activate → network recoloured, name shown as
+  `Test`, `color` in portals.yml. Sheet survives chunk unload/reload and switching effects.
 - PARTICLE effect: switch via reload from NETHER (blocks vanish), particle sheet visible, teleport
   works, placing a block into the interior is refused, switch back to NETHER refills. Try DUST with
   a colour and an invalid type (warning for admins).

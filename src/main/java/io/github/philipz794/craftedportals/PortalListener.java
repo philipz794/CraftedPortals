@@ -101,6 +101,7 @@ final class PortalListener implements Listener {
                 p.sendActionBar(plugin.portalMsg("activated", portal));
                 if (mgr.count(portal) == 1) {
                     Component hint = plugin.msg("no-target", "%name%", portal.displayName);
+                    // (displayName has any colour suffix already stripped)
                     plugin.getServer().getScheduler().runTaskLater(plugin, () -> p.sendActionBar(hint), 50L);
                 }
             }

@@ -1,6 +1,7 @@
 package io.github.philipz794.craftedportals;
 
 import org.bukkit.Axis;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -20,6 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** Manages all portals, networks and persistence in portals.yml. */
 final class PortalManager {
@@ -29,6 +32,24 @@ final class PortalManager {
 
     /** Network key -> portals in order. */
     private final Map<String, List<Portal>> networks = new LinkedHashMap<>();
+    /** Network key -> colour chosen via the item name suffix, e.g. "Home #3366FF". */
+    private final Map<String, Color> colors = new HashMap<>();
+    private final SheetRenderer sheets;
+
+    /** Trailing "#RRGGBB" (with optional space before it) in an item name. */
+    private static final Pattern COLOR_SUFFIX = Pattern.compile("\\s*#([0-9a-fA-F]{6})$");
+
+    /** Result of splitting an item name into network name and optional colour. */
+    record ParsedName(String name, Color color) {}
+
+    /** "Home #3366FF" -> ("Home", blue); "Home" -> ("Home", null). */
+    static ParsedName parseName(String raw) {
+        Matcher m = COLOR_SUFFIX.matcher(raw);
+        if (!m.find()) return new ParsedName(raw.trim(), null);
+        String name = raw.substring(0, m.start()).trim();
+        if (name.isEmpty()) return new ParsedName(raw.trim(), null); // a bare colour is a name, not a colour
+        return new ParsedName(name, Color.fromRGB(Integer.parseInt(m.group(1), 16)));
+    }
     /** World name -> block key -> portal (interior). */
     private final Map<String, Map<Long, Portal>> interiorIndex = new HashMap<>();
     /** World name -> block key -> portal (frame). */
@@ -37,7 +58,13 @@ final class PortalManager {
     PortalManager(CraftedPortals plugin) {
         this.plugin = plugin;
         this.file = new File(plugin.getDataFolder(), "portals.yml");
+        this.sheets = new SheetRenderer(plugin);
     }
+
+    SheetRenderer sheets() { return sheets; }
+
+    /** The network's own colour or null. */
+    Color colorOf(Portal p) { return colors.get(p.networkKey); }
 
     // ------------------------------------------------------------ Queries
 
@@ -84,11 +111,17 @@ final class PortalManager {
 
     // ------------------------------------------------------------ Mutation
 
-    Portal create(String name, World w, FrameDetector.Result r) {
-        String key = name.toLowerCase();
-        Portal p = new Portal(key, name, w.getName(), r.axis(),
+    Portal create(String rawName, World w, FrameDetector.Result r) {
+        ParsedName pn = parseName(rawName);
+        String key = pn.name().toLowerCase();
+        Portal p = new Portal(key, pn.name(), w.getName(), r.axis(),
                 r.minX(), r.minY(), r.minZ(), r.maxX(), r.maxY(), r.maxZ(), r.mask());
         networks.computeIfAbsent(key, k -> new ArrayList<>()).add(p);
+        if (pn.color() != null) {
+            // A colour on the item recolours the whole network
+            colors.put(key, pn.color());
+            for (Portal other : networks.get(key)) if (other != p) fill(other);
+        }
         index(p);
         fill(p);
         save();
@@ -99,9 +132,10 @@ final class PortalManager {
         List<Portal> list = networks.get(p.networkKey);
         if (list != null) {
             list.remove(p);
-            if (list.isEmpty()) networks.remove(p.networkKey);
+            if (list.isEmpty()) { networks.remove(p.networkKey); colors.remove(p.networkKey); }
         }
         unindex(p);
+        sheets.remove(p);
         World w = p.world();
         if (w != null) {
             for (Block b : p.interior(w)) {
@@ -119,6 +153,9 @@ final class PortalManager {
         World w = p.world();
         if (w == null) return;
         CraftedPortals.Effect effect = plugin.effect();
+        CraftedPortals.ParticleSettings ps = plugin.particles();
+        Color sheetColor = colorOf(p) != null ? colorOf(p) : ps.sheetColor();
+        sheets.update(p, sheetColor, ps.sheetOpacity(), effect == CraftedPortals.Effect.PARTICLE && ps.sheet());
         for (Block b : p.interior(w)) {
             if (effect == CraftedPortals.Effect.PARTICLE) {
                 // Interior stays air; only remove portal blocks left over from another effect
@@ -163,6 +200,7 @@ final class PortalManager {
 
     void load() {
         networks.clear();
+        colors.clear();
         interiorIndex.clear();
         frameIndex.clear();
         if (!file.exists()) return;
@@ -174,6 +212,11 @@ final class PortalManager {
             ConfigurationSection net = nets.getConfigurationSection(key);
             if (net == null) continue;
             String name = net.getString("name", key);
+            String hex = net.getString("color");
+            if (hex != null) {
+                try { colors.put(key, Color.fromRGB(Integer.parseInt(hex.replace("#", ""), 16))); }
+                catch (NumberFormatException e) { plugin.getLogger().warning("Invalid colour '" + hex + "' for network " + key); }
+            }
             List<Portal> list = new ArrayList<>();
             for (Map<?, ?> m : net.getMapList("portals")) {
                 try {
@@ -224,6 +267,8 @@ final class PortalManager {
                 list.add(m);
             }
             yml.set(base + ".name", e.getValue().get(0).displayName);
+            Color c = colors.get(e.getKey());
+            if (c != null) yml.set(base + ".color", String.format("#%06X", c.asRGB()));
             yml.set(base + ".portals", list);
         }
         try {

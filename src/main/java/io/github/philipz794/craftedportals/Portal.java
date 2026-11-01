@@ -173,6 +173,38 @@ public final class Portal {
         return new Location(w, x, bestY, z);
     }
 
+    /**
+     * Greedy decomposition of the interior into rectangles {u0, u1, y0, y1} (inclusive, u = x or z
+     * depending on the axis). Rows are split into runs; runs with identical u-range in consecutive rows
+     * are merged. A plain rectangle yields one entry.
+     */
+    List<int[]> rectangles() {
+        List<int[]> open = new ArrayList<>();   // rectangles that may still grow upwards
+        List<int[]> done = new ArrayList<>();
+        for (int y = minY; y <= maxY; y++) {
+            List<int[]> runs = new ArrayList<>();
+            int start = -1;
+            for (int u = minU(); u <= maxU() + 1; u++) {
+                boolean in = u <= maxU() && containsUY(u, y);
+                if (in && start < 0) start = u;
+                if (!in && start >= 0) { runs.add(new int[]{start, u - 1}); start = -1; }
+            }
+            List<int[]> stillOpen = new ArrayList<>();
+            for (int[] run : runs) {
+                int[] grown = null;
+                for (int[] r : open) {
+                    if (r[0] == run[0] && r[1] == run[1] && r[3] == y - 1) { grown = r; break; }
+                }
+                if (grown != null) { grown[3] = y; open.remove(grown); stillOpen.add(grown); }
+                else stillOpen.add(new int[]{run[0], run[1], y, y});
+            }
+            done.addAll(open); // rectangles that did not continue into this row
+            open = stillOpen;
+        }
+        done.addAll(open);
+        return done;
+    }
+
     // ------------------------------------------------------------ Serialisation
 
     /** Mask as rows from top (maxY) to bottom (minY), '#' = interior, '.' = not. */
