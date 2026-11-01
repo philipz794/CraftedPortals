@@ -57,13 +57,17 @@ particles:
 player-delay-ticks: 80
 
 # What a survival player sees while waiting inside a portal:
-#   VANILLA  - the purple nether portal overlay, as in vanilla (default)
-#   NAUSEA   - screen wobble without the purple tint
+#   VANILLA  - the purple nether portal overlay with its wobble, exactly as
+#              in vanilla (default). The game client draws it by itself as
+#              soon as the player stands in nether portal blocks.
+#   NAUSEA   - only the wobble, without the purple tint (nausea effect)
 #   FROST    - icy screen border like powder snow, no damage
 #   DARKNESS - pulsing darkness like the Warden's
 #   BORDER   - red vignette like the world border
-#   NONE     - no screen effect
-# Only VANILLA shows the purple overlay; the others hide it.
+#   NONE     - no screen effect at all
+# With every value except VANILLA the plugin hides the portal blocks the
+# waiting player touches from that player only, so the vanilla overlay
+# cannot appear. Other players still see the full portal.
 travel-effect: VANILLA
 
 # Particles around the waiting player, independent of the portal visuals
