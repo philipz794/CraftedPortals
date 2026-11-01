@@ -46,6 +46,8 @@ final class TravelTask extends BukkitRunnable {
 
     /** Per-player world border used by the BORDER travel effect. */
     private final Map<UUID, WorldBorder> borders = new HashMap<>();
+    /** Players who see the interior of their arrival portal as air until they step out. */
+    private final Map<UUID, Portal> hiddenInterior = new HashMap<>();
 
     @Override
     public void run() {
@@ -96,7 +98,15 @@ final class TravelTask extends BukkitRunnable {
             if (p != null) endWaiting(p);
         }
         // Clear the "arrived" marker once the portal has been left (at least 1 s later)
-        justArrived.entrySet().removeIf(en -> !inside.contains(en.getKey()) && tick - en.getValue() > 20);
+        justArrived.entrySet().removeIf(en -> {
+            if (inside.contains(en.getKey()) || tick - en.getValue() <= 20) return false;
+            Portal hidden = hiddenInterior.remove(en.getKey());
+            if (hidden != null) {
+                Player p = plugin.getServer().getPlayer(en.getKey());
+                if (p != null) sendInterior(p, hidden, false);
+            }
+            return true;
+        });
     }
 
     /**
@@ -276,6 +286,7 @@ final class TravelTask extends BukkitRunnable {
             if (e instanceof Player p) {
                 p.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.25f, 1.0f);
                 p.sendActionBar(plugin.portalMsg("arrived", to));
+                hideArrivalPortal(p, to);
                 for (Mob m : leashed) {
                     m.teleportAsync(dest, PlayerTeleportEvent.TeleportCause.PLUGIN).thenAccept(ok2 ->
                             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
@@ -284,6 +295,34 @@ final class TravelTask extends BukkitRunnable {
                 }
             }
         });
+    }
+
+    // ------------------------------------------------------------ Arrival portal overlay
+
+    /**
+     * The client renders the purple portal overlay on its own as soon as it stands inside nether
+     * portal blocks; vanilla avoids that after a portal trip with a client-side cooldown we cannot
+     * set. So the arriving player is shown the destination interior as air until they step out
+     * (justArrived cleared). Sent twice because chunk data arriving after the teleport could
+     * overwrite the fake blocks.
+     */
+    private void hideArrivalPortal(Player p, Portal to) {
+        if (plugin.effect() != CraftedPortals.Effect.NETHER) return;
+        hiddenInterior.put(p.getUniqueId(), to);
+        for (long d : new long[]{1L, 20L}) {
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                if (p.isOnline() && hiddenInterior.get(p.getUniqueId()) == to) sendInterior(p, to, true);
+            }, d);
+        }
+    }
+
+    /** Sends the interior of a portal to one player, either as air or as it really is. */
+    private void sendInterior(Player p, Portal portal, boolean asAir) {
+        World w = portal.world();
+        if (w == null || !p.getWorld().equals(w)) return;
+        for (Block b : portal.interior(w)) {
+            p.sendBlockChange(b.getLocation(), asAir ? Material.AIR.createBlockData() : b.getBlockData());
+        }
     }
 
     private static Entity safeHolder(Mob m) {

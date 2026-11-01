@@ -67,6 +67,15 @@ Always place portal blocks with `setBlockData(…, false)`, otherwise vanilla tr
 Gateway with exit pointing to itself plus `ExactTeleport`, so vanilla generates nothing.
 Age set high so no beam is rendered.
 
+### Arrival portal overlay (TravelTask.hideArrivalPortal)
+
+The client renders the purple portal overlay by itself whenever it stands inside nether portal blocks,
+independent of the server. After a vanilla trip a client-side portal cooldown suppresses it in the exit
+portal; a plugin cannot set that cooldown. So, with the NETHER effect, the arriving player receives the
+destination interior as fake air via `sendBlockChange` (1 and 20 ticks after the teleport, in case chunk
+data overwrites it) and the real blocks again when `justArrived` is cleared, i.e. once they stepped out.
+Other players are unaffected.
+
 ### Waiting effect (TravelTask.showWaiting / endWaiting)
 
 Applied every tick to a survival player waiting inside a portal with a destination, removed when the
