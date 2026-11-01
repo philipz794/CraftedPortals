@@ -32,7 +32,7 @@ public final class CraftedPortals extends JavaPlugin {
     enum Effect { NETHER, END, PARTICLE }
 
     /** Settings of the PARTICLE effect. */
-    record ParticleSettings(ParticleSpec spec, int perBlock, int intervalTicks, boolean sound,
+    record ParticleSettings(ParticleSpec spec, int perBlock, int intervalTicks, SoundSpec ambient, int ambientSeconds,
                             boolean sheet, Color sheetColor, int sheetOpacity) {}
 
     /** Screen effect shown to a waiting survival player. */
@@ -40,7 +40,7 @@ public final class CraftedPortals extends JavaPlugin {
 
     /** Everything a waiting player sees and hears. */
     record TravelSettings(TravelEffect effect, boolean particles, ParticleSpec spec,
-                          int particleAmount, boolean sound, boolean bar) {}
+                          int particleAmount, SoundSpec sound, SoundSpec arrival, boolean bar) {}
 
     private Effect effect = Effect.NETHER;
     private ParticleSettings particles;
@@ -150,13 +150,14 @@ public final class CraftedPortals extends JavaPlugin {
         ParticleSpec spec = ParticleSpec.load(sec, "particles", "TRAIL", Color.fromRGB(0x4682B4), this::warn);
         int perBlock = sec == null ? 1 : Math.max(0, Math.min(10, sec.getInt("per-block", 1)));
         int interval = sec == null ? 5 : Math.max(1, Math.min(40, sec.getInt("interval-ticks", 5)));
-        boolean sound = sec == null || sec.getBoolean("sound", true);
+        SoundSpec ambient = SoundSpec.load(sec, "sound", "BLOCK_PORTAL_AMBIENT", 0.3f, "particles.sound", this::warn);
+        int ambientSeconds = sec == null ? 4 : Math.max(1, Math.min(60, sec.getInt("sound-interval", 4)));
         ConfigurationSection sh = sec == null ? null : sec.getConfigurationSection("sheet");
         boolean sheet = sh == null || sh.getBoolean("enabled", true);
         Color sheetColor = ParticleSpec.parseColor(sh == null ? null : sh.getString("color"),
                 Color.fromRGB(0x4169E1), "particles.sheet.color", this::warn);
         int opacity = sh == null ? 50 : Math.max(5, Math.min(100, sh.getInt("opacity", 50)));
-        return new ParticleSettings(spec, perBlock, interval, sound, sheet, sheetColor, opacity);
+        return new ParticleSettings(spec, perBlock, interval, ambient, ambientSeconds, sheet, sheetColor, opacity);
     }
 
     private TravelSettings loadTravelSettings() {
@@ -172,9 +173,10 @@ public final class CraftedPortals extends JavaPlugin {
         boolean particlesOn = tp != null && tp.getBoolean("enabled", true);
         ParticleSpec spec = ParticleSpec.load(tp, "travel-particles", "ENCHANT", ParticleSpec.DEFAULT_COLOR, this::warn);
         int amount = tp == null ? 10 : Math.max(1, Math.min(30, tp.getInt("amount", 10)));
-        boolean sound = getConfig().getBoolean("travel-sound", true);
+        SoundSpec sound = SoundSpec.load(getConfig(), "travel-sound", "BLOCK_PORTAL_TRIGGER", 0.6f, "travel-sound", this::warn);
+        SoundSpec arrival = SoundSpec.load(getConfig(), "arrival-sound", "BLOCK_PORTAL_TRAVEL", 0.25f, "arrival-sound", this::warn);
         boolean bar = getConfig().getBoolean("travel-bar", true);
-        return new TravelSettings(eff, particlesOn, spec, amount, sound, bar);
+        return new TravelSettings(eff, particlesOn, spec, amount, sound, arrival, bar);
     }
 
     private void warn(String problem) {

@@ -104,8 +104,22 @@ particles:
   per-block: 1
   # Ticks between particle bursts (1-40); lower = denser, more traffic
   interval-ticks: 5
-  # Play the quiet nether portal ambient sound every 5 seconds
+  # Ambient sound of a portal, played like vanilla does it: at random moments
+  # on random interior blocks with slightly varying pitch. true = the nether
+  # portal ambient, false = off, or any sound: game names such as
+  # BLOCK_BEACON_AMBIENT, or a key from a resource pack such as
+  # mypack:portal_hum (the client needs that pack). Good steady candidates:
+  #   BLOCK_PORTAL_AMBIENT        - classic whoosh
+  #   BLOCK_BEACON_AMBIENT        - deep soft hum
+  #   BLOCK_CONDUIT_AMBIENT       - calm underwater shimmer
+  #   BLOCK_RESPAWN_ANCHOR_AMBIENT - eerie warble
+  #   BLOCK_AMETHYST_BLOCK_CHIME  - short crystal chimes
+  #   BLOCK_END_PORTAL_FRAME_FILL - short magical accent
   sound: true
+  sound-volume: 0.3
+  sound-pitch: 1.0
+  # Average seconds between two sounds per portal (randomised, 1-60)
+  sound-interval: 4
   # Translucent coloured sheet filling the portal, built from display
   # entities. Java clients only; Bedrock players see just the particles.
   sheet:
@@ -145,8 +159,17 @@ travel-particles:
   # Particles per tick at full progress (1-30)
   amount: 10
 
-# Play the swelling nether portal trigger sound when the wait starts
+# Sound when the wait starts: true = the swelling nether portal trigger
+# sound (about four seconds), false = off, or any sound name as above
 travel-sound: true
+travel-sound-volume: 0.6
+travel-sound-pitch: 1.0
+
+# Sound on arrival: true = the nether portal travel sound, false = off, or
+# any sound name as above
+arrival-sound: true
+arrival-sound-volume: 0.25
+arrival-sound-pitch: 1.0
 
 # Show a progress bar in the action bar while waiting
 travel-bar: true

@@ -54,7 +54,8 @@ Update it alongside behaviour changes in the code.
 - While waiting, `travel-effect` decides what the player sees: NAUSEA (default), FROST, DARKNESS or
   NONE, independent of the portal look. Vanilla's purple overlay is never shown: with NETHER blocks the
   touched portal blocks are hidden from that player, so the client cannot draw it. Independently: `travel-particles` around the player (own type/colour),
-  `travel-sound` (swelling portal trigger sound) and `travel-bar` (progress bar in the action bar,
+  `travel-sound` (swelling portal trigger sound by default; any game sound or resource pack key, with
+  volume and pitch), `arrival-sound` (same options) and `travel-bar` (progress bar in the action bar,
   `messages.travel-bar`). Everything stops when the player teleports or steps out early.
 - After arriving, players see `messages.arrived` (name, #X of Y) in the action bar.
 
@@ -73,7 +74,7 @@ Update it alongside behaviour changes in the code.
   into the centre.
 - `effect: END` → end gateway blocks, teleport always instant.
 - `effect: PARTICLE` → the interior stays air and is filled with particles (`particles.*`: any type of
-  the game except block-texture particles, with its options `color`, `color-to`, `item`, `value`; density, interval, ambient sound) plus, if `particles.sheet.enabled`, a translucent coloured
+  the game except block-texture particles, with its options `color`, `color-to`, `item`, `value`; density, interval, ambient sound (`sound`: true/false or any sound name, with `sound-volume`, `sound-pitch`, `sound-interval`; played at random moments on random interior blocks)) plus, if `particles.sheet.enabled`, a translucent coloured
   sheet (`color`, `opacity` in percent; Java clients only). Players cannot place blocks into the interior.
   Normal player delay applies. No vanilla portal logic is involved at all.
 - All effects can be switched live with `/craftedportals reload`.

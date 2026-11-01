@@ -55,7 +55,10 @@ final class TravelTask extends BukkitRunnable {
         tick++;
         PortalManager mgr = plugin.manager();
         if (tick % 10 == 0) maintain(mgr);
-        if (plugin.effect() == CraftedPortals.Effect.PARTICLE) emitParticles(mgr);
+        if (plugin.effect() == CraftedPortals.Effect.PARTICLE) {
+            emitParticles(mgr);
+            ambientSounds(mgr);
+        }
         updateHiddenCells();
         Set<UUID> inside = new HashSet<>();
 
@@ -155,7 +158,6 @@ final class TravelTask extends BukkitRunnable {
     private void emitParticles(PortalManager mgr) {
         CraftedPortals.ParticleSettings ps = plugin.particles();
         if (tick % ps.intervalTicks() != 0 || ps.perBlock() == 0) return;
-        boolean ambient = ps.sound() && tick % 100 == 0;
         for (Portal p : mgr.all()) {
             if (!p.isLoaded()) continue;
             World w = p.world();
@@ -168,7 +170,27 @@ final class TravelTask extends BukkitRunnable {
                 Location c = b.getLocation().add(0.5, 0.5, 0.5);
                 w.spawnParticle(spec.type(), c, ps.perBlock(), dx, 0.3, dz, 0.0, data);
             }
-            if (ambient) w.playSound(centre, Sound.BLOCK_PORTAL_AMBIENT, 0.3f, 1.0f);
+        }
+    }
+
+    private final java.util.Random random = new java.util.Random();
+
+    /**
+     * Ambient sound like vanilla's portal blocks: at random moments, on a random interior block,
+     * with a slightly random pitch, so start and end of the clip do not line up audibly.
+     */
+    private void ambientSounds(PortalManager mgr) {
+        CraftedPortals.ParticleSettings ps = plugin.particles();
+        if (!ps.ambient().enabled()) return;
+        int chance = ps.ambientSeconds() * 20; // one in N ticks per portal
+        for (Portal p : mgr.all()) {
+            if (random.nextInt(chance) != 0 || !p.isLoaded()) continue;
+            World w = p.world();
+            Location centre = p.box().getCenter().toLocation(w);
+            if (w.getNearbyPlayers(centre, PARTICLE_RANGE).isEmpty()) continue;
+            List<Block> cells = p.interior(w);
+            Location at = cells.get(random.nextInt(cells.size())).getLocation().add(0.5, 0.5, 0.5);
+            ps.ambient().play(w, at, 0.9f + random.nextFloat() * 0.2f);
         }
     }
 
@@ -197,10 +219,7 @@ final class TravelTask extends BukkitRunnable {
             Location c = p.getLocation().add(0, 1, 0);
             p.getWorld().spawnParticle(ts.spec().type(), c, count, 0.4, 0.6, 0.4, 0.0, ts.spec().data(c));
         }
-        if (ts.sound() && t == 1) {
-            // The vanilla trigger sound swells over about four seconds, matching the default delay
-            p.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 0.6f, 1.0f);
-        }
+        if (t == 1) ts.sound().play(p, p.getLocation()); // the default trigger sound swells over ~4 s
         if (ts.bar()) {
             int filled = (int) Math.round(progress * 10);
             String bar = "■".repeat(filled) + "□".repeat(10 - filled);
@@ -219,7 +238,7 @@ final class TravelTask extends BukkitRunnable {
             case FROST -> p.setFreezeTicks(0);
             case NONE -> { }
         }
-        if (ts.sound()) p.stopSound(Sound.BLOCK_PORTAL_TRIGGER);
+        ts.sound().stop(p);
     }
 
     private boolean canTravel(Entity e) {
@@ -281,7 +300,7 @@ final class TravelTask extends BukkitRunnable {
             if (!ok) return;
             if (!(e instanceof Player)) e.setVelocity(outVel);
             if (e instanceof Player p) {
-                p.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.25f, 1.0f);
+                plugin.travelSettings().arrival().play(p, p.getLocation());
                 p.sendActionBar(plugin.portalMsg("arrived", to));
                 hideArrivalPortal(p, to);
                 for (Mob m : leashed) {

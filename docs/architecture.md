@@ -103,6 +103,15 @@ particles per interior cell, spread 0.3 in the portal plane and 0.05 perpendicul
 flat. `maintain()` skips the refill check for this effect. `BlockPlaceEvent` into the interior is
 cancelled. Particle data comes from `ParticleSpec`, see above.
 
+### Sounds (SoundSpec)
+
+`SoundSpec.load()` accepts `true` (default sound), `false`, a game sound name (`BLOCK_BEACON_AMBIENT`,
+resolved through `Sound.valueOf` to its key) or a raw key (`mypack:portal_hum`, passed to the client
+as is, so resource pack sounds work). `<option>-volume` and `<option>-pitch` sit next to the option.
+Used for `particles.sound` (ambient, played by `TravelTask.ambientSounds()` with a per-tick chance of
+1/(interval × 20) per portal on a random interior block with pitch ±10 %, only with players in range),
+`travel-sound` (start of the wait, stopped on early exit) and `arrival-sound`.
+
 ### Particle specs (ParticleSpec)
 
 `ParticleSpec.load()` reads `type`, `color`, `color-to`, `item` and `value` from a section and
