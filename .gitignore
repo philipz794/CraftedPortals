@@ -18,3 +18,6 @@ target/
 
 # Design sources stay local (not part of the public repo)
 *.sketch
+
+# Full-size screenshot originals stay local (used for Modrinth uploads)
+assets/screenshots/originals/
