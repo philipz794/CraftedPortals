@@ -304,7 +304,7 @@ final class TravelTask extends BukkitRunnable {
      * cannot set. So, until the arriving player steps out (justArrived cleared), the one or two
      * portal blocks they are standing in are sent to them as air, every tick following their
      * position. The rest of the portal keeps its texture, and the blocks they left behind pop back.
-     * The same mechanism hides the source portal's blocks while waiting with a non-VANILLA effect.
+     * The same mechanism hides the source portal's blocks while a player waits inside it.
      */
     private void hideArrivalPortal(Player p, Portal to) {
         if (plugin.effect() != CraftedPortals.Effect.NETHER) return;
