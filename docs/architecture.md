@@ -72,8 +72,12 @@ Age set high so no beam is rendered.
 Applied every tick to a survival player waiting inside a portal with a destination, removed when the
 player travels or steps out (`endWaiting`, also for players who vanished from the portal):
 
-- `NAUSEA` / `DARKNESS`: potion effect refreshed with 100 ticks (the client only ramps nausea while
-  more than 60 ticks remain), no icon or particles; removed at the end so it fades.
+- `NAUSEA`: potion effect refreshed with 100 ticks, no icon or particles, but only during the first
+  half of the wait. The client ramps the wobble up at about 1/150 per tick while the effect is active
+  and fades it just as slowly afterwards; there is no way to cut it off (a same-world teleport keeps the
+  client player object). Feeding it for half the delay makes it peak midway and vanish on arrival.
+  Cross-dimension arrivals reset it instantly anyway.
+- `DARKNESS`: potion effect refreshed with 100 ticks, removed at the end so it fades.
 - `FROST`: `setFreezeTicks` proportional to progress, capped at 130 (vanilla damages from 140). Vanilla
   thaws 2 ticks per tick, hence the `+2`.
 - `BORDER`: a per-player `WorldBorder` centred on the player with radius 300 (outside render distance,

@@ -166,7 +166,14 @@ final class TravelTask extends BukkitRunnable {
         CraftedPortals.TravelSettings ts = plugin.travelSettings();
         double progress = delay <= 0 ? 1.0 : Math.min(1.0, t / (double) delay);
         switch (ts.effect()) {
-            case NAUSEA -> p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0, true, false, false));
+            case NAUSEA -> {
+                // The client ramps the wobble up while nausea is active and lets it fade just as
+                // slowly after removal (no way to cut it off). So feed it for the first half of
+                // the wait only; the wobble peaks midway and is gone on arrival. Cross-dimension
+                // arrivals reset it instantly anyway.
+                if (t * 2 <= delay) p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0, true, false, false));
+                else if (p.hasPotionEffect(PotionEffectType.NAUSEA)) p.removePotionEffect(PotionEffectType.NAUSEA);
+            }
             case DARKNESS -> p.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 100, 0, true, false, false));
             case FROST -> p.setFreezeTicks((int) (MAX_FROST * progress) + 2); // +2: vanilla thaws 2 per tick
             case BORDER -> {
@@ -268,6 +275,7 @@ final class TravelTask extends BukkitRunnable {
             if (!(e instanceof Player)) e.setVelocity(outVel);
             if (e instanceof Player p) {
                 p.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.25f, 1.0f);
+                p.sendActionBar(plugin.portalMsg("arrived", to));
                 for (Mob m : leashed) {
                     m.teleportAsync(dest, PlayerTeleportEvent.TeleportCause.PLUGIN).thenAccept(ok2 ->
                             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {

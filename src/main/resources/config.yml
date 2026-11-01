@@ -59,7 +59,8 @@ player-delay-ticks: 80
 # What a survival player sees while waiting inside a portal. Vanilla's purple
 # portal overlay cannot be used (the plugin has to block vanilla's portal
 # logic), so the plugin provides its own:
-#   NAUSEA   - screen wobble like a nether portal (default)
+#   NAUSEA   - screen wobble like a nether portal, peaks halfway and has
+#              faded by the time you arrive (default)
 #   FROST    - icy screen border like powder snow, no damage
 #   DARKNESS - pulsing darkness like the Warden's
 #   BORDER   - red vignette like the world border
@@ -109,3 +110,4 @@ messages:
   missing-keys: "&cThe frame is missing key blocks (%have%/%need% %block%)."
   no-target: "&eThis portal has no destination yet - build a second one named &f%name%&e."
   travel-bar: "&5%bar%"
+  arrived: "&aArrived at &f%name% &7(#%pos% of %count%)"
