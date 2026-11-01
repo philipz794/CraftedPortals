@@ -42,8 +42,9 @@ max-blocks: 200
 effect: PARTICLE
 
 # ---------------------------------------------------------------------------
-# Particle types (all 128 of Minecraft 26.3 work, for 'type' here and in
-# travel-particles). Names in upper case.
+# Particle types (123 of the 128 in Minecraft 26.3 work, for 'type' here and
+# in travel-particles; the five block-texture particles are left out).
+# Names in upper case.
 #
 # No extra options needed (106):
 #   ANGRY_VILLAGER, ASH, BUBBLE, BUBBLE_COLUMN_UP, BUBBLE_POP,
@@ -78,9 +79,6 @@ effect: PARTICLE
 #   the portal centre (or the waiting player) within 'value' seconds.
 #   EFFECT / INSTANT_EFFECT use 'value' as power.
 #
-# Need a block via 'block' (e.g. block: EMERALD_BLOCK):
-#   BLOCK, FALLING_DUST, DUST_PILLAR, BLOCK_CRUMBLE, BLOCK_MARKER
-#
 # Need an item via 'item' (e.g. item: EMERALD):
 #   ITEM
 #
@@ -99,8 +97,7 @@ particles:
   color: "#4682B4"
   # Second colour for DUST_COLOR_TRANSITION
   color-to: "#FFFFFF"
-  # Block for block-based types, item for ITEM, value for the rest (see list)
-  block: EMERALD_BLOCK
+  # Item for ITEM, value for the types listed above
   item: EMERALD
   value: 1.0
   # Particles per interior block and interval (0-10)
@@ -138,12 +135,11 @@ travel-effect: NAUSEA
 # Particles around the waiting player, independent of the portal visuals
 travel-particles:
   enabled: true
-  # Same options as under particles (type, color, color-to, block, item,
-  # value); see the particle list above
+  # Same options as under particles (type, color, color-to, item, value);
+  # see the particle list above
   type: ENCHANT
   color: "#9B30FF"
   color-to: "#FFFFFF"
-  block: EMERALD_BLOCK
   item: EMERALD
   value: 1.0
   # Particles per tick at full progress (1-30)

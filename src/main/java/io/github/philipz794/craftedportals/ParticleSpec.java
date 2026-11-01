@@ -5,7 +5,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Vibration;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,9 +14,10 @@ import java.util.function.Consumer;
 
 /**
  * A particle type from the config together with whatever extra data that type needs, so that every
- * particle of the game can be used. Options per section: type, color, color-to, block, item, value.
+ * particle of the game except the block-based ones can be used. Options per section: type, color,
+ * color-to, item, value.
  */
-record ParticleSpec(Particle type, Color color, Color colorTo, BlockData block, ItemStack item, float value) {
+record ParticleSpec(Particle type, Color color, Color colorTo, ItemStack item, float value) {
 
     static final Color DEFAULT_COLOR = Color.fromRGB(0x9B30FF);
 
@@ -29,7 +29,7 @@ record ParticleSpec(Particle type, Color color, Color colorTo, BlockData block, 
 
     /** Same spec with another colour (network colour); only matters for colourable types. */
     ParticleSpec withColor(Color c) {
-        return c == null ? this : new ParticleSpec(type, c, colorTo, block, item, value);
+        return c == null ? this : new ParticleSpec(type, c, colorTo, item, value);
     }
 
     /**
@@ -43,7 +43,6 @@ record ParticleSpec(Particle type, Color color, Color colorTo, BlockData block, 
         if (t == Particle.DustTransition.class) return new Particle.DustTransition(color, colorTo, value);
         if (t == Color.class) return color;
         if (t == Particle.Spell.class) return new Particle.Spell(color, value);
-        if (t == BlockData.class) return block;
         if (t == ItemStack.class) return item;
         if (t == Float.class) return value;
         if (t == Integer.class) return Math.round(value);
@@ -58,7 +57,7 @@ record ParticleSpec(Particle type, Color color, Color colorTo, BlockData block, 
     static boolean supported(Particle p) {
         Class<?> t = p.getDataType();
         return t == Void.class || t == Particle.DustOptions.class || t == Particle.DustTransition.class
-                || t == Color.class || t == Particle.Spell.class || t == BlockData.class || t == ItemStack.class
+                || t == Color.class || t == Particle.Spell.class || t == ItemStack.class
                 || t == Float.class || t == Integer.class || t == Particle.Trail.class || t == Vibration.class
                 || t == Particle.Geyser.class || t == Particle.GeyserBase.class;
     }
@@ -75,23 +74,13 @@ record ParticleSpec(Particle type, Color color, Color colorTo, BlockData block, 
             type = Particle.PORTAL;
         }
         if (!supported(type)) {
-            warn.accept(path + ".type " + type + " needs data this plugin cannot provide, using PORTAL");
-            type = Particle.PORTAL;
+            warn.accept(path + ".type " + type + " is not supported (block-based particles are left out), using " + defaultType);
+            type = Particle.valueOf(defaultType);
         }
         Color color = parseColor(sec == null ? null : sec.getString("color"), defaultColor, path + ".color", warn);
         Color colorTo = parseColor(sec == null ? null : sec.getString("color-to"), Color.WHITE, path + ".color-to", warn);
         float value = sec == null ? 1.0f : (float) sec.getDouble("value", 1.0);
 
-        BlockData block = null;
-        if (type.getDataType() == BlockData.class) {
-            String name = sec == null ? "EMERALD_BLOCK" : sec.getString("block", "EMERALD_BLOCK");
-            Material m = Material.matchMaterial(name);
-            if (m == null || !m.isBlock()) {
-                warn.accept("Unknown " + path + ".block '" + name + "', using EMERALD_BLOCK");
-                m = Material.EMERALD_BLOCK;
-            }
-            block = m.createBlockData();
-        }
         ItemStack item = null;
         if (type.getDataType() == ItemStack.class) {
             String name = sec == null ? "EMERALD" : sec.getString("item", "EMERALD");
@@ -102,7 +91,7 @@ record ParticleSpec(Particle type, Color color, Color colorTo, BlockData block, 
             }
             item = new ItemStack(m);
         }
-        return new ParticleSpec(type, color, colorTo, block, item, value);
+        return new ParticleSpec(type, color, colorTo, item, value);
     }
 
     static Color parseColor(String hex, Color fallback, String path, Consumer<String> warn) {

@@ -1,6 +1,6 @@
 # Particle types
 
-All 128 particle types of Minecraft 26.3 can be used for `particles.type` (portal visuals) and
+123 of the 128 particle types of Minecraft 26.3 can be used (the five block-texture particles `BLOCK`, `FALLING_DUST`, `DUST_PILLAR`, `BLOCK_CRUMBLE`, `BLOCK_MARKER` are left out) for `particles.type` (portal visuals) and
 `travel-particles.type` (around the waiting player). Names in upper case. Looks differ between Java and
 Bedrock (Geyser maps most common ones).
 
@@ -10,7 +10,6 @@ Bedrock (Geyser maps most common ones).
 |---|---|
 | `color` | colourable types below; overridden per network by the item name suffix (`Home #3366FF`) |
 | `color-to` | `DUST_COLOR_TRANSITION` (fade target) |
-| `block` | block-based types (block texture / dust) |
 | `item` | `ITEM` |
 | `value` | size for `DUST`/`DUST_COLOR_TRANSITION`, power for `DRAGON_BREATH`/`EFFECT`/`INSTANT_EFFECT`, roll for `SCULK_CHARGE`, delay ticks for `SHRIEK`, water blocks for `GEYSER*`, travel seconds for `TRAIL`/`VIBRATION` |
 
@@ -35,17 +34,11 @@ Bedrock (Geyser maps most common ones).
 | `TRAIL` | coloured streaks flying into the portal centre |
 | `ENTITY_EFFECT` | coloured potion swirls |
 | `TINTED_LEAVES` | coloured falling leaves |
-| `BLOCK` | crumbs of the configured block |
-| `BLOCK_MARKER` | floating texture of the configured block |
 | `ITEM` | crumbs of the configured item |
 
 ## Colourable
 
 `DUST`, `DUST_COLOR_TRANSITION`, `ENTITY_EFFECT`, `FLASH`, `TINTED_LEAVES`, `TRAIL`, `EFFECT`, `INSTANT_EFFECT`
-
-## Block-based (`block`)
-
-`BLOCK`, `FALLING_DUST`, `DUST_PILLAR`, `BLOCK_CRUMBLE`, `BLOCK_MARKER`
 
 ## Item-based (`item`)
 

@@ -105,10 +105,11 @@ cancelled. Particle data comes from `ParticleSpec`, see above.
 
 ### Particle specs (ParticleSpec)
 
-`ParticleSpec.load()` reads `type`, `color`, `color-to`, `block`, `item` and `value` from a section and
+`ParticleSpec.load()` reads `type`, `color`, `color-to`, `item` and `value` from a section and
 builds the data object spawnParticle needs for that type (`DustOptions`, `DustTransition`, `Color`,
-`Spell`, `BlockData`, `ItemStack`, `Float`, `Integer`, `Trail`, `Vibration`, `Geyser`, `GeyserBase`), so
-every particle of the game is usable. `withColor()` applies the network colour to colourable types.
+`Spell`, `ItemStack`, `Float`, `Integer`, `Trail`, `Vibration`, `Geyser`, `GeyserBase`), so every
+particle of the game except the five block-texture ones (`BlockData`) is usable; those fall back to the
+section's default type with a warning. `withColor()` applies the network colour to colourable types.
 `data(target)` takes the location that TRAIL and VIBRATION fly to (portal centre or waiting player).
 
 ### Coloured sheet (SheetRenderer)

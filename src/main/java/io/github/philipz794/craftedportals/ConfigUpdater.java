@@ -31,7 +31,8 @@ final class ConfigUpdater {
             "consume-clock", "consume-item");
 
     /** Options that no longer exist; their line and comment block are deleted from the owner's file. */
-    private static final java.util.Set<String> REMOVED = java.util.Set.of("travel-nausea-peak");
+    private static final java.util.Set<String> REMOVED = java.util.Set.of(
+            "travel-nausea-peak", "particles.block", "travel-particles.block");
 
     private static final Pattern TOP_KEY = Pattern.compile("^([A-Za-z0-9_-]+):(.*)$");
     private static final Pattern SUB_KEY = Pattern.compile("^(\\s+)([A-Za-z0-9_-]+):(.*)$");
@@ -75,21 +76,20 @@ final class ConfigUpdater {
         List<String> renamed = new ArrayList<>();
         List<String> removed = new ArrayList<>();
 
-        // 0) Obsolete options: drop the key line, its comment block and a blank line that follows
+        // 0) Obsolete options (top-level or nested): drop the key line, its comment block and,
+        //    for top-level keys, a blank line that follows
         for (String oldKey : REMOVED) {
             if (!cur.contains(oldKey)) continue;
-            for (int i = 0; i < out.size(); i++) {
-                Matcher m = TOP_KEY.matcher(out.get(i));
-                if (!m.matches() || !m.group(1).equals(oldKey)) continue;
-                int start = i;
-                while (start > 0 && out.get(start - 1).startsWith("#")) start--;
-                int end = i + 1;
-                while (end < out.size() && (out.get(end).startsWith(" ") || out.get(end).startsWith("\t"))) end++;
-                if (end < out.size() && out.get(end).isBlank()) end++;
-                out.subList(start, end).clear();
-                removed.add(oldKey);
-                break;
-            }
+            int i = findKeyLine(out, oldKey);
+            if (i < 0) continue;
+            int indent = leadingSpaces(out.get(i));
+            int start = i;
+            while (start > 0 && leadingSpaces(out.get(start - 1)) == indent && out.get(start - 1).stripLeading().startsWith("#")) start--;
+            int end = i + 1;
+            while (end < out.size() && !out.get(end).isBlank() && leadingSpaces(out.get(end)) > indent) end++;
+            if (indent == 0 && end < out.size() && out.get(end).isBlank()) end++;
+            out.subList(start, end).clear();
+            removed.add(oldKey);
         }
 
         // 1) Renamed options: replace the old key line in place, keep the owner's value converted
@@ -187,6 +187,42 @@ final class ConfigUpdater {
             pending.clear();
             if (isSection) { pathStack.add(m.group(2)); indentStack.add(indent); }
         }
+    }
+
+    /** Line index of a dotted key path (e.g. "particles.block") in the file, or -1. */
+    private static int findKeyLine(List<String> out, String dotted) {
+        String[] parts = dotted.split("\\.");
+        int indent = -1, from = 0;
+        int line = -1;
+        for (String part : parts) {
+            line = -1;
+            for (int i = from; i < out.size(); i++) {
+                String l = out.get(i);
+                if (l.isBlank() || l.stripLeading().startsWith("#")) continue;
+                int ind = leadingSpaces(l);
+                if (indent >= 0 && ind <= indent) break; // left the parent section
+                Matcher m = (indent < 0 ? TOP_KEY : SUB_KEY).matcher(l);
+                if (!m.matches()) continue;
+                String key = indent < 0 ? m.group(1) : m.group(2);
+                if (indent >= 0 && ind != childIndent(out, from, indent)) continue; // deeper levels
+                if (key.equals(part)) { line = i; break; }
+            }
+            if (line < 0) return -1;
+            indent = leadingSpaces(out.get(line));
+            from = line + 1;
+        }
+        return line;
+    }
+
+    /** Indentation of the first child line of a section starting at index {@code from}. */
+    private static int childIndent(List<String> out, int from, int parentIndent) {
+        for (int i = from; i < out.size(); i++) {
+            String l = out.get(i);
+            if (l.isBlank() || l.stripLeading().startsWith("#")) continue;
+            int ind = leadingSpaces(l);
+            return ind > parentIndent ? ind : -1;
+        }
+        return -1;
     }
 
     private static int leadingSpaces(String s) {
