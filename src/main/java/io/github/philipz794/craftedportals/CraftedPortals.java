@@ -34,8 +34,16 @@ public final class CraftedPortals extends JavaPlugin {
     /** Settings of the PARTICLE effect. */
     record ParticleSettings(Particle type, Object data, int perBlock, int intervalTicks, boolean sound) {}
 
+    /** Screen effect shown to a waiting survival player. */
+    enum TravelEffect { NAUSEA, FROST, DARKNESS, BORDER, NONE }
+
+    /** Everything a waiting player sees and hears. */
+    record TravelSettings(TravelEffect effect, boolean particles, Particle particleType, Object particleData,
+                          int particleAmount, boolean sound, boolean bar) {}
+
     private Effect effect = Effect.NETHER;
     private ParticleSettings particles;
+    private TravelSettings travelSettings;
     private int playerDelay;
     private boolean consumeClock, teleportMobs, teleportItems, leashedFollow, piglinSpawn;
     private int maxBlocks;
@@ -122,6 +130,7 @@ public final class CraftedPortals extends JavaPlugin {
             effect = Effect.NETHER;
         }
         particles = loadParticles();
+        travelSettings = loadTravelSettings();
         playerDelay = Math.max(0, getConfig().getInt("player-delay-ticks", 80));
         consumeClock = getConfig().getBoolean("consume-clock", true);
         teleportMobs = getConfig().getBoolean("teleport-mobs", true);
@@ -130,14 +139,15 @@ public final class CraftedPortals extends JavaPlugin {
         piglinSpawn = getConfig().getBoolean("piglin-spawn", false);
     }
 
-    private ParticleSettings loadParticles() {
-        ConfigurationSection sec = getConfig().getConfigurationSection("particles");
+    /** Particle type plus optional dust colour from a config section; falls back to PORTAL. */
+    private Object[] loadParticleType(String path) {
+        ConfigurationSection sec = getConfig().getConfigurationSection(path);
         String typeName = sec == null ? "PORTAL" : sec.getString("type", "PORTAL");
         Particle type;
         try {
             type = Particle.valueOf(typeName.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ex) {
-            warn("Unknown particles.type '" + typeName + "', using PORTAL");
+            warn("Unknown " + path + ".type '" + typeName + "', using PORTAL");
             type = Particle.PORTAL;
         }
         Object data = null;
@@ -147,18 +157,42 @@ public final class CraftedPortals extends JavaPlugin {
             try {
                 color = Color.fromRGB(Integer.parseInt(hex.replace("#", ""), 16));
             } catch (NumberFormatException ex) {
-                warn("Invalid particles.color '" + hex + "', using #9B30FF");
+                warn("Invalid " + path + ".color '" + hex + "', using #9B30FF");
                 color = Color.fromRGB(0x9B30FF);
             }
             data = new Particle.DustOptions(color, 1.0f);
         } else if (type.getDataType() != Void.class) {
-            warn("particles.type " + type + " needs extra data the plugin cannot provide, using PORTAL");
+            warn(path + ".type " + type + " needs extra data the plugin cannot provide, using PORTAL");
             type = Particle.PORTAL;
         }
+        return new Object[]{type, data};
+    }
+
+    private ParticleSettings loadParticles() {
+        ConfigurationSection sec = getConfig().getConfigurationSection("particles");
+        Object[] t = loadParticleType("particles");
         int perBlock = sec == null ? 2 : Math.max(0, Math.min(10, sec.getInt("per-block", 2)));
         int interval = sec == null ? 2 : Math.max(1, Math.min(40, sec.getInt("interval-ticks", 2)));
         boolean sound = sec == null || sec.getBoolean("sound", true);
-        return new ParticleSettings(type, data, perBlock, interval, sound);
+        return new ParticleSettings((Particle) t[0], t[1], perBlock, interval, sound);
+    }
+
+    private TravelSettings loadTravelSettings() {
+        String name = getConfig().getString("travel-effect", "NAUSEA");
+        TravelEffect eff;
+        try {
+            eff = TravelEffect.valueOf(name.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            warn("Unknown travel-effect '" + name + "', using NAUSEA");
+            eff = TravelEffect.NAUSEA;
+        }
+        ConfigurationSection tp = getConfig().getConfigurationSection("travel-particles");
+        boolean particlesOn = tp != null && tp.getBoolean("enabled", true);
+        Object[] t = loadParticleType("travel-particles");
+        int amount = tp == null ? 6 : Math.max(1, Math.min(30, tp.getInt("amount", 6)));
+        boolean sound = getConfig().getBoolean("travel-sound", true);
+        boolean bar = getConfig().getBoolean("travel-bar", true);
+        return new TravelSettings(eff, particlesOn, (Particle) t[0], t[1], amount, sound, bar);
     }
 
     private void warn(String problem) {
@@ -182,6 +216,7 @@ public final class CraftedPortals extends JavaPlugin {
     TravelTask travel() { return travel; }
     Effect effect() { return effect; }
     ParticleSettings particles() { return particles; }
+    TravelSettings travelSettings() { return travelSettings; }
     boolean useEndEffect() { return effect == Effect.END; }
     int playerDelay() { return effect == Effect.END ? 0 : playerDelay; }
     boolean consumeClock() { return consumeClock; }

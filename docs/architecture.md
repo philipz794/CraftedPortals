@@ -25,11 +25,9 @@ So that vanilla does not treat the portal blocks as its own nether/end portals, 
   later events below did not catch that case on Paper 26.3.
 
   Cancelling it also removes the purple portal overlay, which is driven by the server-side portal
-  process (verified in-game). Therefore the event is cancelled selectively: always for mobs, items and
-  gateways; for players in creative/spectator (vanilla would teleport them instantly), in portals
-  without destination, right after arrival, and from the 60th consecutive tick inside. Vanilla's own
-  timer needs 80 ticks and decays while the event is cancelled, so it can never complete, while
-  survival players see the overlay build up for three seconds before our teleport at 80 ticks.
+  process (verified in-game). A selective cancel that lets vanilla's timer run for a while was tried
+  and rejected: it turns the protection into a race with vanilla's 80-tick timer. Instead the plugin
+  renders its own waiting effect, see below.
 - `PlayerPortalEvent`, `EntityPortalEvent`, `EntityPortalReadyEvent`
 - `PlayerTeleportEvent` with cause `NETHER_PORTAL` / `END_GATEWAY`
 - `EntityTeleportEndGatewayEvent`
@@ -68,6 +66,22 @@ Always place portal blocks with `setBlockData(…, false)`, otherwise vanilla tr
 
 Gateway with exit pointing to itself plus `ExactTeleport`, so vanilla generates nothing.
 Age set high so no beam is rendered.
+
+### Waiting effect (TravelTask.showWaiting / endWaiting)
+
+Applied every tick to a survival player waiting inside a portal with a destination, removed when the
+player travels or steps out (`endWaiting`, also for players who vanished from the portal):
+
+- `NAUSEA` / `DARKNESS`: potion effect refreshed with 100 ticks (the client only ramps nausea while
+  more than 60 ticks remain), no icon or particles; removed at the end so it fades.
+- `FROST`: `setFreezeTicks` proportional to progress, capped at 130 (vanilla damages from 140). Vanilla
+  thaws 2 ticks per tick, hence the `+2`.
+- `BORDER`: a per-player `WorldBorder` centred on the player with radius 300 (outside render distance,
+  so no wall is visible); the warning distance grows from 300 to 1200, which fades the red vignette in.
+  `setWorldBorder(null)` restores the real border.
+- Particles around the player (`travel-particles`), count scaling with progress; the swelling
+  `BLOCK_PORTAL_TRIGGER` sound once at the start (stopped on early exit); a ten-segment progress bar in
+  the action bar.
 
 ### PARTICLE effect
 

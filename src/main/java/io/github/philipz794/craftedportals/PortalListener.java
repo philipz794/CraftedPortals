@@ -212,33 +212,17 @@ final class PortalListener implements Listener {
     }
 
     /**
-     * Vanilla needs this many consecutive ticks inside a nether portal before it teleports a
-     * survival player (80). From this tick on we cut vanilla off, so its timer can never complete
-     * and decays instead; the player still gets the purple overlay for the first three seconds.
-     */
-    private static final int VANILLA_PORTAL_GUARD_TICKS = 60;
-
-    /**
      * Earliest hook: fired every tick for an entity standing in a nether portal or end gateway
-     * block. Cancelling it keeps vanilla from processing the portal, which prevents the vanilla
-     * teleport and portal generation but also removes the purple overlay the client shows while
-     * vanilla's timer runs. So we cancel only where the overlay would be wrong or vanilla could
-     * win the race: mobs and items, gateways, creative players (vanilla teleports them instantly),
-     * portals without a destination, players who just arrived, and everyone from tick 60 on.
-     * The portal event handlers below remain as a safety net.
+     * block. Cancelling it stops vanilla from starting its portal logic at all, so no vanilla
+     * teleport and no portal generation in the other dimension can happen. This also removes the
+     * vanilla purple overlay (it depends on the server-side portal process); the plugin shows its
+     * own travel effect instead, see TravelTask. The portal event handlers below remain as a safety net.
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInsideBlock(EntityInsideBlockEvent e) {
         Material t = e.getBlock().getType();
         if (t != Material.NETHER_PORTAL && t != Material.END_GATEWAY) return;
-        Portal portal = mgr.byInterior(e.getBlock());
-        if (portal == null) return;
-        if (t == Material.END_GATEWAY || !(e.getEntity() instanceof Player p)) { e.setCancelled(true); return; }
-        boolean allowOverlay = p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE;
-        allowOverlay &= mgr.next(portal) != null;
-        allowOverlay &= !plugin.travel().hasJustArrived(p.getUniqueId());
-        allowOverlay &= plugin.travel().ticksInside(p.getUniqueId()) < VANILLA_PORTAL_GUARD_TICKS;
-        if (!allowOverlay) e.setCancelled(true);
+        if (mgr.byInterior(e.getBlock()) != null) e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

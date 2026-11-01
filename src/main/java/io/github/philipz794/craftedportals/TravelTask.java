@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EnderDragon;
@@ -15,12 +16,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,15 +44,8 @@ final class TravelTask extends BukkitRunnable {
         this.plugin = plugin;
     }
 
-    /** Consecutive ticks a player has spent inside a portal (0 if not inside). */
-    int ticksInside(UUID player) {
-        return waiting.getOrDefault(player, 0);
-    }
-
-    /** Has this entity just arrived and not left the destination portal yet? */
-    boolean hasJustArrived(UUID entity) {
-        return justArrived.containsKey(entity);
-    }
+    /** Per-player world border used by the BORDER travel effect. */
+    private final Map<UUID, WorldBorder> borders = new HashMap<>();
 
     @Override
     public void run() {
@@ -71,11 +68,18 @@ final class TravelTask extends BukkitRunnable {
 
                 if (e instanceof Player p) {
                     if (p.getGameMode() == GameMode.SPECTATOR) continue;
+                    if (mgr.next(portal) == null) {
+                        travel(e, portal); // no destination: say so right away, no waiting
+                        continue;
+                    }
                     int t = waiting.merge(id, 1, Integer::sum);
                     int delay = p.getGameMode() == GameMode.CREATIVE ? 0 : plugin.playerDelay();
                     if (t >= delay) {
                         waiting.remove(id);
+                        endWaiting(p);
                         travel(e, portal);
+                    } else {
+                        showWaiting(p, t, delay);
                     }
                 } else if (canTravel(e)) {
                     travel(e, portal);
@@ -83,7 +87,14 @@ final class TravelTask extends BukkitRunnable {
             }
         }
 
-        waiting.keySet().retainAll(inside);
+        // Players who left the portal before the delay was over: stop their effects
+        for (Iterator<UUID> it = waiting.keySet().iterator(); it.hasNext(); ) {
+            UUID id = it.next();
+            if (inside.contains(id)) continue;
+            it.remove();
+            Player p = plugin.getServer().getPlayer(id);
+            if (p != null) endWaiting(p);
+        }
         // Clear the "arrived" marker once the portal has been left (at least 1 s later)
         justArrived.entrySet().removeIf(en -> !inside.contains(en.getKey()) && tick - en.getValue() > 20);
     }
@@ -141,6 +152,60 @@ final class TravelTask extends BukkitRunnable {
             }
             if (ambient) w.playSound(centre, Sound.BLOCK_PORTAL_AMBIENT, 0.3f, 1.0f);
         }
+    }
+
+    // ------------------------------------------------------------ Waiting effects
+
+    /** Full-screen frost without damage: vanilla hurts at 140, so stay below. */
+    private static final int MAX_FROST = 130;
+    /** BORDER effect: border radius well outside render distance, warning distance grows over time. */
+    private static final double BORDER_RADIUS = 300;
+
+    /** Called every tick while a survival player waits inside a portal (t of delay ticks done). */
+    private void showWaiting(Player p, int t, int delay) {
+        CraftedPortals.TravelSettings ts = plugin.travelSettings();
+        double progress = delay <= 0 ? 1.0 : Math.min(1.0, t / (double) delay);
+        switch (ts.effect()) {
+            case NAUSEA -> p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0, true, false, false));
+            case DARKNESS -> p.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 100, 0, true, false, false));
+            case FROST -> p.setFreezeTicks((int) (MAX_FROST * progress) + 2); // +2: vanilla thaws 2 per tick
+            case BORDER -> {
+                WorldBorder wb = borders.computeIfAbsent(p.getUniqueId(), k -> plugin.getServer().createWorldBorder());
+                wb.setCenter(p.getLocation());
+                wb.setSize(BORDER_RADIUS * 2);
+                // vignette alpha = 1 - radius / warning distance -> ramps from 0 to about 0.75
+                wb.setWarningDistance((int) (BORDER_RADIUS * (1 + 3 * progress)));
+                p.setWorldBorder(wb);
+            }
+            case NONE -> { }
+        }
+        if (ts.particles()) {
+            int count = 1 + (int) (ts.particleAmount() * progress);
+            Location c = p.getLocation().add(0, 1, 0);
+            p.getWorld().spawnParticle(ts.particleType(), c, count, 0.4, 0.6, 0.4, 0.0, ts.particleData());
+        }
+        if (ts.sound() && t == 1) {
+            // The vanilla trigger sound swells over about four seconds, matching the default delay
+            p.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 0.6f, 1.0f);
+        }
+        if (ts.bar()) {
+            int filled = (int) Math.round(progress * 10);
+            String bar = "■".repeat(filled) + "□".repeat(10 - filled);
+            p.sendActionBar(plugin.msg("travel-bar", "%bar%", bar));
+        }
+    }
+
+    /** Removes everything showWaiting() applied, whether the player travels or walks out. */
+    private void endWaiting(Player p) {
+        CraftedPortals.TravelSettings ts = plugin.travelSettings();
+        switch (ts.effect()) {
+            case NAUSEA -> p.removePotionEffect(PotionEffectType.NAUSEA);
+            case DARKNESS -> p.removePotionEffect(PotionEffectType.DARKNESS);
+            case FROST -> p.setFreezeTicks(0);
+            case BORDER -> { if (borders.remove(p.getUniqueId()) != null) p.setWorldBorder(null); }
+            case NONE -> { }
+        }
+        if (ts.sound()) p.stopSound(Sound.BLOCK_PORTAL_TRIGGER);
     }
 
     private boolean canTravel(Entity e) {

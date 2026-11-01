@@ -40,11 +40,17 @@ Update it alongside behaviour changes in the code.
   by 90°, convert velocity.
 - After arrival a lock (`justArrived`) applies until the entity has left the portal (at least 20 ticks).
 
-## Delays
+## Delays and the waiting effect
 
 - Survival players: `player-delay-ticks` (default 80, like a vanilla nether portal).
 - Creative: instant. Mobs and items: instant.
 - `effect: END`: always instant.
+- A portal without destination tells the player immediately (`messages.no-target`), no waiting.
+- While waiting, the player gets the plugin's own feedback instead of vanilla's purple overlay (which
+  cannot be shown because vanilla's portal logic is blocked): `travel-effect` (NAUSEA default, FROST,
+  DARKNESS, BORDER or NONE), `travel-particles` around the player (own type/colour, independent of the
+  portal visuals), `travel-sound` (swelling portal trigger sound) and `travel-bar` (progress bar in the
+  action bar, `messages.travel-bar`). Everything stops when the player teleports or steps out early.
 
 ## Extras (each configurable)
 

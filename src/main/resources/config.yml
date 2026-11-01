@@ -56,6 +56,32 @@ particles:
 # With the END effect teleportation is always instant.
 player-delay-ticks: 80
 
+# What a survival player sees while waiting inside a portal. Vanilla's purple
+# portal overlay cannot be used (the plugin has to block vanilla's portal
+# logic), so the plugin provides its own:
+#   NAUSEA   - screen wobble like a nether portal (default)
+#   FROST    - icy screen border like powder snow, no damage
+#   DARKNESS - pulsing darkness like the Warden's
+#   BORDER   - red vignette like the world border
+#   NONE     - no screen effect
+travel-effect: NAUSEA
+
+# Particles around the waiting player, independent of the portal visuals
+travel-particles:
+  enabled: true
+  # Same names as particles.type (see docs/particles.md)
+  type: PORTAL
+  # Only used by DUST (hex color)
+  color: "#9B30FF"
+  # Particles per tick at full progress (1-30)
+  amount: 6
+
+# Play the swelling nether portal trigger sound when the wait starts
+travel-sound: true
+
+# Show a progress bar in the action bar while waiting
+travel-bar: true
+
 # Consume the named clock when activating a portal?
 consume-clock: true
 
@@ -82,3 +108,4 @@ messages:
   too-big: "&cThe portal is too big (max. %max% blocks of air inside)."
   missing-keys: "&cThe frame is missing key blocks (%have%/%need% %block%)."
   no-target: "&eThis portal has no destination yet - build a second one named &f%name%&e."
+  travel-bar: "&5%bar%"
