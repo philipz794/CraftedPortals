@@ -31,6 +31,9 @@ There are no unit tests. Verification happens on a Paper 26.3 test server, prefe
 - Single-portal network (1 of 1), player in creative and survival: must only show `no-target`, no
   vanilla Nether teleport and no portal generated in the Nether (regression, fixed via
   `EntityInsideBlockEvent`).
+- Portal overlay: survival player in a networked portal sees the purple overlay build up before the
+  teleport. Guard test: set `player-delay-ticks: 400`, stand in a networked overworld portal in
+  survival for 15 seconds → overlay builds and fades, no vanilla Nether teleport.
 - PARTICLE effect: switch via reload from NETHER (blocks vanish), particle sheet visible, teleport
   works, placing a block into the interior is refused, switch back to NETHER refills. Try DUST with
   a colour and an invalid type (warning for admins).

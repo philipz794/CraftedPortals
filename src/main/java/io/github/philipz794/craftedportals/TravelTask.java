@@ -40,6 +40,16 @@ final class TravelTask extends BukkitRunnable {
         this.plugin = plugin;
     }
 
+    /** Consecutive ticks a player has spent inside a portal (0 if not inside). */
+    int ticksInside(UUID player) {
+        return waiting.getOrDefault(player, 0);
+    }
+
+    /** Has this entity just arrived and not left the destination portal yet? */
+    boolean hasJustArrived(UUID entity) {
+        return justArrived.containsKey(entity);
+    }
+
     @Override
     public void run() {
         tick++;

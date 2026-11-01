@@ -22,7 +22,14 @@ So that vanilla does not treat the portal blocks as its own nether/end portals, 
   hook (fired every tick while an entity stands in such a block) and prevents vanilla from even starting
   its portal process. It was added after a bug where a player standing in a portal with no destination
   (1 of 1 in its network) was teleported to the Nether by vanilla, including portal generation; the
-  later events below did not catch that case on Paper 26.3. Side effect: no vanilla portal nausea overlay.
+  later events below did not catch that case on Paper 26.3.
+
+  Cancelling it also removes the purple portal overlay, which is driven by the server-side portal
+  process (verified in-game). Therefore the event is cancelled selectively: always for mobs, items and
+  gateways; for players in creative/spectator (vanilla would teleport them instantly), in portals
+  without destination, right after arrival, and from the 60th consecutive tick inside. Vanilla's own
+  timer needs 80 ticks and decays while the event is cancelled, so it can never complete, while
+  survival players see the overlay build up for three seconds before our teleport at 80 ticks.
 - `PlayerPortalEvent`, `EntityPortalEvent`, `EntityPortalReadyEvent`
 - `PlayerTeleportEvent` with cause `NETHER_PORTAL` / `END_GATEWAY`
 - `EntityTeleportEndGatewayEvent`
