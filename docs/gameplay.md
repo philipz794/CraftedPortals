@@ -51,7 +51,8 @@ Update it alongside behaviour changes in the code.
   DARKNESS, BORDER or NONE), `travel-particles` around the player (own type/colour, independent of the
   portal visuals), `travel-sound` (swelling portal trigger sound) and `travel-bar` (progress bar in the
   action bar, `messages.travel-bar`). Everything stops when the player teleports or steps out early.
-  NAUSEA peaks halfway through the wait and has faded on arrival (client-side fade cannot be cut).
+  NAUSEA stops growing at `travel-nausea-peak` percent of the wait (default 50) and fades from there,
+  because the client-side fade cannot be cut; 100 means full wobble on arrival.
 - After arriving, players see `messages.arrived` (name, #X of Y) in the action bar.
 
 ## Extras (each configurable)

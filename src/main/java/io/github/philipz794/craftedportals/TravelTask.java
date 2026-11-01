@@ -168,10 +168,10 @@ final class TravelTask extends BukkitRunnable {
         switch (ts.effect()) {
             case NAUSEA -> {
                 // The client ramps the wobble up while nausea is active and lets it fade just as
-                // slowly after removal (no way to cut it off). So feed it for the first half of
-                // the wait only; the wobble peaks midway and is gone on arrival. Cross-dimension
-                // arrivals reset it instantly anyway.
-                if (t * 2 <= delay) p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0, true, false, false));
+                // slowly after removal (no way to cut it off). So feed it only until the configured
+                // share of the wait is over; the wobble peaks there and fades until arrival.
+                // Cross-dimension arrivals reset it instantly anyway.
+                if (t * 100 <= delay * ts.nauseaPeak()) p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0, true, false, false));
                 else if (p.hasPotionEffect(PotionEffectType.NAUSEA)) p.removePotionEffect(PotionEffectType.NAUSEA);
             }
             case DARKNESS -> p.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 100, 0, true, false, false));

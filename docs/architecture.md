@@ -76,7 +76,8 @@ player travels or steps out (`endWaiting`, also for players who vanished from th
   half of the wait. The client ramps the wobble up at about 1/150 per tick while the effect is active
   and fades it just as slowly afterwards; there is no way to cut it off (a same-world teleport keeps the
   client player object). Feeding it for half the delay makes it peak midway and vanish on arrival.
-  Cross-dimension arrivals reset it instantly anyway.
+  Cross-dimension arrivals reset it instantly anyway. `travel-nausea-peak` (percent of the delay,
+  default 50) sets the point where feeding stops.
 - `DARKNESS`: potion effect refreshed with 100 ticks, removed at the end so it fades.
 - `FROST`: `setFreezeTicks` proportional to progress, capped at 130 (vanilla damages from 140). Vanilla
   thaws 2 ticks per tick, hence the `+2`.

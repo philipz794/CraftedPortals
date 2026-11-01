@@ -38,8 +38,8 @@ public final class CraftedPortals extends JavaPlugin {
     enum TravelEffect { NAUSEA, FROST, DARKNESS, BORDER, NONE }
 
     /** Everything a waiting player sees and hears. */
-    record TravelSettings(TravelEffect effect, boolean particles, Particle particleType, Object particleData,
-                          int particleAmount, boolean sound, boolean bar) {}
+    record TravelSettings(TravelEffect effect, int nauseaPeak, boolean particles, Particle particleType,
+                          Object particleData, int particleAmount, boolean sound, boolean bar) {}
 
     private Effect effect = Effect.NETHER;
     private ParticleSettings particles;
@@ -192,7 +192,8 @@ public final class CraftedPortals extends JavaPlugin {
         int amount = tp == null ? 6 : Math.max(1, Math.min(30, tp.getInt("amount", 6)));
         boolean sound = getConfig().getBoolean("travel-sound", true);
         boolean bar = getConfig().getBoolean("travel-bar", true);
-        return new TravelSettings(eff, particlesOn, (Particle) t[0], t[1], amount, sound, bar);
+        int peak = Math.max(10, Math.min(100, getConfig().getInt("travel-nausea-peak", 50)));
+        return new TravelSettings(eff, peak, particlesOn, (Particle) t[0], t[1], amount, sound, bar);
     }
 
     private void warn(String problem) {
