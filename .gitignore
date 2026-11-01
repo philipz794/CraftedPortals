@@ -21,3 +21,6 @@ target/
 
 # Full-size screenshot originals stay local (used for Modrinth uploads)
 assets/screenshots/originals/
+
+# Project icon stays local (used for Modrinth)
+assets/icon.png
