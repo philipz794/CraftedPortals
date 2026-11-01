@@ -14,4 +14,9 @@ See docs/testing.md, section "Not yet verified".
 
 ## Ideas / Backlog
 
-- (empty – add wishes here)
+- **Horizontal portals (jump in):** third orientation (plane X-Z), always instant. Visuals should be
+  `END_PORTAL` blocks (flat, no vanilla frame validation, so no flicker); the vanilla End teleport must
+  then be suppressed like the nether one. Open design question: arrival at a horizontal portal.
+  Options: (a) horizontal portals are entrances only, exit is always the next vertical portal;
+  (b) "pipe" mode: arrive on top and fall through, builder provides a landing zone. Suggested default
+  (a) with (b) as a config option. Planned for after the 1.0.0 release.
