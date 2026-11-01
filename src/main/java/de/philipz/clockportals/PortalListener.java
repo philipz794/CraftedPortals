@@ -19,6 +19,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
@@ -221,6 +222,17 @@ final class PortalListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPortalReady(EntityPortalReadyEvent e) {
         if (inOurPortal(e.getEntity().getLocation())) e.setCancelled(true);
+    }
+
+    /**
+     * Vanilla laesst aus Netherportal-Bloecken Zombifizierte Piglins spawnen
+     * (NetherPortalBlock.randomTick, Spawnposition = unterster Portalblock der Spalte).
+     * Bei piglin-spawn: false wird das fuer unsere Portale unterbunden.
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onCreatureSpawn(CreatureSpawnEvent e) {
+        if (e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NETHER_PORTAL) return;
+        if (!plugin.piglinSpawn() && inOurPortal(e.getLocation())) e.setCancelled(true);
     }
 
     @EventHandler

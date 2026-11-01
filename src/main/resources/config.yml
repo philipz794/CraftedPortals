@@ -38,6 +38,11 @@ teleport-items: true
 # Reisen angeleinte Tiere mit dem Spieler mit?
 leashed-follow: true
 
+# Duerfen aus den Netherportal-Bloecken eines Clock-Portals Zombifizierte
+# Piglins spawnen (wie bei einem Vanilla-Netherportal in der Oberwelt)?
+# Betrifft nur Clock-Portals, normale Netherportale bleiben unveraendert.
+piglin-spawn: false
+
 # Meldungen (& fuer Farbcodes)
 messages:
   activated: "&aPortal &f%name% &aaktiviert &7(Nr. %pos% von %count%)"

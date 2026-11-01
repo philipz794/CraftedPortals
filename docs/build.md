@@ -2,9 +2,16 @@
 
 ## Toolchain
 
-- **JDK 25 nötig** (z. B. Temurin): `paper-api 26.3` ist mit Java 25 kompiliert (Classfile 69).
+- **JDK 25 oder neuer nötig**: `paper-api 26.3` ist mit Java 25 kompiliert (Classfile 69).
   Erzeugt wird trotzdem Java-21-Bytecode (`maven.compiler.release` = 21 in der pom.xml).
 - Maven 3.9+.
+
+Auf Philips Mac: Maven und OpenJDK 27 über Homebrew (`brew install maven`). Das System-Java ist
+Temurin 24 und reicht nicht, deshalb beim Bauen `JAVA_HOME` setzen:
+
+```
+JAVA_HOME=/opt/homebrew/opt/openjdk mvn package
+```
 
 ## Build
 

@@ -40,6 +40,8 @@ Bei Verhaltensänderungen im Code hier mitpflegen.
 - `leashed-follow`: angeleinte Tiere reisen mit dem Spieler mit.
 - `teleport-mobs`: Tiere, Villager, Monster laufen selbst durch.
 - `teleport-items`: geworfene Items fliegen durch.
+- `piglin-spawn` (Default **false**): dürfen aus den Netherportal-Blöcken eines Clock-Portals
+  Zombifizierte Piglins spawnen? Betrifft nur Clock-Portals, Vanilla-Netherportale bleiben unverändert.
 
 ## Optik
 

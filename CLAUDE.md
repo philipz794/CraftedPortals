@@ -5,7 +5,7 @@ Nur öffentliche Paper-API, kein NMS. Sprache im Projekt (Kommentare, Texte, Doc
 
 ## Kommandos
 
-- Build: `mvn package` → `target/clockportals-1.0.0.jar` (JDK 25 nötig, siehe docs/build.md)
+- Build: `JAVA_HOME=/opt/homebrew/opt/openjdk mvn package` → `target/clockportals-1.0.0.jar` (JDK 25+, siehe docs/build.md)
 - Es gibt keine automatisierten Tests. Prüfung erfolgt auf einem Paper-Testserver (docs/testen.md).
 
 ## Struktur

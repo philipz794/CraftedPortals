@@ -22,7 +22,7 @@ public final class ClockPortals extends JavaPlugin {
 
     private boolean endEffect;
     private int playerDelay;
-    private boolean consumeClock, teleportMobs, teleportItems, leashedFollow;
+    private boolean consumeClock, teleportMobs, teleportItems, leashedFollow, piglinSpawn;
     private int maxSize;
 
     @Override
@@ -58,6 +58,7 @@ public final class ClockPortals extends JavaPlugin {
         teleportMobs = getConfig().getBoolean("teleport-mobs", true);
         teleportItems = getConfig().getBoolean("teleport-items", true);
         leashedFollow = getConfig().getBoolean("leashed-follow", true);
+        piglinSpawn = getConfig().getBoolean("piglin-spawn", false);
     }
 
     PortalManager manager() { return manager; }
@@ -69,6 +70,7 @@ public final class ClockPortals extends JavaPlugin {
     boolean teleportMobs() { return teleportMobs; }
     boolean teleportItems() { return teleportItems; }
     boolean leashedFollow() { return leashedFollow; }
+    boolean piglinSpawn() { return piglinSpawn; }
     int maxSize() { return maxSize; }
     Material keyBlock() { return Material.matchMaterial(getConfig().getString("key-block", "EMERALD_BLOCK")); }
     int keyCount() { return getConfig().getInt("key-block-count", 2); }

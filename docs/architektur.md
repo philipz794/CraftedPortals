@@ -54,6 +54,14 @@ Portalblöcke immer mit `setBlockData(…, false)` setzen, sonst löst Vanilla P
 Gateway mit Exit auf sich selbst + `ExactTeleport`, damit Vanilla nichts generiert.
 Age hoch gesetzt, damit kein Lichtstrahl erscheint.
 
+### Piglin-Spawns aus Portalblöcken
+
+Vanilla spawnt aus Netherportal-Blöcken per `NetherPortalBlock.randomTick` Zombifizierte Piglins
+(`CreatureSpawnEvent` mit `SpawnReason.NETHER_PORTAL`). Die Spawnposition ist der unterste
+Portalblock der Spalte, also immer im Innenraum. Bei `piglin-spawn: false` cancelt der Listener das
+Event, wenn die Spawnposition in einem unserer Portale liegt (`inOurPortal`). Vanilla-Netherportale
+sind nicht betroffen.
+
 ### Persistenz
 
 `portals.yml` speichert Netzwerke in Reihenfolge; beim Start und bei `WorldLoadEvent` werden die
