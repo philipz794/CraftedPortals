@@ -23,11 +23,11 @@ import java.util.Map;
  * rectangular portal is a single quad without seams. Java clients only; Geyser does not render
  * scaled display backgrounds, Bedrock players see the particles.
  *
- * Geometry (vanilla TextDisplayRenderer): 40 text pixels per block; the text is bottom-anchored at
- * the entity position and centred horizontally. The background quad spans from x = -1 to the text
- * width k and from y = -1 to lines * 10, i.e. (k + BG_PAD) x BG_HEIGHT pixels for one line. A text of
- * SPACES spaces is 4 * SPACES pixels wide. If the sheet shows gaps or overlaps in game, BG_PAD /
- * BG_HEIGHT are the knobs to tune.
+ * Geometry (measured in game): 40 text pixels per block; the text is bottom-anchored at the entity
+ * position and centred horizontally. The background of a one-line text of width k is (k + BG_PAD) px
+ * wide and BG_HEIGHT px high. A text of SPACES spaces is 4 * SPACES px wide. The quad is back-face
+ * culled, so every rectangle gets two displays facing opposite directions. If the sheet shows gaps or
+ * overlaps in game, BG_PAD / BG_HEIGHT are the knobs to tune.
  */
 final class SheetRenderer {
 
@@ -36,8 +36,8 @@ final class SheetRenderer {
 
     private static final int SPACES = 10;
     private static final float PX_PER_BLOCK = 40f;
-    private static final float BG_PAD = 1f;      // quad from x = -1 to x = k
-    private static final float BG_HEIGHT = 11f;  // quad from y = -1 to y = 10 for one line
+    private static final float BG_PAD = 1f;
+    private static final float BG_HEIGHT = 10f;  // measured: an 11 left the top 1/11 of the sheet empty
 
     private final CraftedPortals plugin;
     private final Map<Portal, List<TextDisplay>> sheets = new HashMap<>();
@@ -61,7 +61,10 @@ final class SheetRenderer {
         list = new ArrayList<>();
         List<int[]> rects = p.rectangles();
         try {
-            for (int[] r : rects) list.add(spawn(w, p, r, argb));
+            for (int[] r : rects) {
+                list.add(spawn(w, p, r, argb, false));
+                list.add(spawn(w, p, r, argb, true)); // back side
+            }
         } catch (RuntimeException ex) {
             plugin.getLogger().log(java.util.logging.Level.WARNING, "Could not spawn the colour sheet for portal "
                     + p.displayName + " at " + p.minX + " " + p.minY + " " + p.minZ, ex);
@@ -90,7 +93,7 @@ final class SheetRenderer {
     /** Portals whose sheet creation has been logged once, to keep the console quiet. */
     private final java.util.Set<Portal> logged = new java.util.HashSet<>();
 
-    private TextDisplay spawn(World w, Portal p, int[] r, Color argb) {
+    private TextDisplay spawn(World w, Portal p, int[] r, Color argb, boolean back) {
         int u0 = r[0], u1 = r[1], y0 = r[2], y1 = r[3];
         float width = u1 - u0 + 1, height = y1 - y0 + 1;
         double uCentre = (u0 + u1 + 1) / 2.0;
@@ -110,8 +113,10 @@ final class SheetRenderer {
             d.addScoreboardTag(TAG);
             float sx = PX_PER_BLOCK * width / (4 * SPACES + BG_PAD);
             float sy = PX_PER_BLOCK * height / BG_HEIGHT;
-            // A text display faces -Z and lies in the X-Y plane; turn it for Z-axis portals.
-            Quaternionf left = axisX ? new Quaternionf() : new Quaternionf(new AxisAngle4f((float) Math.toRadians(90), 0, 1, 0));
+            // A text display lies in the X-Y plane and is visible from one side only; turn it for
+            // Z-axis portals and add 180 degrees for the back-side copy.
+            float deg = (axisX ? 0f : 90f) + (back ? 180f : 0f);
+            Quaternionf left = new Quaternionf(new AxisAngle4f((float) Math.toRadians(deg), 0, 1, 0));
             d.setTransformation(new Transformation(new Vector3f(0, 0, 0), left, new Vector3f(sx, sy, 1f), new Quaternionf()));
         });
     }

@@ -109,8 +109,9 @@ cancelled. Particle types that need data other than `DustOptions` (e.g. `BLOCK`,
 With `effect: PARTICLE` and `particles.sheet.enabled`, each portal gets text display entities with an
 empty text and a translucent background colour, one per rectangle of `Portal.rectangles()` (greedy
 row-run merge, so a rectangular portal is a single seamless quad). Text displays render 40 px per block;
-the background of a text of `SPACES` spaces is `(4 * SPACES + BG_PAD) × BG_HEIGHT` px, which the
-transformation scales onto the rectangle. Z-axis portals are rotated 90° around Y. Displays are
+the background of a text of `SPACES` spaces is `(4 * SPACES + BG_PAD) × BG_HEIGHT` px (measured in game:
+pad 1, height 10), which the transformation scales onto the rectangle. The quad is back-face culled, so
+each rectangle gets two displays rotated 180° to each other. Z-axis portals are rotated 90° around Y. Displays are
 non-persistent, tagged `craftedportals_sheet` (strays are removed on startup), removed on destroy /
 effect switch / disable, and recreated by `maintain()` when a chunk reloads. Colour: the network colour
 (item name suffix, persisted as `networks.<key>.color`) or `particles.sheet.color`. Geyser does not
