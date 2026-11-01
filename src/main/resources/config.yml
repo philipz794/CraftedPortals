@@ -38,8 +38,9 @@ effect: NETHER
 
 # Settings for effect: PARTICLE
 particles:
-  # Any particle name, e.g. PORTAL, REVERSE_PORTAL, END_ROD, SOUL,
-  # SOUL_FIRE_FLAME, WITCH, ENCHANT, DUST
+  # Any particle name that needs no extra data, e.g. PORTAL, REVERSE_PORTAL,
+  # END_ROD, SOUL, SOUL_FIRE_FLAME, WITCH, ENCHANT, ELECTRIC_SPARK, DUST.
+  # Full list with descriptions: docs/particles.md in the repository.
   type: PORTAL
   # Only used by DUST (hex color)
   color: "#9B30FF"

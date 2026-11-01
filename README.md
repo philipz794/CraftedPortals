@@ -74,7 +74,7 @@ See [`config.yml`](src/main/resources/config.yml) for all options and messages. 
 | `activation-item` | `CLOCK` | Item that activates portals when renamed |
 | `key-block` / `key-block-count` | `EMERALD_BLOCK` / `2` | Block type and minimum count required in the frame |
 | `max-blocks` | `200` | Maximum number of air blocks inside a portal (hard limit 1000) |
-| `effect` | `NETHER` | `NETHER`, `END` or `PARTICLE` visuals (`particles.*` for the latter) |
+| `effect` | `NETHER` | `NETHER`, `END` or `PARTICLE` visuals (`particles.*` for the latter, see [docs/particles.md](docs/particles.md)) |
 | `player-delay-ticks` | `80` | Time a survival player has to stand in the portal |
 | `consume-clock` | `true` | Consume the clock on activation (never in creative) |
 | `teleport-mobs` / `teleport-items` / `leashed-follow` | `true` | Who else may travel |
