@@ -24,7 +24,9 @@ real name anywhere.
 - Vanilla portal teleports (nether / end gateway) are suppressed in the listener; when changing the
   portal visuals, make sure that still holds.
 - Always place portal blocks with `setBlockData(…, false)` (no physics), see docs/architecture.md.
-- Configurable values and player-facing texts come from `config.yml`, never hard-coded.
+- Configurable values and player-facing texts come from `config.yml`, never hard-coded. New options
+  need a comment block directly above them in the bundled `config.yml`; `ConfigUpdater` copies it into
+  existing server configs. Renamed options go into `ConfigUpdater.RENAMED`.
 - Read docs/gameplay.md before touching frame detection or teleport logic; the specification there
   is authoritative and must be updated alongside behaviour changes.
 

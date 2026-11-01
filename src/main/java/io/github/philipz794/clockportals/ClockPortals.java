@@ -10,9 +10,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 
 public final class ClockPortals extends JavaPlugin {
 
@@ -28,6 +30,13 @@ public final class ClockPortals extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        try {
+            ConfigUpdater.Result upd = ConfigUpdater.update(this);
+            for (String r : upd.renamed()) getLogger().info("config.yml: renamed option " + r);
+            if (!upd.added().isEmpty()) getLogger().info("config.yml: added new option(s) " + String.join(", ", upd.added()));
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Could not update config.yml", e);
+        }
         loadSettings();
         manager = new PortalManager(this);
         manager.load();

@@ -36,6 +36,12 @@ There are no unit tests. Verification happens on a Paper 26.3 test server, prefe
 - Bedrock players via Geyser/Floodgate (action bar, right-click, teleport).
 - `piglin-spawn: true` actually allowing spawns (vanilla spawn chance is low; never on peaceful).
 
+## Config update on a server running 1.0.0
+
+Expected log lines on first start with the new jar: `renamed option max-size -> max-blocks` and
+`added new option(s) piglin-spawn, messages.too-small`. The file keeps all owner values and comments;
+`max-blocks` is `(max-size - 2)²`, i.e. 784 for the default 30.
+
 ## Checklist after changes
 
 1. `mvn package`, copy the jar to the test server, restart.

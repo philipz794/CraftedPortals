@@ -11,6 +11,7 @@ Package: `io.github.philipz794.clockportals`
 | `Portal` | Interior bounding box (min/max inclusive) plus a boolean mask of the interior cells, axis, world. `contains()`, `intersects(BoundingBox)`, `frame()` (edge neighbours plus diagonal-only corners, derived from the mask), `interior()`, `box()`, `arrival()` (lowest 2-high column nearest the centre), `isLoaded()`, `maskRows()`/`parseMask()` for persistence. |
 | `PortalManager` | Networks (`LinkedHashMap` name → list), index world → block → portal for interior and frame. `create/destroy/fill/next`. Persistence in `plugins/Clock-Portals/portals.yml`. |
 | `PortalListener` | Clock click, destruction, protection (pistons, fluids), suppression of vanilla teleports, piglin spawns, `WorldLoadEvent` → reindex. |
+| `ConfigUpdater` | On startup, brings an existing `config.yml` up to date from the bundled template: appends missing options with their comment block, inserts missing keys inside existing sections (e.g. `messages`), converts renamed options in place (`RENAMED` map + `convert()`). Never touches values or comments the owner wrote. Pure `merge()` for testing. |
 | `TravelTask` | Runs every tick: `getNearbyEntities(portal.box())`, per-player delay, `justArrived` lock, `teleportAsync`, yaw/velocity conversion for different axes, leash handling. Every 10 ticks `maintain()`. |
 
 ## Suppressed vanilla events
@@ -73,6 +74,19 @@ Per portal the interior bounding box is stored (`minX`…`maxZ`). Non-rectangula
 carry `cells`, a list of strings from top to bottom with `#` for interior and `.` for not, e.g.
 `["#..", "#..", "###"]` for an L. Entries without `cells` are full rectangles, which also makes
 files written by version 1.0.0 load unchanged.
+
+### Config updates
+
+`ConfigUpdater.update()` runs in `onEnable()` right after `saveDefaultConfig()`. It works on the file as
+text, so the owner's comments and ordering survive. Missing top-level options are appended with the
+comment lines directly above them in the template (a blank line separates a comment block from the
+previous option, so the file header is never copied). Missing keys of an existing section are inserted
+at the end of that section. A renamed option is rewritten in place: the old key line and its stale
+comment block are replaced by the new key with the converted value and the template's comment.
+Additions are logged. Running it twice changes nothing.
+
+To rename an option in a future version: add it to `ConfigUpdater.RENAMED` and, if the meaning
+changed, to `convert()`.
 
 ### Size limits
 
