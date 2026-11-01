@@ -89,8 +89,8 @@ travel-sound: true
 # Show a progress bar in the action bar while waiting
 travel-bar: true
 
-# Consume the named clock when activating a portal?
-consume-clock: true
+# Consume the named item when activating a portal? Never in creative mode.
+consume-item: true
 
 # Do animals, villagers and monsters travel through portals on their own?
 teleport-mobs: true

@@ -71,7 +71,7 @@ See [`config.yml`](src/main/resources/config.yml) for all options and messages. 
 | `player-delay-ticks` | `80` | Time a survival player has to stand in the portal |
 | `travel-effect` | `NAUSEA` | Screen effect while waiting: `NAUSEA`, `FROST`, `DARKNESS`, `BORDER` or `NONE` |
 | `travel-particles` / `travel-sound` / `travel-bar` | on | Particles around the player, swelling sound, progress bar |
-| `consume-clock` | `true` | Consume the item on activation (never in creative) |
+| `consume-item` | `true` | Consume the item on activation (never in creative) |
 | `teleport-mobs` / `teleport-items` / `leashed-follow` | `true` | Who else may travel |
 | `piglin-spawn` | `false` | Allow zombified piglins to spawn from portal blocks |
 

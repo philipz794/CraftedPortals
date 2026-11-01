@@ -26,7 +26,9 @@ import java.util.regex.Pattern;
 final class ConfigUpdater {
 
     /** Old option name -> new option name. The value is converted by {@link #convert}. */
-    private static final Map<String, String> RENAMED = Map.of("max-size", "max-blocks");
+    private static final Map<String, String> RENAMED = Map.of(
+            "max-size", "max-blocks",
+            "consume-clock", "consume-item");
 
     private static final Pattern TOP_KEY = Pattern.compile("^([A-Za-z0-9_-]+):(.*)$");
     private static final Pattern SUB_KEY = Pattern.compile("^(\\s+)([A-Za-z0-9_-]+):(.*)$");

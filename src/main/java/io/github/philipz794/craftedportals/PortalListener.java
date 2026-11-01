@@ -88,7 +88,7 @@ final class PortalListener implements Listener {
         switch (r.error()) {
             case NONE -> {
                 Portal portal = mgr.create(name, clicked.getWorld(), r);
-                if (plugin.consumeClock() && p.getGameMode() != GameMode.CREATIVE) {
+                if (plugin.consumeItem() && p.getGameMode() != GameMode.CREATIVE) {
                     item.setAmount(item.getAmount() - 1);
                 }
                 Location c = portal.arrival(clicked.getWorld());

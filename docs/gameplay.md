@@ -24,7 +24,7 @@ Update it alongside behaviour changes in the code.
   The item is `activation-item` (default `CLOCK`, any item from the registry). An unknown name falls
   back to `CLOCK`; the problem is logged and shown to admins (`craftedportals.admin`) on join and after
   `/craftedportals reload`.
-- The item is consumed (`consume-clock`, default true), never in creative mode.
+- The item is consumed (`consume-item`, default true), never in creative mode.
 - Item name = network name. Key is case-insensitive, display name as typed.
 - Right-click an already active portal with a named item → info only ("name, #X of Y"), no renaming.
 - Unnamed item on a valid frame → hint to rename it (`messages.no-name`, placeholder `%item%`).

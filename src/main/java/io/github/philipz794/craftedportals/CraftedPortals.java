@@ -45,7 +45,7 @@ public final class CraftedPortals extends JavaPlugin {
     private ParticleSettings particles;
     private TravelSettings travelSettings;
     private int playerDelay;
-    private boolean consumeClock, teleportMobs, teleportItems, leashedFollow, piglinSpawn;
+    private boolean consumeItem, teleportMobs, teleportItems, leashedFollow, piglinSpawn;
     private int maxBlocks;
     private Material activationItem = Material.CLOCK;
     /** Problems found in config.yml, shown to admins on join and after reload. */
@@ -132,7 +132,7 @@ public final class CraftedPortals extends JavaPlugin {
         particles = loadParticles();
         travelSettings = loadTravelSettings();
         playerDelay = Math.max(0, getConfig().getInt("player-delay-ticks", 80));
-        consumeClock = getConfig().getBoolean("consume-clock", true);
+        consumeItem = getConfig().getBoolean("consume-item", true);
         teleportMobs = getConfig().getBoolean("teleport-mobs", true);
         teleportItems = getConfig().getBoolean("teleport-items", true);
         leashedFollow = getConfig().getBoolean("leashed-follow", true);
@@ -220,7 +220,7 @@ public final class CraftedPortals extends JavaPlugin {
     TravelSettings travelSettings() { return travelSettings; }
     boolean useEndEffect() { return effect == Effect.END; }
     int playerDelay() { return effect == Effect.END ? 0 : playerDelay; }
-    boolean consumeClock() { return consumeClock; }
+    boolean consumeItem() { return consumeItem; }
     boolean teleportMobs() { return teleportMobs; }
     boolean teleportItems() { return teleportItems; }
     boolean leashedFollow() { return leashedFollow; }
