@@ -4,7 +4,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/philipz794/CraftedPortals?label=release)](https://github.com/philipz794/CraftedPortals/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-![Portals are not limited to rectangles: an arched deepslate frame with emerald key blocks, filled with a translucent blue sheet and particles](assets/screenshots/craftedportals_1.jpg)
+![CraftedPortals: a stone brick portal with emerald key blocks, filled with a translucent blue sheet and particles](assets/screenshots/hero.jpg)
 
 A server-side [Paper](https://papermc.io) plugin that lets players build portals out of **any full blocks**
 in **any shape** and link them with a **renamed item**, a clock by default. No client mods required;
@@ -33,9 +33,9 @@ plugin without dependencies.
 
 ## Screenshots
 
-| Classic frame, corners left out | Mix any blocks, just include the key blocks |
-|---|---|
-| ![A nether-portal-sized frame without corner blocks](assets/screenshots/craftedportals_2.jpg) | ![A frame mixing sculk, deepslate and emerald blocks](assets/screenshots/craftedportals_3.jpg) |
+| Any shape, not just rectangles | Classic frame, corners left out | Mix any blocks, just include the key blocks |
+|---|---|---|
+| ![An arched deepslate frame with emerald key blocks](assets/screenshots/craftedportals_1.jpg) | ![A nether-portal-sized frame without corner blocks](assets/screenshots/craftedportals_2.jpg) | ![A frame mixing sculk, deepslate and emerald blocks](assets/screenshots/craftedportals_3.jpg) |
 
 ## Requirements
 
