@@ -1,7 +1,11 @@
 # Clock-Portals – Hinweise für Claude
 
 Paper-Plugin (Java 21 Bytecode, gebaut mit JDK 25) für Paper 26.3.
-Nur öffentliche Paper-API, kein NMS. Sprache im Projekt (Kommentare, Texte, Docs): Deutsch.
+Nur öffentliche Paper-API, kein NMS.
+
+Sprachen: Code-Kommentare und `docs/` auf Deutsch. Alles, was Spieler oder Server-Admins sehen
+(`config.yml`, `plugin.yml`, Actionbar- und Befehlsausgaben, Log-Meldungen) auf Englisch, damit das
+Plugin veröffentlicht werden kann.
 
 ## Kommandos
 
@@ -11,7 +15,7 @@ Nur öffentliche Paper-API, kein NMS. Sprache im Projekt (Kommentare, Texte, Doc
 ## Struktur
 
 - `src/main/java/de/philipz/clockportals/` – alle Klassen (Main, FrameDetector, Portal, PortalManager, PortalListener, TravelTask)
-- `src/main/resources/` – `plugin.yml`, `config.yml` (Defaults + deutsche Meldungen)
+- `src/main/resources/` – `plugin.yml`, `config.yml` (Defaults + englische Meldungen)
 - `docs/` – Dev-Dokumentation. Neues Wissen gehört dorthin, nicht in diese Datei.
 
 ## Regeln

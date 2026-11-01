@@ -5,7 +5,7 @@ Es gibt keine Unit-Tests. Geprüft wird auf einem Paper-26.3-Testserver, bevorzu
 
 ## Hilfreiche Befehle
 
-- `/clockportals create <name> <x> <y> <z> [welt]` – Portal ohne Uhr aktivieren (auch Konsole).
+- `/clockportals create <name> <x> <y> <z> [world]` – Portal ohne Uhr aktivieren (auch Konsole).
 - `/clockportals list` – alle Netzwerke und Portale.
 - `/clockportals reload` – Config neu laden.
 - `/summon`, `/setblock`, `/fill`, TNT – für Mob-, Rahmen- und Zerstörungstests.

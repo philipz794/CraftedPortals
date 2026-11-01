@@ -19,7 +19,7 @@ Bei Verhaltensänderungen im Code hier mitpflegen.
 - Uhrname = Netzwerkname. Schlüssel case-insensitive, Anzeige wie getippt.
 - Rechtsklick mit benannter Uhr auf ein bereits aktives Portal → nur Info („Name, Nr. X von Y“), kein Umbenennen.
 - Unbenannte Uhr auf gültigen Rahmen → Hinweis „Uhr benennen“ (`messages.no-name`).
-- Admin-Alternative ohne Uhr: `/clockportals create <name> <x> <y> <z> [welt]` (auch von der Konsole).
+- Admin-Alternative ohne Uhr: `/clockportals create <name> <x> <y> <z> [world]` (auch von der Konsole).
 
 ## Netzwerke & Reise
 
@@ -57,6 +57,7 @@ Bei Verhaltensänderungen im Code hier mitpflegen.
 
 ## Meldungen & Befehle
 
-- Alle Meldungen in der Actionbar, Texte in `config.yml` (`&`-Farbcodes, deutsch).
-- Befehl `/clockportals list | reload | create <name> <x> <y> <z> [welt]`.
+- Alle Meldungen in der Actionbar, Texte in `config.yml` (`&`-Farbcodes). Config, Spielertexte und
+  Log-Ausgaben sind Englisch (Plugin soll veröffentlichbar sein); Server-Admins können die Texte übersetzen.
+- Befehl `/clockportals list | reload | create <name> <x> <y> <z> [world]`.
 - Permission `clockportals.admin` (Default: op).

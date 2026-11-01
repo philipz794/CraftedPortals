@@ -47,7 +47,7 @@ public final class ClockPortals extends JavaPlugin {
         reloadConfig();
         Material key = Material.matchMaterial(getConfig().getString("key-block", "EMERALD_BLOCK"));
         if (key == null || !key.isBlock()) {
-            getLogger().warning("Unbekannter key-block, verwende EMERALD_BLOCK");
+            getLogger().warning("Unknown key-block, falling back to EMERALD_BLOCK");
             key = Material.EMERALD_BLOCK;
         }
         maxSize = Math.max(4, getConfig().getInt("max-size", 30));
@@ -109,16 +109,16 @@ public final class ClockPortals extends JavaPlugin {
             case "reload" -> {
                 loadSettings();
                 manager.all().forEach(manager::fill);
-                sender.sendMessage(Component.text("Clock-Portals: Config neu geladen."));
+                sender.sendMessage(Component.text("Clock-Portals: config reloaded."));
             }
             case "list" -> {
                 if (manager.networks().isEmpty()) {
-                    sender.sendMessage(Component.text("Keine Portale vorhanden."));
+                    sender.sendMessage(Component.text("No portals yet."));
                     return true;
                 }
                 for (List<Portal> net : manager.networks()) {
                     sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(
-                            "&6" + net.get(0).displayName + " &7(" + net.size() + " Portal(e))"));
+                            "&6" + net.get(0).displayName + " &7(" + net.size() + " portal(s))"));
                     int i = 1;
                     for (Portal p : net) {
                         sender.sendMessage(Component.text("  " + i++ + ". " + p.worldName + " "
@@ -129,13 +129,13 @@ public final class ClockPortals extends JavaPlugin {
             case "create" -> {
                 // /clockportals create <name> <x> <y> <z> [welt]  -> aktiviert den Rahmen am Block x y z
                 if (args.length < 5) {
-                    sender.sendMessage(Component.text("/clockportals create <name> <x> <y> <z> [welt]"));
+                    sender.sendMessage(Component.text("/clockportals create <name> <x> <y> <z> [world]"));
                     return true;
                 }
                 World w = args.length >= 6 ? Bukkit.getWorld(args[5])
                         : sender instanceof Player pl ? pl.getWorld() : Bukkit.getWorlds().get(0);
                 if (w == null) {
-                    sender.sendMessage(Component.text("Welt nicht gefunden."));
+                    sender.sendMessage(Component.text("World not found."));
                     return true;
                 }
                 try {
@@ -143,7 +143,7 @@ public final class ClockPortals extends JavaPlugin {
                     Component res = activate(args[1], w.getBlockAt(x, y, z));
                     sender.sendMessage(res);
                 } catch (NumberFormatException e) {
-                    sender.sendMessage(Component.text("Ungueltige Koordinaten."));
+                    sender.sendMessage(Component.text("Invalid coordinates."));
                 }
             }
             default -> sender.sendMessage(Component.text("/clockportals <list|reload|create>"));

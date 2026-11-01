@@ -181,13 +181,13 @@ final class PortalManager {
                     list.add(p);
                     n++;
                 } catch (Exception e) {
-                    plugin.getLogger().log(Level.WARNING, "Fehlerhafter Portaleintrag in Netzwerk " + key, e);
+                    plugin.getLogger().log(Level.WARNING, "Invalid portal entry in network " + key, e);
                 }
             }
             if (!list.isEmpty()) networks.put(key, list);
         }
         for (Portal p : all()) index(p);
-        plugin.getLogger().info(n + " Portal(e) in " + networks.size() + " Netzwerk(en) geladen.");
+        plugin.getLogger().info(n + " portal(s) in " + networks.size() + " network(s) loaded.");
     }
 
     /** Index fuer Portale nachholen, deren Welt erst spaeter geladen wurde. */
@@ -215,7 +215,7 @@ final class PortalManager {
             plugin.getDataFolder().mkdirs();
             yml.save(file);
         } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, "portals.yml konnte nicht gespeichert werden", ex);
+            plugin.getLogger().log(Level.SEVERE, "Could not save portals.yml", ex);
         }
     }
 

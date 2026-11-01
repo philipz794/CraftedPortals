@@ -11,7 +11,7 @@ Gleicher Uhrname = gemeinsames Netzwerk, Reise im Kreis 1 → 2 → 3 → 1, auc
 - Build: `mvn package` (JDK 25 nötig) → `target/clockportals-1.0.0.jar`
 - JAR nach `plugins/` auf den Paper-Server kopieren
 - Konfiguration: `plugins/Clock-Portals/config.yml`
-- Befehl: `/clockportals list | reload | create <name> <x> <y> <z> [welt]` (Permission `clockportals.admin`)
+- Befehl: `/clockportals list | reload | create <name> <x> <y> <z> [world]` (Permission `clockportals.admin`)
 
 ## Dokumentation
 

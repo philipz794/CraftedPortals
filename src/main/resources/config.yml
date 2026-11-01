@@ -1,55 +1,55 @@
 # ============================================================
-#  Clock-Portals - Konfiguration
+#  Clock-Portals - Configuration
 # ============================================================
 #
-# Bau eines Portals:
-#   - Senkrechter Rahmen (wie ein Netherportal) aus beliebigen
-#     vollen Bloecken. Ecken duerfen fehlen.
-#   - Im Rahmen muessen mindestens 'key-block-count' Bloecke vom
-#     Typ 'key-block' verbaut sein.
-#   - Innenraum leer (Luft), mindestens 1 breit und 2 hoch.
-#   - Rechtsklick mit einer am Amboss benannten Uhr auf den Rahmen.
-#   - Portale mit gleichem Uhr-Namen bilden ein Netzwerk und werden
-#     der Reihe nach im Kreis durchlaufen (1 -> 2 -> 3 -> 1 ...).
+# Building a portal:
+#   - Vertical frame (like a nether portal) made of any full
+#     blocks. Corners may be left out.
+#   - The frame must contain at least 'key-block-count' blocks
+#     of type 'key-block'.
+#   - Interior empty (air), at least 1 wide and 2 high.
+#   - Right-click the frame with a clock renamed on an anvil.
+#   - Portals with the same clock name form a network and are
+#     visited in a loop (1 -> 2 -> 3 -> 1 ...).
 
-# Block, der im Rahmen vorkommen muss
+# Block that must be part of the frame
 key-block: EMERALD_BLOCK
-# Wie viele dieser Bloecke mindestens im Rahmen sein muessen
+# Minimum number of these blocks in the frame
 key-block-count: 2
 
-# Maximale Aussenmasse des Rahmens (Breite und Hoehe in Bloecken)
+# Maximum outer size of the frame (width and height in blocks)
 max-size: 30
 
-# Optik im Portal: NETHER (lila Netherportal) oder END (Endtransitportal)
+# Portal visuals: NETHER (purple nether portal) or END (end gateway)
 effect: NETHER
 
-# Wie lange ein Spieler im Survival im Portal stehen muss (in Ticks,
-# 20 Ticks = 1 Sekunde). Vanilla-Netherportal: 80. Kreativ: immer sofort.
-# Beim END-Effekt wird immer sofort teleportiert.
+# How long a survival player has to stand in the portal (in ticks,
+# 20 ticks = 1 second). Vanilla nether portal: 80. Creative: always instant.
+# With the END effect teleportation is always instant.
 player-delay-ticks: 80
 
-# Wird die benannte Uhr beim Aktivieren verbraucht?
+# Consume the named clock when activating a portal?
 consume-clock: true
 
-# Laufen Tiere, Villager und Monster selbst durch Portale?
+# Do animals, villagers and monsters travel through portals on their own?
 teleport-mobs: true
-# Koennen geworfene Items durch Portale fliegen?
+# Can thrown items fly through portals?
 teleport-items: true
-# Reisen angeleinte Tiere mit dem Spieler mit?
+# Do leashed animals travel along with the player?
 leashed-follow: true
 
-# Duerfen aus den Netherportal-Bloecken eines Clock-Portals Zombifizierte
-# Piglins spawnen (wie bei einem Vanilla-Netherportal in der Oberwelt)?
-# Betrifft nur Clock-Portals, normale Netherportale bleiben unveraendert.
+# May zombified piglins spawn from the nether portal blocks of a
+# Clock-Portal (like a vanilla nether portal in the overworld)?
+# Only affects Clock-Portals, regular nether portals are unchanged.
 piglin-spawn: false
 
-# Meldungen (& fuer Farbcodes)
+# Messages (& for color codes)
 messages:
-  activated: "&aPortal &f%name% &aaktiviert &7(Nr. %pos% von %count%)"
-  info: "&7Portal &f%name% &7- Nr. %pos% von %count%"
-  destroyed: "&cPortal &f%name% &cwurde zerstoert"
-  no-name: "&eBenenne die Uhr zuerst am Amboss - der Name wird der Portalname."
-  invalid-frame: "&cKein gueltiger Portalrahmen gefunden."
-  too-big: "&cDer Rahmen ist zu gross (max. %max% Bloecke)."
-  missing-keys: "&cIm Rahmen fehlen Schluesselbloecke (%have%/%need% %block%)."
-  no-target: "&eDieses Portal hat noch kein Ziel - baue ein zweites mit dem Namen &f%name%&e."
+  activated: "&aPortal &f%name% &aactivated &7(#%pos% of %count%)"
+  info: "&7Portal &f%name% &7- #%pos% of %count%"
+  destroyed: "&cPortal &f%name% &chas been destroyed"
+  no-name: "&eRename the clock on an anvil first - its name becomes the portal name."
+  invalid-frame: "&cNo valid portal frame found."
+  too-big: "&cThe frame is too big (max. %max% blocks)."
+  missing-keys: "&cThe frame is missing key blocks (%have%/%need% %block%)."
+  no-target: "&eThis portal has no destination yet - build a second one named &f%name%&e."
