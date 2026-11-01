@@ -116,9 +116,9 @@ particles:
 
 # Ambient sound of portals with the PARTICLE or END look (nether portal
 # blocks bring their own). Played like vanilla does it: at random moments on
-# random interior blocks with slightly varying pitch. true = the nether
-# portal ambient, false = off, or any sound: game names such as
-# BLOCK_BEACON_AMBIENT, or a key from a resource pack such as
+# random interior blocks with slightly varying pitch. true = the default
+# (BLOCK_BEACON_AMBIENT), false = off, or any sound: game names such as
+# BLOCK_PORTAL_AMBIENT, or a key from a resource pack such as
 # mypack:portal_hum (the client needs that pack). Good steady candidates:
 #   BLOCK_PORTAL_AMBIENT         - classic whoosh
 #   BLOCK_BEACON_AMBIENT         - deep soft hum
@@ -126,7 +126,7 @@ particles:
 #   BLOCK_RESPAWN_ANCHOR_AMBIENT - eerie warble
 #   BLOCK_AMETHYST_BLOCK_CHIME   - short crystal chimes
 #   BLOCK_END_PORTAL_FRAME_FILL  - short magical accent
-ambient-sound: true
+ambient-sound: BLOCK_BEACON_AMBIENT
 ambient-sound-volume: 0.3
 ambient-sound-pitch: 1.0
 # Average seconds between two sounds per portal (randomised, 1-60)

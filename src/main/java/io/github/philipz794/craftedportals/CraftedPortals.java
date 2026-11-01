@@ -141,7 +141,7 @@ public final class CraftedPortals extends JavaPlugin {
         }
         particles = loadParticles();
         ambient = new AmbientSettings(
-                SoundSpec.load(getConfig(), "ambient-sound", "BLOCK_PORTAL_AMBIENT", 0.3f, "ambient-sound", this::warn),
+                SoundSpec.load(getConfig(), "ambient-sound", "BLOCK_BEACON_AMBIENT", 0.3f, "ambient-sound", this::warn),
                 Math.max(1, Math.min(60, getConfig().getInt("ambient-sound-interval", 4))));
         travelSettings = loadTravelSettings();
         playerDelay = Math.max(0, getConfig().getInt("player-delay-ticks", 60));
