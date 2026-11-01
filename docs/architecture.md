@@ -18,6 +18,11 @@ Package: `io.github.philipz794.clockportals`
 
 So that vanilla does not treat the portal blocks as its own nether/end portals, the listener cancels:
 
+- `EntityInsideBlockEvent` for nether portal / end gateway blocks of our portals. This is the earliest
+  hook (fired every tick while an entity stands in such a block) and prevents vanilla from even starting
+  its portal process. It was added after a bug where a player standing in a portal with no destination
+  (1 of 1 in its network) was teleported to the Nether by vanilla, including portal generation; the
+  later events below did not catch that case on Paper 26.3. Side effect: no vanilla portal nausea overlay.
 - `PlayerPortalEvent`, `EntityPortalEvent`, `EntityPortalReadyEvent`
 - `PlayerTeleportEvent` with cause `NETHER_PORTAL` / `END_GATEWAY`
 - `EntityTeleportEndGatewayEvent`

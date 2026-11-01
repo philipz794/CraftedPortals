@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
+import io.papermc.paper.event.entity.EntityInsideBlockEvent;
 import io.papermc.paper.event.entity.EntityPortalReadyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -196,6 +197,19 @@ final class PortalListener implements Listener {
         if (loc == null || loc.getWorld() == null) return false;
         Block b = loc.getBlock();
         return mgr.byInterior(b) != null || mgr.byInterior(b.getRelative(0, 1, 0)) != null;
+    }
+
+    /**
+     * Earliest hook: fired every tick for an entity standing in a nether portal or end gateway
+     * block. Cancelling it stops vanilla from starting its portal logic at all, so no vanilla
+     * teleport and no portal generation in the other dimension can happen, regardless of whether
+     * our own portal has a destination. The handlers below remain as a safety net.
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInsideBlock(EntityInsideBlockEvent e) {
+        Material t = e.getBlock().getType();
+        if (t != Material.NETHER_PORTAL && t != Material.END_GATEWAY) return;
+        if (mgr.byInterior(e.getBlock()) != null) e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
