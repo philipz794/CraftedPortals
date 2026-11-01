@@ -3,8 +3,9 @@
 <img src="assets/icon.png" alt="CraftedPortals icon" width="128" align="right">
 
 A server-side [Paper](https://papermc.io) plugin that lets players build portals out of **any full blocks**
-and link them with a **named clock**. No client mods required; works for Java and Bedrock players
-(via Geyser/Floodgate).
+in **any shape** and link them with a **named clock**. No client mods required; works for Java and
+Bedrock players (via Geyser/Floodgate). Inspired by [CreativeGates](https://github.com/JeremyFail/CreativeGates),
+rebuilt from scratch as a lightweight plugin without dependencies.
 
 ## Features
 
