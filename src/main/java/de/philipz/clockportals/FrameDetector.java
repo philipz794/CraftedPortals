@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Erkennt einen gueltigen Portalrahmen ausgehend vom angeklickten Block. */
+/** Detects a valid portal frame starting from the clicked block. */
 final class FrameDetector {
 
     enum Error { NONE, NO_FRAME, TOO_BIG, MISSING_KEYS }
@@ -32,7 +32,7 @@ final class FrameDetector {
         this.maxSize = Math.max(4, maxSize);
     }
 
-    /** Voller 1x1x1-Block (keine Stufen, Slabs, Zaeune, Schnee ...). */
+    /** Full 1x1x1 block (no stairs, slabs, fences, snow ...). */
     static boolean isFullBlock(Block b) {
         Material m = b.getType();
         if (!m.isBlock() || !m.isSolid() || b.isLiquid()) return false;
@@ -83,7 +83,7 @@ final class FrameDetector {
 
         while (!queue.isEmpty()) {
             int[] c = queue.poll();
-            // Luft "laeuft aus" -> Rahmen offen oder viel zu gross
+            // air "leaks out" -> frame is open or far too big
             if (seen.size() > limit) return fail(Error.NO_FRAME);
             minX = Math.min(minX, c[0]); maxX = Math.max(maxX, c[0]);
             minY = Math.min(minY, c[1]); maxY = Math.max(maxY, c[1]);
@@ -106,7 +106,7 @@ final class FrameDetector {
         int height = maxY - minY + 1;
         if (width > maxInner || height > maxInner) return fail(Error.TOO_BIG);
         if (width < 1 || height < 2) return fail(Error.NO_FRAME);
-        if (seen.size() != width * height) return fail(Error.NO_FRAME); // kein Rechteck
+        if (seen.size() != width * height) return fail(Error.NO_FRAME); // not a rectangle
 
         Portal tmp = new Portal("", "", w.getName(), axis, minX, minY, minZ, maxX, maxY, maxZ);
         boolean clickedIsFrame = false;

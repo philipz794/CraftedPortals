@@ -26,13 +26,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-/** Prueft jeden Tick, wer in einem Portal steht, und teleportiert. */
+/** Checks every tick who is standing in a portal and teleports them. */
 final class TravelTask extends BukkitRunnable {
 
     private final ClockPortals plugin;
-    /** Spieler -> Ticks im Portal. */
+    /** Player -> ticks spent in the portal. */
     private final Map<UUID, Integer> waiting = new HashMap<>();
-    /** Gerade angekommen: erst wieder reisen, wenn das Portal verlassen wurde. */
+    /** Just arrived: may travel again only after leaving the portal. */
     private final Map<UUID, Long> justArrived = new HashMap<>();
     private long tick;
 
@@ -71,14 +71,14 @@ final class TravelTask extends BukkitRunnable {
         }
 
         waiting.keySet().retainAll(inside);
-        // "Angekommen"-Markierung loeschen, sobald das Portal verlassen wurde (min. 1 s spaeter)
+        // Clear the "arrived" marker once the portal has been left (at least 1 s later)
         justArrived.entrySet().removeIf(en -> !inside.contains(en.getKey()) && tick - en.getValue() > 20);
     }
 
     /**
-     * Vanilla entfernt Netherportal-Bloecke, sobald sich ein Rahmenblock aendert
-     * (kein Obsidian). Deshalb: Rahmen noch gueltig -> Innenraum reparieren,
-     * Rahmen kaputt (z.B. per Befehl/WorldEdit) -> Portal entfernen.
+     * Vanilla removes nether portal blocks as soon as a frame block changes
+     * (frame is not obsidian). Therefore: frame still valid -> repair the interior,
+     * frame broken (e.g. via command/WorldEdit) -> remove the portal.
      */
     private void maintain(PortalManager mgr) {
         Material want = plugin.useEndEffect() ? Material.END_GATEWAY : Material.NETHER_PORTAL;
@@ -104,7 +104,7 @@ final class TravelTask extends BukkitRunnable {
         if (e instanceof Item) return plugin.teleportItems();
         if (e instanceof Boss || e instanceof EnderDragon) return false;
         if (e instanceof LivingEntity le) {
-            if (le instanceof Mob m && m.isLeashed()) return false; // reist mit dem Spieler
+            if (le instanceof Mob m && m.isLeashed()) return false; // travels along with the player
             return plugin.teleportMobs();
         }
         return false;
@@ -116,7 +116,7 @@ final class TravelTask extends BukkitRunnable {
         if (to == null) {
             if (e instanceof Player p) {
                 p.sendActionBar(plugin.msg("no-target", "%name%", from.displayName));
-                justArrived.put(e.getUniqueId(), tick); // nicht jeden Tick melden
+                justArrived.put(e.getUniqueId(), tick); // do not notify every tick
             }
             return;
         }
@@ -131,7 +131,7 @@ final class TravelTask extends BukkitRunnable {
         dest.setYaw(yaw);
         dest.setPitch(cur.getPitch());
 
-        // Bewegung umrechnen (Richtung senkrecht zum Portal bleibt erhalten)
+        // Convert velocity (the component perpendicular to the portal is preserved)
         Vector v = e.getVelocity();
         Vector nv = v.clone();
         if (rotate) {
@@ -140,7 +140,7 @@ final class TravelTask extends BukkitRunnable {
         }
         final Vector outVel = nv;
 
-        // Angeleinte Tiere des Spielers einsammeln
+        // Collect the player's leashed animals
         List<Mob> leashed = new ArrayList<>();
         if (e instanceof Player p && plugin.leashedFollow()) {
             for (Entity n : p.getNearbyEntities(12, 12, 12)) {

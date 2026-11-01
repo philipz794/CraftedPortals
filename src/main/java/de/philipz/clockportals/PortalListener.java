@@ -48,7 +48,7 @@ final class PortalListener implements Listener {
         this.mgr = plugin.manager();
     }
 
-    // ------------------------------------------------------------ Aktivieren
+    // ------------------------------------------------------------ Activation
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onInteract(PlayerInteractEvent e) {
@@ -74,7 +74,7 @@ final class PortalListener implements Listener {
 
         FrameDetector.Result r = plugin.detector().detect(clicked);
         if (name == null) {
-            // Unbenannte Uhr: nur melden, wenn es wirklich ein Rahmen ist
+            // Unnamed clock: only respond if this really is a frame
             if (r.ok() || r.error() == FrameDetector.Error.MISSING_KEYS) {
                 e.setCancelled(true);
                 p.sendActionBar(plugin.msg("no-name"));
@@ -105,7 +105,7 @@ final class PortalListener implements Listener {
         }
     }
 
-    // ------------------------------------------------------------ Zerstoeren
+    // ------------------------------------------------------------ Destruction
 
     private void destroy(Portal p) {
         plugin.destroyWithMessage(p);
@@ -158,7 +158,7 @@ final class PortalListener implements Listener {
         hit.forEach(this::destroy);
     }
 
-    // ------------------------------------------------------------ Schuetzen
+    // ------------------------------------------------------------ Protection
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPhysics(BlockPhysicsEvent e) {
@@ -189,7 +189,7 @@ final class PortalListener implements Listener {
         return false;
     }
 
-    // ------------------------------------------------------------ Vanilla-Portale unterdruecken
+    // ------------------------------------------------------------ Suppress vanilla portals
 
     private boolean inOurPortal(Location loc) {
         if (loc == null || loc.getWorld() == null) return false;
@@ -225,9 +225,9 @@ final class PortalListener implements Listener {
     }
 
     /**
-     * Vanilla laesst aus Netherportal-Bloecken Zombifizierte Piglins spawnen
-     * (NetherPortalBlock.randomTick, Spawnposition = unterster Portalblock der Spalte).
-     * Bei piglin-spawn: false wird das fuer unsere Portale unterbunden.
+     * Vanilla spawns zombified piglins from nether portal blocks
+     * (NetherPortalBlock.randomTick, spawn position = lowest portal block of the column).
+     * With piglin-spawn: false this is suppressed for our portals.
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent e) {

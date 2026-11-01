@@ -1,32 +1,34 @@
-# Clock-Portals – Hinweise für Claude
+# Clock-Portals – Notes for Claude
 
-Paper-Plugin (Java 21 Bytecode, gebaut mit JDK 25) für Paper 26.3.
-Nur öffentliche Paper-API, kein NMS.
+Paper plugin (Java 21 bytecode, built with JDK 25+) for Paper 26.3. Public Paper API only, no NMS.
 
-Sprachen: Code-Kommentare und `docs/` auf Deutsch. Alles, was Spieler oder Server-Admins sehen
-(`config.yml`, `plugin.yml`, Actionbar- und Befehlsausgaben, Log-Meldungen) auf Englisch, damit das
-Plugin veröffentlicht werden kann.
+Language: everything in this repository is English (code, comments, config, player-facing texts,
+docs, commit messages). The project is meant to be released publicly; do not mention the author's
+real name anywhere.
 
-## Kommandos
+## Commands
 
-- Build: `JAVA_HOME=/opt/homebrew/opt/openjdk mvn package` → `target/clockportals-1.0.0.jar` (JDK 25+, siehe docs/build.md)
-- Es gibt keine automatisierten Tests. Prüfung erfolgt auf einem Paper-Testserver (docs/testen.md).
+- Build: `mvn package` → `target/clockportals-1.0.0.jar`. Needs JDK 25+ on `JAVA_HOME`
+  (Homebrew on macOS: `JAVA_HOME=/opt/homebrew/opt/openjdk mvn package`). See docs/build.md.
+- There are no automated tests. Verification happens on a Paper test server (docs/testing.md).
 
-## Struktur
+## Layout
 
-- `src/main/java/de/philipz/clockportals/` – alle Klassen (Main, FrameDetector, Portal, PortalManager, PortalListener, TravelTask)
-- `src/main/resources/` – `plugin.yml`, `config.yml` (Defaults + englische Meldungen)
-- `docs/` – Dev-Dokumentation. Neues Wissen gehört dorthin, nicht in diese Datei.
+- `src/main/java/de/philipz/clockportals/` – all classes (main, FrameDetector, Portal, PortalManager, PortalListener, TravelTask)
+- `src/main/resources/` – `plugin.yml`, `config.yml` (defaults and messages)
+- `docs/` – developer documentation. New knowledge goes there, not into this file.
 
-## Regeln
+## Rules
 
-- Keine Client-Mods, keine NMS-Zugriffe. Bedrock-Spieler (Geyser/Floodgate) müssen funktionieren.
-- Vanilla-Portal-Teleports (Nether/End-Gateway) werden im Listener unterdrückt; beim Ändern der Portal-Optik prüfen, dass das weiterhin gilt.
-- Portalblöcke immer mit `setBlockData(…, false)` setzen (keine Physik), siehe docs/architektur.md.
-- Konfigurierbare Werte und Spielertexte kommen aus `config.yml`, nicht hartkodiert.
-- Vor Änderungen an Rahmenerkennung oder Teleport-Logik docs/spielmechanik.md lesen; die Spezifikation dort ist maßgeblich und bei Verhaltensänderungen mit zu pflegen.
+- No client mods, no NMS. Bedrock players (Geyser/Floodgate) must work.
+- Vanilla portal teleports (nether / end gateway) are suppressed in the listener; when changing the
+  portal visuals, make sure that still holds.
+- Always place portal blocks with `setBlockData(…, false)` (no physics), see docs/architecture.md.
+- Configurable values and player-facing texts come from `config.yml`, never hard-coded.
+- Read docs/gameplay.md before touching frame detection or teleport logic; the specification there
+  is authoritative and must be updated alongside behaviour changes.
 
-## Docs pflegen
+## Keeping docs
 
-Diese Datei kurz halten. Details, Entscheidungen und Eigenheiten in `docs/` als eigene Markdown-Dateien
-ablegen und in `docs/README.md` verlinken.
+Keep this file short. Put details, decisions and quirks into `docs/` as separate Markdown files and
+link them from `docs/README.md`.

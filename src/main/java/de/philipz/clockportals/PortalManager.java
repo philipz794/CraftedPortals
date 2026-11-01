@@ -21,17 +21,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-/** Verwaltet alle Portale, Netzwerke und die Speicherung in portals.yml. */
+/** Manages all portals, networks and persistence in portals.yml. */
 final class PortalManager {
 
     private final ClockPortals plugin;
     private final File file;
 
-    /** Netzwerk-Schluessel -> Portale in Reihenfolge. */
+    /** Network key -> portals in order. */
     private final Map<String, List<Portal>> networks = new LinkedHashMap<>();
-    /** Weltname -> Blockschluessel -> Portal (Innenraum). */
+    /** World name -> block key -> portal (interior). */
     private final Map<String, Map<Long, Portal>> interiorIndex = new HashMap<>();
-    /** Weltname -> Blockschluessel -> Portal (Rahmen). */
+    /** World name -> block key -> portal (frame). */
     private final Map<String, Map<Long, Portal>> frameIndex = new HashMap<>();
 
     PortalManager(ClockPortals plugin) {
@@ -39,7 +39,7 @@ final class PortalManager {
         this.file = new File(plugin.getDataFolder(), "portals.yml");
     }
 
-    // ------------------------------------------------------------ Abfragen
+    // ------------------------------------------------------------ Queries
 
     Portal byInterior(Block b) {
         Map<Long, Portal> m = interiorIndex.get(b.getWorld().getName());
@@ -74,7 +74,7 @@ final class PortalManager {
         return networks.get(p.networkKey).size();
     }
 
-    /** Naechstes Portal im Netzwerk (im Kreis) oder null. */
+    /** Next portal in the network (cyclic) or null. */
     Portal next(Portal p) {
         List<Portal> list = networks.get(p.networkKey);
         if (list == null || list.size() < 2) return null;
@@ -82,7 +82,7 @@ final class PortalManager {
         return list.get((i + 1) % list.size());
     }
 
-    // ------------------------------------------------------------ Aendern
+    // ------------------------------------------------------------ Mutation
 
     Portal create(String name, World w, FrameDetector.Result r) {
         String key = name.toLowerCase();
@@ -114,7 +114,7 @@ final class PortalManager {
         save();
     }
 
-    /** Fuellt den Innenraum mit Portalbloecken (ohne Physik-Updates). */
+    /** Fills the interior with portal blocks (without physics updates). */
     void fill(Portal p) {
         World w = p.world();
         if (w == null) return;
@@ -124,11 +124,11 @@ final class PortalManager {
                 if (b.getType() != Material.END_GATEWAY) b.setType(Material.END_GATEWAY, false);
                 BlockState st = b.getState();
                 if (st instanceof EndGateway gw) {
-                    // Ausgang auf sich selbst -> Vanilla teleportiert nirgendwohin
-                    // und generiert im End keine Inseln/Gateways.
+                    // Exit points to itself -> vanilla teleports nowhere
+                    // and does not generate islands/gateways in the End.
                     gw.setExitLocation(b.getLocation());
                     gw.setExactTeleport(true);
-                    gw.setAge(Long.MAX_VALUE / 2); // kein Lichtstrahl
+                    gw.setAge(Long.MAX_VALUE / 2); // no beam
                     gw.update(true, false);
                 }
             } else {
@@ -155,7 +155,7 @@ final class PortalManager {
         if (fr != null) fr.values().removeIf(x -> x == p);
     }
 
-    // ------------------------------------------------------------ Speichern
+    // ------------------------------------------------------------ Persistence
 
     void load() {
         networks.clear();
@@ -190,7 +190,7 @@ final class PortalManager {
         plugin.getLogger().info(n + " portal(s) in " + networks.size() + " network(s) loaded.");
     }
 
-    /** Index fuer Portale nachholen, deren Welt erst spaeter geladen wurde. */
+    /** Build the index for portals whose world was loaded later. */
     void reindexWorld(World w) {
         for (Portal p : all()) if (p.worldName.equals(w.getName())) index(p);
     }
@@ -219,7 +219,7 @@ final class PortalManager {
         }
     }
 
-    /** Ist die Location (Fuesse) in irgendeinem Portal-Innenraum? */
+    /** Is the location (feet) inside any portal interior? */
     Portal portalAt(Location loc) {
         if (loc == null || loc.getWorld() == null) return null;
         return byInterior(loc.getBlock());

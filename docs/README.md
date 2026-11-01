@@ -1,11 +1,11 @@
-# Dev-Dokumentation
+# Developer Documentation
 
-| Datei | Inhalt |
+| File | Contents |
 |---|---|
-| [build.md](build.md) | Toolchain, Dependencies, Build und Deployment |
-| [spielmechanik.md](spielmechanik.md) | Spezifikation des Spielverhaltens (maßgeblich) |
-| [architektur.md](architektur.md) | Klassen, Datenfluss, wichtige Eigenheiten der Paper-API |
-| [testen.md](testen.md) | Teststand und Testablauf auf dem Paper-Server |
-| [offene-punkte.md](offene-punkte.md) | Bekannte Randfälle, ungetestete Bereiche, Ideen |
+| [build.md](build.md) | Toolchain, dependencies, build and deployment |
+| [gameplay.md](gameplay.md) | Specification of the gameplay behaviour (authoritative) |
+| [architecture.md](architecture.md) | Classes, data flow, Paper API quirks |
+| [testing.md](testing.md) | Test status and test procedure on a Paper server |
+| [open-issues.md](open-issues.md) | Known edge cases, untested areas, ideas |
 
-Neue Themen als eigene Datei anlegen und hier eintragen.
+Add new topics as separate files and list them here.

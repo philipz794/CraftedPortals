@@ -34,7 +34,7 @@ public final class ClockPortals extends JavaPlugin {
         travel = new TravelTask(this);
         travel.runTaskTimer(this, 1L, 1L);
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
-        // Portalbloecke nach Start erneut setzen (falls Effekt in der Config geaendert wurde)
+        // Re-place portal blocks after startup (in case the effect was changed in the config)
         Bukkit.getScheduler().runTask(this, () -> manager.all().forEach(manager::fill));
     }
 
@@ -75,7 +75,7 @@ public final class ClockPortals extends JavaPlugin {
     Material keyBlock() { return Material.matchMaterial(getConfig().getString("key-block", "EMERALD_BLOCK")); }
     int keyCount() { return getConfig().getInt("key-block-count", 2); }
 
-    /** Meldung aus der Config mit Platzhaltern (Paare: "%name%", wert, ...). */
+    /** Message from the config with placeholders (pairs: "%name%", value, ...). */
     Component msg(String key, Object... repl) {
         String s = getConfig().getString("messages." + key, key);
         for (int i = 0; i + 1 < repl.length; i += 2) s = s.replace(String.valueOf(repl[i]), String.valueOf(repl[i + 1]));
@@ -86,7 +86,7 @@ public final class ClockPortals extends JavaPlugin {
         return msg(key, "%name%", p.displayName, "%pos%", manager.position(p), "%count%", manager.count(p));
     }
 
-    /** Portal entfernen, Sound + Meldung an Spieler in der Naehe. */
+    /** Remove a portal, play a sound and notify nearby players. */
     void destroyWithMessage(Portal p) {
         World w = p.world();
         org.bukkit.Location c = w != null ? p.arrival(w) : null;
@@ -100,7 +100,7 @@ public final class ClockPortals extends JavaPlugin {
         }
     }
 
-    // ------------------------------------------------------------ Befehl
+    // ------------------------------------------------------------ Command
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -127,7 +127,7 @@ public final class ClockPortals extends JavaPlugin {
                 }
             }
             case "create" -> {
-                // /clockportals create <name> <x> <y> <z> [welt]  -> aktiviert den Rahmen am Block x y z
+                // /clockportals create <name> <x> <y> <z> [world]  -> activates the frame at block x y z
                 if (args.length < 5) {
                     sender.sendMessage(Component.text("/clockportals create <name> <x> <y> <z> [world]"));
                     return true;
@@ -161,7 +161,7 @@ public final class ClockPortals extends JavaPlugin {
         return out;
     }
 
-    /** Versucht, am Block ein Portal zu aktivieren. Liefert die Meldung; null-sicher. */
+    /** Tries to activate a portal at the block. Returns the message; null-safe. */
     Component activate(String name, org.bukkit.block.Block clicked) {
         Portal existing = manager.byAny(clicked);
         if (existing != null) return portalMsg("info", existing);

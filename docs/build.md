@@ -2,12 +2,12 @@
 
 ## Toolchain
 
-- **JDK 25 oder neuer nötig**: `paper-api 26.3` ist mit Java 25 kompiliert (Classfile 69).
-  Erzeugt wird trotzdem Java-21-Bytecode (`maven.compiler.release` = 21 in der pom.xml).
+- **JDK 25 or newer**: `paper-api 26.3` is compiled for Java 25 (class file version 69).
+  The plugin itself is compiled to Java 21 bytecode (`maven.compiler.release` = 21 in the pom.xml).
 - Maven 3.9+.
 
-Auf Philips Mac: Maven und OpenJDK 27 über Homebrew (`brew install maven`). Das System-Java ist
-Temurin 24 und reicht nicht, deshalb beim Bauen `JAVA_HOME` setzen:
+If your default JDK is older than 25, point `JAVA_HOME` to a newer one. With Homebrew on macOS,
+`brew install maven` also installs a current OpenJDK:
 
 ```
 JAVA_HOME=/opt/homebrew/opt/openjdk mvn package
@@ -19,24 +19,24 @@ JAVA_HOME=/opt/homebrew/opt/openjdk mvn package
 mvn package
 ```
 
-Ergebnis: `target/clockportals-1.0.0.jar`. `target/` ist gitignored.
+Output: `target/clockportals-1.0.0.jar`. `target/` is gitignored.
 
 ## Dependencies
 
-- `io.papermc.paper:paper-api:26.3.build.235-stable`, Scope `provided`
+- `io.papermc.paper:paper-api:26.3.build.235-stable`, scope `provided`
 - Repository: `https://repo.papermc.io/repository/maven-public/`
-- Keine weiteren Laufzeit-Abhängigkeiten, kein Shading nötig.
+- No further runtime dependencies, no shading required.
 
 ## plugin.yml
 
-- `name: Clock-Portals` → Datenordner `plugins/Clock-Portals/`
+- `name: Clock-Portals` → data folder `plugins/Clock-Portals/`
 - `api-version: '1.21'`
-- Main: `de.philipz.clockportals.ClockPortals`
-- Ressourcen werden von Maven gefiltert (`${project.version}` in plugin.yml).
+- Main class: `de.philipz.clockportals.ClockPortals`
+- Resources are filtered by Maven (`${project.version}` in plugin.yml).
 
 ## Deployment
 
-1. JAR nach `plugins/` auf dem Paper-26.3-Server kopieren.
-2. Server starten; `config.yml` wird nach `plugins/Clock-Portals/` geschrieben.
-3. Portale werden in `plugins/Clock-Portals/portals.yml` gespeichert.
-4. Nach Config-Änderungen: `/clockportals reload`.
+1. Copy the jar into `plugins/` on a Paper 26.3 server.
+2. Start the server; `config.yml` is written to `plugins/Clock-Portals/`.
+3. Portals are persisted in `plugins/Clock-Portals/portals.yml`.
+4. After config changes: `/clockportals reload`.

@@ -11,19 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Ein aktives Portal. Gespeichert wird nur der Innenraum (min/max inklusive),
- * der Rahmen liegt jeweils einen Block drumherum.
+ * An active portal. Only the interior is stored (min/max inclusive);
+ * the frame is the ring of blocks one step around it.
  *
- * axis = X: Portal liegt in der X-Y-Ebene (z konstant), man laeuft in Z-Richtung hindurch.
- * axis = Z: Portal liegt in der Z-Y-Ebene (x konstant), man laeuft in X-Richtung hindurch.
+ * axis = X: portal lies in the X-Y plane (constant z), you walk through along Z.
+ * axis = Z: portal lies in the Z-Y plane (constant x), you walk through along X.
  */
 public final class Portal {
 
-    final String networkKey;   // Kleinbuchstaben, zum Vergleichen
-    String displayName;        // Name wie auf der Uhr
+    final String networkKey;   // lower-case, used for lookups
+    String displayName;        // name exactly as written on the clock
     final String worldName;
     final Axis axis;
-    final int minX, minY, minZ, maxX, maxY, maxZ; // Innenraum, inklusive
+    final int minX, minY, minZ, maxX, maxY, maxZ; // interior, inclusive
 
     Portal(String networkKey, String displayName, String worldName, Axis axis,
            int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
@@ -49,7 +49,7 @@ public final class Portal {
         return true;
     }
 
-    /** Alle Bloecke des Innenraums. */
+    /** All interior blocks. */
     List<Block> interior(World w) {
         List<Block> list = new ArrayList<>();
         for (int x = minX; x <= maxX; x++)
@@ -59,7 +59,7 @@ public final class Portal {
         return list;
     }
 
-    /** Alle Rahmenpositionen inkl. Ecken (Ecken koennen leer sein). */
+    /** All frame positions including corners (corners may be empty). */
     List<Block> frame(World w) {
         List<Block> list = new ArrayList<>();
         if (axis == Axis.X) {
@@ -92,12 +92,12 @@ public final class Portal {
         return yEdge && (b.getZ() == minZ - 1 || b.getZ() == maxZ + 1);
     }
 
-    /** Bereich, in dem Entities als "im Portal" gelten. */
+    /** Region in which entities count as "inside the portal". */
     BoundingBox box() {
         return new BoundingBox(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
     }
 
-    /** Ankunftspunkt: unten mittig im Innenraum. */
+    /** Arrival point: bottom centre of the interior. */
     Location arrival(World w) {
         double cx = (minX + maxX + 1) / 2.0;
         double cz = (minZ + maxZ + 1) / 2.0;
