@@ -30,20 +30,23 @@ final class ConfigUpdater {
             "max-size", "max-blocks",
             "consume-clock", "consume-item");
 
+    /** Options that no longer exist; their line and comment block are deleted from the owner's file. */
+    private static final java.util.Set<String> REMOVED = java.util.Set.of("travel-nausea-peak");
+
     private static final Pattern TOP_KEY = Pattern.compile("^([A-Za-z0-9_-]+):(.*)$");
     private static final Pattern SUB_KEY = Pattern.compile("^(\\s+)([A-Za-z0-9_-]+):(.*)$");
 
     private ConfigUpdater() {}
 
-    record Result(List<String> lines, List<String> added, List<String> renamed) {
-        boolean changed() { return !added.isEmpty() || !renamed.isEmpty(); }
+    record Result(List<String> lines, List<String> added, List<String> renamed, List<String> removed) {
+        boolean changed() { return !added.isEmpty() || !renamed.isEmpty() || !removed.isEmpty(); }
     }
 
     /** Updates plugins/<name>/config.yml from the bundled config.yml; returns what was changed. */
     static Result update(JavaPlugin plugin) throws IOException {
         File file = new File(plugin.getDataFolder(), "config.yml");
         InputStream in = plugin.getResource("config.yml");
-        if (in == null || !file.exists()) return new Result(List.of(), List.of(), List.of());
+        if (in == null || !file.exists()) return new Result(List.of(), List.of(), List.of(), List.of());
         String template;
         try (InputStreamReader r = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             template = readAll(r);
@@ -70,6 +73,24 @@ final class ConfigUpdater {
         List<String> out = new ArrayList<>(current);
         List<String> added = new ArrayList<>();
         List<String> renamed = new ArrayList<>();
+        List<String> removed = new ArrayList<>();
+
+        // 0) Obsolete options: drop the key line, its comment block and a blank line that follows
+        for (String oldKey : REMOVED) {
+            if (!cur.contains(oldKey)) continue;
+            for (int i = 0; i < out.size(); i++) {
+                Matcher m = TOP_KEY.matcher(out.get(i));
+                if (!m.matches() || !m.group(1).equals(oldKey)) continue;
+                int start = i;
+                while (start > 0 && out.get(start - 1).startsWith("#")) start--;
+                int end = i + 1;
+                while (end < out.size() && (out.get(end).startsWith(" ") || out.get(end).startsWith("\t"))) end++;
+                if (end < out.size() && out.get(end).isBlank()) end++;
+                out.subList(start, end).clear();
+                removed.add(oldKey);
+                break;
+            }
+        }
 
         // 1) Renamed options: replace the old key line in place, keep the owner's value converted
         for (Map.Entry<String, String> e : RENAMED.entrySet()) {
@@ -119,7 +140,7 @@ final class ConfigUpdater {
             pending.clear();
             i = end - 1;
         }
-        return new Result(out, added, renamed);
+        return new Result(out, added, renamed, removed);
     }
 
     /** Inserts sub keys of a section that the owner's file lacks at the end of that section. */

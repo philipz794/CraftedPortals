@@ -24,10 +24,9 @@ So that vanilla does not treat the portal blocks as its own nether/end portals, 
   (1 of 1 in its network) was teleported to the Nether by vanilla, including portal generation; the
   later events below did not catch that case on Paper 26.3.
 
-  Cancelling it also removes the purple portal overlay, which is driven by the server-side portal
-  process (verified in-game). A selective cancel that lets vanilla's timer run for a while was tried
-  and rejected: it turns the protection into a race with vanilla's 80-tick timer. Instead the plugin
-  renders its own waiting effect, see below.
+  The purple portal overlay is **not** affected by this: the client draws it on its own while its
+  bounding box touches nether portal blocks (verified in-game, after a first test had suggested
+  otherwise). The plugin controls the overlay by hiding the touched blocks from the player, see below.
 - `PlayerPortalEvent`, `EntityPortalEvent`, `EntityPortalReadyEvent`
 - `PlayerTeleportEvent` with cause `NETHER_PORTAL` / `END_GATEWAY`
 - `EntityTeleportEndGatewayEvent`
@@ -83,12 +82,11 @@ unaffected.
 Applied every tick to a survival player waiting inside a portal with a destination, removed when the
 player travels or steps out (`endWaiting`, also for players who vanished from the portal):
 
-- `NAUSEA`: potion effect refreshed with 100 ticks, no icon or particles, but only during the first
-  half of the wait. The client ramps the wobble up at about 1/150 per tick while the effect is active
-  and fades it just as slowly afterwards; there is no way to cut it off (a same-world teleport keeps the
-  client player object). Feeding it for half the delay makes it peak midway and vanish on arrival.
-  Cross-dimension arrivals reset it instantly anyway. `travel-nausea-peak` (percent of the delay,
-  default 50) sets the point where feeding stops.
+- `VANILLA`: nothing is applied; the client's own overlay shows because the portal blocks stay visible.
+- Every other value first hides the touched portal blocks (same mechanism as on arrival), so the
+  vanilla overlay never builds up.
+- `NAUSEA`: potion effect refreshed with 100 ticks, no icon or particles, removed at the end; the client
+  fades the wobble quickly after removal (verified in-game).
 - `DARKNESS`: potion effect refreshed with 100 ticks, removed at the end so it fades.
 - `FROST`: `setFreezeTicks` proportional to progress, capped at 130 (vanilla damages from 140). Vanilla
   thaws 2 ticks per tick, hence the `+2`.

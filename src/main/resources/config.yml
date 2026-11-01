@@ -56,22 +56,15 @@ particles:
 # With the END effect teleportation is always instant.
 player-delay-ticks: 80
 
-# What a survival player sees while waiting inside a portal. Vanilla's purple
-# portal overlay cannot be used (the plugin has to block vanilla's portal
-# logic), so the plugin provides its own:
-#   NAUSEA   - screen wobble like a nether portal (default), see
-#              travel-nausea-peak below
+# What a survival player sees while waiting inside a portal:
+#   VANILLA  - the purple nether portal overlay, as in vanilla (default)
+#   NAUSEA   - screen wobble without the purple tint
 #   FROST    - icy screen border like powder snow, no damage
 #   DARKNESS - pulsing darkness like the Warden's
 #   BORDER   - red vignette like the world border
 #   NONE     - no screen effect
-travel-effect: NAUSEA
-
-# NAUSEA only: percentage of the wait after which the wobble stops growing
-# and starts to fade (10-100). The client fades it as slowly as it builds
-# and cannot be told to stop, so 50 means it has faded on arrival, 100
-# means full wobble on arrival that lingers for a few seconds.
-travel-nausea-peak: 50
+# Only VANILLA shows the purple overlay; the others hide it.
+travel-effect: VANILLA
 
 # Particles around the waiting player, independent of the portal visuals
 travel-particles:

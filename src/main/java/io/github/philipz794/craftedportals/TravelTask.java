@@ -85,7 +85,7 @@ final class TravelTask extends BukkitRunnable {
                         endWaiting(p);
                         travel(e, portal);
                     } else {
-                        showWaiting(p, t, delay);
+                        showWaiting(p, portal, t, delay);
                     }
                 } else if (canTravel(e)) {
                     travel(e, portal);
@@ -176,18 +176,17 @@ final class TravelTask extends BukkitRunnable {
     private static final double BORDER_RADIUS = 300;
 
     /** Called every tick while a survival player waits inside a portal (t of delay ticks done). */
-    private void showWaiting(Player p, int t, int delay) {
+    private void showWaiting(Player p, Portal portal, int t, int delay) {
         CraftedPortals.TravelSettings ts = plugin.travelSettings();
         double progress = delay <= 0 ? 1.0 : Math.min(1.0, t / (double) delay);
+        // The client draws vanilla's purple overlay on its own while touching nether portal blocks.
+        // VANILLA wants exactly that; every other value hides the touched blocks from the player.
+        if (ts.effect() != CraftedPortals.TravelEffect.VANILLA && plugin.effect() == CraftedPortals.Effect.NETHER) {
+            hiddenInterior.computeIfAbsent(p.getUniqueId(), k -> new Hidden(portal, new HashSet<>()));
+        }
         switch (ts.effect()) {
-            case NAUSEA -> {
-                // The client ramps the wobble up while nausea is active and lets it fade just as
-                // slowly after removal (no way to cut it off). So feed it only until the configured
-                // share of the wait is over; the wobble peaks there and fades until arrival.
-                // Cross-dimension arrivals reset it instantly anyway.
-                if (t * 100 <= delay * ts.nauseaPeak()) p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0, true, false, false));
-                else if (p.hasPotionEffect(PotionEffectType.NAUSEA)) p.removePotionEffect(PotionEffectType.NAUSEA);
-            }
+            case VANILLA -> { }
+            case NAUSEA -> p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0, true, false, false));
             case DARKNESS -> p.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 100, 0, true, false, false));
             case FROST -> p.setFreezeTicks((int) (MAX_FROST * progress) + 2); // +2: vanilla thaws 2 per tick
             case BORDER -> {
@@ -219,7 +218,10 @@ final class TravelTask extends BukkitRunnable {
     /** Removes everything showWaiting() applied, whether the player travels or walks out. */
     private void endWaiting(Player p) {
         CraftedPortals.TravelSettings ts = plugin.travelSettings();
+        Hidden h = hiddenInterior.remove(p.getUniqueId());
+        if (h != null) revealAll(p, h);
         switch (ts.effect()) {
+            case VANILLA -> { }
             case NAUSEA -> p.removePotionEffect(PotionEffectType.NAUSEA);
             case DARKNESS -> p.removePotionEffect(PotionEffectType.DARKNESS);
             case FROST -> p.setFreezeTicks(0);
@@ -309,10 +311,12 @@ final class TravelTask extends BukkitRunnable {
      * cannot set. So, until the arriving player steps out (justArrived cleared), the one or two
      * portal blocks they are standing in are sent to them as air, every tick following their
      * position. The rest of the portal keeps its texture, and the blocks they left behind pop back.
+     * The same mechanism hides the source portal's blocks while waiting with a non-VANILLA effect.
      */
     private void hideArrivalPortal(Player p, Portal to) {
         if (plugin.effect() != CraftedPortals.Effect.NETHER) return;
-        hiddenInterior.put(p.getUniqueId(), new Hidden(to, new HashSet<>()));
+        Hidden old = hiddenInterior.put(p.getUniqueId(), new Hidden(to, new HashSet<>()));
+        if (old != null) revealAll(p, old);
     }
 
     /** Hidden cells follow the player; every second all hidden cells are re-sent in case chunk data overwrote them. */

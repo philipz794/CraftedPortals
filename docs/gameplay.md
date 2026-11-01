@@ -46,13 +46,12 @@ Update it alongside behaviour changes in the code.
 - Creative: instant. Mobs and items: instant.
 - `effect: END`: always instant.
 - A portal without destination tells the player immediately (`messages.no-target`), no waiting.
-- While waiting, the player gets the plugin's own feedback instead of vanilla's purple overlay (which
-  cannot be shown because vanilla's portal logic is blocked): `travel-effect` (NAUSEA default, FROST,
-  DARKNESS, BORDER or NONE), `travel-particles` around the player (own type/colour, independent of the
-  portal visuals), `travel-sound` (swelling portal trigger sound) and `travel-bar` (progress bar in the
-  action bar, `messages.travel-bar`). Everything stops when the player teleports or steps out early.
-  NAUSEA stops growing at `travel-nausea-peak` percent of the wait (default 50) and fades from there,
-  because the client-side fade cannot be cut; 100 means full wobble on arrival.
+- While waiting, `travel-effect` decides what the player sees: VANILLA (default) is the real purple
+  portal overlay, which the client draws on its own while touching nether portal blocks; NAUSEA, FROST,
+  DARKNESS, BORDER and NONE hide the touched portal blocks from that player (no overlay) and show their
+  own effect, if any. Independently: `travel-particles` around the player (own type/colour),
+  `travel-sound` (swelling portal trigger sound) and `travel-bar` (progress bar in the action bar,
+  `messages.travel-bar`). Everything stops when the player teleports or steps out early.
 - After arriving, players see `messages.arrived` (name, #X of Y) in the action bar.
 
 ## Extras (each configurable)

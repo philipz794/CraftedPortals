@@ -35,10 +35,10 @@ public final class CraftedPortals extends JavaPlugin {
     record ParticleSettings(Particle type, Object data, int perBlock, int intervalTicks, boolean sound) {}
 
     /** Screen effect shown to a waiting survival player. */
-    enum TravelEffect { NAUSEA, FROST, DARKNESS, BORDER, NONE }
+    enum TravelEffect { VANILLA, NAUSEA, FROST, DARKNESS, BORDER, NONE }
 
     /** Everything a waiting player sees and hears. */
-    record TravelSettings(TravelEffect effect, int nauseaPeak, boolean particles, Particle particleType,
+    record TravelSettings(TravelEffect effect, boolean particles, Particle particleType,
                           Object particleData, int particleAmount, boolean sound, boolean bar) {}
 
     private Effect effect = Effect.NETHER;
@@ -58,6 +58,7 @@ public final class CraftedPortals extends JavaPlugin {
         try {
             ConfigUpdater.Result upd = ConfigUpdater.update(this);
             for (String r : upd.renamed()) getLogger().info("config.yml: renamed option " + r);
+            for (String r : upd.removed()) getLogger().info("config.yml: removed obsolete option " + r);
             if (!upd.added().isEmpty()) getLogger().info("config.yml: added new option(s) " + String.join(", ", upd.added()));
         } catch (IOException e) {
             getLogger().log(Level.WARNING, "Could not update config.yml", e);
@@ -178,13 +179,13 @@ public final class CraftedPortals extends JavaPlugin {
     }
 
     private TravelSettings loadTravelSettings() {
-        String name = getConfig().getString("travel-effect", "NAUSEA");
+        String name = getConfig().getString("travel-effect", "VANILLA");
         TravelEffect eff;
         try {
             eff = TravelEffect.valueOf(name.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ex) {
-            warn("Unknown travel-effect '" + name + "', using NAUSEA");
-            eff = TravelEffect.NAUSEA;
+            warn("Unknown travel-effect '" + name + "', using VANILLA");
+            eff = TravelEffect.VANILLA;
         }
         ConfigurationSection tp = getConfig().getConfigurationSection("travel-particles");
         boolean particlesOn = tp != null && tp.getBoolean("enabled", true);
@@ -192,8 +193,7 @@ public final class CraftedPortals extends JavaPlugin {
         int amount = tp == null ? 6 : Math.max(1, Math.min(30, tp.getInt("amount", 6)));
         boolean sound = getConfig().getBoolean("travel-sound", true);
         boolean bar = getConfig().getBoolean("travel-bar", true);
-        int peak = Math.max(10, Math.min(100, getConfig().getInt("travel-nausea-peak", 50)));
-        return new TravelSettings(eff, peak, particlesOn, (Particle) t[0], t[1], amount, sound, bar);
+        return new TravelSettings(eff, particlesOn, (Particle) t[0], t[1], amount, sound, bar);
     }
 
     private void warn(String problem) {
