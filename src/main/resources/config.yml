@@ -3,7 +3,8 @@
 # ============================================================
 #
 # Building a portal:
-#   - Vertical frame made of any full blocks, in any closed shape:
+#   - Vertical frame made of any solid blocks (full blocks, also soul
+#     sand, mud, end portal frames; no slabs/stairs), in any closed shape:
 #     rectangle, L, cross, heart ... Blocks that touch the interior
 #     only diagonally (corners) may be left out.
 #   - The frame must contain at least 'key-block-count' blocks

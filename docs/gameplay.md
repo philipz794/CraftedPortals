@@ -7,8 +7,10 @@ Update it alongside behaviour changes in the code.
 
 - Vertical frame in one plane, axis X or Z. **Any closed shape**: rectangle, L, T, cross, heart, arrow ...
 - The interior is one connected region of air (connected through edges, not diagonals).
-- Every block that touches the interior **through an edge** must be a **full 1×1 block**
-  (no stairs, slabs, snow, fences etc.). Blocks that touch the interior **only diagonally**
+- Every block that touches the interior **through an edge** must read as a **solid cube**: one
+  collision box over the whole footprint, at least 0.8 blocks high. That is every full block plus soul
+  sand, mud, farmland, dirt paths and end portal frames; not stairs, slabs, snow layers, fences, walls,
+  panes, chests or enchanting tables. Blocks that touch the interior **only diagonally**
   ("corners") are optional and may be anything, including air.
 - Minimum: somewhere in the interior **two blocks of air stacked vertically** (a player must fit).
   A horizontal 2×1 slit is invalid (`messages.too-small`).

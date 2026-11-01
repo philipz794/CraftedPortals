@@ -44,7 +44,15 @@ final class FrameDetector {
 
     int maxBlocks() { return maxBlocks; }
 
-    /** Full 1x1x1 block (no stairs, slabs, fences, snow ...). */
+    /** Blocks at least this high (in blocks) count as frame blocks: soul sand and mud are 14/16, end portal frames 13/16. */
+    private static final double MIN_FRAME_HEIGHT = 0.8;
+
+    /**
+     * A block that reads as a solid cube: one collision box covering the whole footprint from the
+     * ground up to at least MIN_FRAME_HEIGHT. Accepts full blocks plus soul sand, mud, farmland, dirt
+     * paths and end portal frames; rejects slabs, stairs, fences, walls, panes, snow layers, chests,
+     * enchanting tables and everything with several boxes.
+     */
     static boolean isFullBlock(Block b) {
         Material m = b.getType();
         if (!m.isBlock() || !m.isSolid() || b.isLiquid()) return false;
@@ -54,7 +62,7 @@ final class FrameDetector {
         if (boxes.size() != 1) return false;
         BoundingBox bb = boxes.iterator().next();
         return bb.getMinX() <= 0.001 && bb.getMinY() <= 0.001 && bb.getMinZ() <= 0.001
-                && bb.getMaxX() >= 0.999 && bb.getMaxY() >= 0.999 && bb.getMaxZ() >= 0.999;
+                && bb.getMaxX() >= 0.999 && bb.getMaxY() >= MIN_FRAME_HEIGHT && bb.getMaxZ() >= 0.999;
     }
 
     Result detect(Block clicked) {
