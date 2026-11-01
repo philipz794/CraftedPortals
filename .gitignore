@@ -15,3 +15,6 @@ target/
 
 # Lokale Claude-Einstellungen
 .claude/settings.local.json
+
+# Design sources stay local (not part of the public repo)
+*.sketch

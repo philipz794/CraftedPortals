@@ -3,7 +3,7 @@ version: '${project.version}'
 main: de.philipz.clockportals.ClockPortals
 api-version: '1.21'
 description: Portals made of any blocks, activated with a named clock.
-author: philipz
+author: philipz794
 commands:
   clockportals:
     description: List portals / reload config / create a portal

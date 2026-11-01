@@ -1,5 +1,7 @@
 # Clock-Portals
 
+<img src="assets/icon.png" alt="Clock-Portals icon" width="128" align="right">
+
 A server-side [Paper](https://papermc.io) plugin that lets players build portals out of **any full blocks**
 and link them with a **named clock**. No client mods required; works for Java and Bedrock players
 (via Geyser/Floodgate).
