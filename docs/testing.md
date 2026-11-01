@@ -31,6 +31,9 @@ There are no unit tests. Verification happens on a Paper 26.3 test server, prefe
 - Single-portal network (1 of 1), player in creative and survival: must only show `no-target`, no
   vanilla Nether teleport and no portal generated in the Nether (regression, fixed via
   `EntityInsideBlockEvent`).
+- PARTICLE effect: switch via reload from NETHER (blocks vanish), particle sheet visible, teleport
+  works, placing a block into the interior is refused, switch back to NETHER refills. Try DUST with
+  a colour and an invalid type (warning for admins).
 - Free-form portals: L, T, cross and a frame with a dividing pillar (two portals). Check that
   standing in a notch does not teleport, arrival in the tall column, `cells` in portals.yml,
   `too-small` for a horizontal slit, `too-big` above `max-blocks`, legacy `max-size` conversion.

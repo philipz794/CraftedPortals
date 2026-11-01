@@ -19,6 +19,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -91,8 +92,12 @@ final class PortalListener implements Listener {
                     item.setAmount(item.getAmount() - 1);
                 }
                 Location c = portal.arrival(clicked.getWorld());
-                clicked.getWorld().playSound(c, plugin.useEndEffect() ? Sound.BLOCK_END_PORTAL_SPAWN
-                        : Sound.BLOCK_PORTAL_TRIGGER, 0.7f, 1.2f);
+                Sound s = switch (plugin.effect()) {
+                    case END -> Sound.BLOCK_END_PORTAL_SPAWN;
+                    case NETHER -> Sound.BLOCK_PORTAL_TRIGGER;
+                    case PARTICLE -> Sound.BLOCK_BEACON_ACTIVATE;
+                };
+                clicked.getWorld().playSound(c, s, 0.7f, 1.2f);
                 p.sendActionBar(plugin.portalMsg("activated", portal));
                 if (mgr.count(portal) == 1) {
                     Component hint = plugin.msg("no-target", "%name%", portal.displayName);
@@ -167,6 +172,12 @@ final class PortalListener implements Listener {
     public void onPhysics(BlockPhysicsEvent e) {
         Material t = e.getBlock().getType();
         if (t != Material.NETHER_PORTAL && t != Material.END_GATEWAY) return;
+        if (mgr.byInterior(e.getBlock()) != null) e.setCancelled(true);
+    }
+
+    /** With the PARTICLE effect the interior is air, so players could build into it. */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlace(BlockPlaceEvent e) {
         if (mgr.byInterior(e.getBlock()) != null) e.setCancelled(true);
     }
 

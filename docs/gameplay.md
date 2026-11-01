@@ -58,6 +58,10 @@ Update it alongside behaviour changes in the code.
 
 - `effect: NETHER` → nether portal blocks in the interior.
 - `effect: END` → end gateway blocks, teleport always instant.
+- `effect: PARTICLE` → the interior stays air and is filled with particles (`particles.*`: type, colour
+  for DUST, density, interval, ambient sound). Players cannot place blocks into the interior. Normal
+  player delay applies. No vanilla portal logic is involved at all.
+- All effects can be switched live with `/clockportals reload`.
 
 ## Destruction & Protection
 

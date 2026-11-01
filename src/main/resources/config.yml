@@ -31,8 +31,24 @@ key-block-count: 2
 # capped at 64 blocks each.
 max-blocks: 200
 
-# Portal visuals: NETHER (purple nether portal) or END (end gateway)
+# Portal visuals: NETHER (purple nether portal blocks), END (end gateway
+# blocks) or PARTICLE (the interior stays air and is filled with particles).
+# Switch at any time with /clockportals reload.
 effect: NETHER
+
+# Settings for effect: PARTICLE
+particles:
+  # Any particle name, e.g. PORTAL, REVERSE_PORTAL, END_ROD, SOUL,
+  # SOUL_FIRE_FLAME, WITCH, ENCHANT, DUST
+  type: PORTAL
+  # Only used by DUST (hex color)
+  color: "#9B30FF"
+  # Particles per interior block and interval (0-10)
+  per-block: 2
+  # Ticks between particle bursts (1-40); lower = denser, more traffic
+  interval-ticks: 2
+  # Play the quiet nether portal ambient sound every 5 seconds
+  sound: true
 
 # How long a survival player has to stand in the portal (in ticks,
 # 20 ticks = 1 second). Vanilla nether portal: 80. Creative: always instant.

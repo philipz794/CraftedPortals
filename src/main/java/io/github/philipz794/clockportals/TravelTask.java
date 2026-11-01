@@ -45,6 +45,7 @@ final class TravelTask extends BukkitRunnable {
         tick++;
         PortalManager mgr = plugin.manager();
         if (tick % 10 == 0) maintain(mgr);
+        if (plugin.effect() == ClockPortals.Effect.PARTICLE) emitParticles(mgr);
         Set<UUID> inside = new HashSet<>();
 
         for (Portal portal : mgr.all()) {
@@ -83,7 +84,11 @@ final class TravelTask extends BukkitRunnable {
      * frame broken (e.g. via command/WorldEdit) -> remove the portal.
      */
     private void maintain(PortalManager mgr) {
-        Material want = plugin.useEndEffect() ? Material.END_GATEWAY : Material.NETHER_PORTAL;
+        Material want = switch (plugin.effect()) {
+            case END -> Material.END_GATEWAY;
+            case NETHER -> Material.NETHER_PORTAL;
+            case PARTICLE -> null; // interior is air, nothing to repair
+        };
         for (Portal p : mgr.all()) {
             if (!p.isLoaded()) continue;
             World w = p.world();
@@ -95,9 +100,36 @@ final class TravelTask extends BukkitRunnable {
                 plugin.destroyWithMessage(p);
                 continue;
             }
+            if (want == null) continue;
             for (Block b : p.interior(w)) {
                 if (b.getType() != want) { mgr.fill(p); break; }
             }
+        }
+    }
+
+    /** Visual range in which particles and the ambient sound are worth sending. */
+    private static final double PARTICLE_RANGE = 48;
+
+    /**
+     * PARTICLE effect: fills the interior with particles every interval, only for portals that
+     * have players nearby. Particles are spread over the whole block in the portal plane and
+     * kept thin perpendicular to it, so the portal reads as a flat sheet.
+     */
+    private void emitParticles(PortalManager mgr) {
+        ClockPortals.ParticleSettings ps = plugin.particles();
+        if (tick % ps.intervalTicks() != 0 || ps.perBlock() == 0) return;
+        boolean ambient = ps.sound() && tick % 100 == 0;
+        for (Portal p : mgr.all()) {
+            if (!p.isLoaded()) continue;
+            World w = p.world();
+            Location centre = p.box().getCenter().toLocation(w);
+            if (w.getNearbyPlayers(centre, PARTICLE_RANGE).isEmpty()) continue;
+            double dx = p.axis == Axis.X ? 0.3 : 0.05, dz = p.axis == Axis.X ? 0.05 : 0.3;
+            for (Block b : p.interior(w)) {
+                Location c = b.getLocation().add(0.5, 0.5, 0.5);
+                w.spawnParticle(ps.type(), c, ps.perBlock(), dx, 0.3, dz, 0.0, ps.data());
+            }
+            if (ambient) w.playSound(centre, Sound.BLOCK_PORTAL_AMBIENT, 0.3f, 1.0f);
         }
     }
 

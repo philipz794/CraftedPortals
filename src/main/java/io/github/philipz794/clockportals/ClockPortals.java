@@ -4,7 +4,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,7 +26,14 @@ public final class ClockPortals extends JavaPlugin {
     private FrameDetector detector;
     private TravelTask travel;
 
-    private boolean endEffect;
+    /** Portal visuals. */
+    enum Effect { NETHER, END, PARTICLE }
+
+    /** Settings of the PARTICLE effect. */
+    record ParticleSettings(Particle type, Object data, int perBlock, int intervalTicks, boolean sound) {}
+
+    private Effect effect = Effect.NETHER;
+    private ParticleSettings particles;
     private int playerDelay;
     private boolean consumeClock, teleportMobs, teleportItems, leashedFollow, piglinSpawn;
     private int maxBlocks;
@@ -89,13 +99,51 @@ public final class ClockPortals extends JavaPlugin {
         }
         detector = new FrameDetector(key, Math.max(0, getConfig().getInt("key-block-count", 2)), wanted);
         maxBlocks = detector.maxBlocks();
-        endEffect = "END".equalsIgnoreCase(getConfig().getString("effect", "NETHER"));
+        String effectName = getConfig().getString("effect", "NETHER");
+        try {
+            effect = Effect.valueOf(effectName.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            warn("Unknown effect '" + effectName + "', using NETHER");
+            effect = Effect.NETHER;
+        }
+        particles = loadParticles();
         playerDelay = Math.max(0, getConfig().getInt("player-delay-ticks", 80));
         consumeClock = getConfig().getBoolean("consume-clock", true);
         teleportMobs = getConfig().getBoolean("teleport-mobs", true);
         teleportItems = getConfig().getBoolean("teleport-items", true);
         leashedFollow = getConfig().getBoolean("leashed-follow", true);
         piglinSpawn = getConfig().getBoolean("piglin-spawn", false);
+    }
+
+    private ParticleSettings loadParticles() {
+        ConfigurationSection sec = getConfig().getConfigurationSection("particles");
+        String typeName = sec == null ? "PORTAL" : sec.getString("type", "PORTAL");
+        Particle type;
+        try {
+            type = Particle.valueOf(typeName.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            warn("Unknown particles.type '" + typeName + "', using PORTAL");
+            type = Particle.PORTAL;
+        }
+        Object data = null;
+        if (type.getDataType() == Particle.DustOptions.class) {
+            String hex = sec == null ? "#9B30FF" : sec.getString("color", "#9B30FF");
+            Color color;
+            try {
+                color = Color.fromRGB(Integer.parseInt(hex.replace("#", ""), 16));
+            } catch (NumberFormatException ex) {
+                warn("Invalid particles.color '" + hex + "', using #9B30FF");
+                color = Color.fromRGB(0x9B30FF);
+            }
+            data = new Particle.DustOptions(color, 1.0f);
+        } else if (type.getDataType() != Void.class) {
+            warn("particles.type " + type + " needs extra data the plugin cannot provide, using PORTAL");
+            type = Particle.PORTAL;
+        }
+        int perBlock = sec == null ? 2 : Math.max(0, Math.min(10, sec.getInt("per-block", 2)));
+        int interval = sec == null ? 2 : Math.max(1, Math.min(40, sec.getInt("interval-ticks", 2)));
+        boolean sound = sec == null || sec.getBoolean("sound", true);
+        return new ParticleSettings(type, data, perBlock, interval, sound);
     }
 
     private void warn(String problem) {
@@ -117,8 +165,10 @@ public final class ClockPortals extends JavaPlugin {
     PortalManager manager() { return manager; }
     FrameDetector detector() { return detector; }
     TravelTask travel() { return travel; }
-    boolean useEndEffect() { return endEffect; }
-    int playerDelay() { return endEffect ? 0 : playerDelay; }
+    Effect effect() { return effect; }
+    ParticleSettings particles() { return particles; }
+    boolean useEndEffect() { return effect == Effect.END; }
+    int playerDelay() { return effect == Effect.END ? 0 : playerDelay; }
     boolean consumeClock() { return consumeClock; }
     boolean teleportMobs() { return teleportMobs; }
     boolean teleportItems() { return teleportItems; }

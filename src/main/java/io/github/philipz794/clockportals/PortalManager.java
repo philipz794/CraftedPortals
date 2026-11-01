@@ -118,9 +118,13 @@ final class PortalManager {
     void fill(Portal p) {
         World w = p.world();
         if (w == null) return;
-        boolean end = plugin.useEndEffect();
+        ClockPortals.Effect effect = plugin.effect();
         for (Block b : p.interior(w)) {
-            if (end) {
+            if (effect == ClockPortals.Effect.PARTICLE) {
+                // Interior stays air; only remove portal blocks left over from another effect
+                Material t = b.getType();
+                if (t == Material.NETHER_PORTAL || t == Material.END_GATEWAY) b.setType(Material.AIR, false);
+            } else if (effect == ClockPortals.Effect.END) {
                 if (b.getType() != Material.END_GATEWAY) b.setType(Material.END_GATEWAY, false);
                 BlockState st = b.getState();
                 if (st instanceof EndGateway gw) {

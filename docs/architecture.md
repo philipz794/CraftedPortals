@@ -62,6 +62,15 @@ Always place portal blocks with `setBlockData(…, false)`, otherwise vanilla tr
 Gateway with exit pointing to itself plus `ExactTeleport`, so vanilla generates nothing.
 Age set high so no beam is rendered.
 
+### PARTICLE effect
+
+`fill()` removes any portal blocks and leaves the interior as air. `TravelTask.emitParticles()` runs
+every `interval-ticks` and, for each loaded portal with a player within 48 blocks, spawns `per-block`
+particles per interior cell, spread 0.3 in the portal plane and 0.05 perpendicular so the sheet looks
+flat. `maintain()` skips the refill check for this effect. `BlockPlaceEvent` into the interior is
+cancelled. Particle types that need data other than `DustOptions` (e.g. `BLOCK`, `ITEM`) fall back to
+`PORTAL` with a config warning.
+
 ### Piglin spawns from portal blocks
 
 Vanilla spawns zombified piglins from nether portal blocks via `NetherPortalBlock.randomTick`
