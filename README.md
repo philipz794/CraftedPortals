@@ -74,3 +74,7 @@ The jar is written to `target/`. See [docs/build.md](docs/build.md) for details.
 ## Documentation
 
 Developer documentation lives in [`docs/`](docs/README.md).
+
+## License
+
+[MIT](LICENSE)
