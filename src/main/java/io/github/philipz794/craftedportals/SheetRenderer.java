@@ -23,10 +23,11 @@ import java.util.Map;
  * rectangular portal is a single quad without seams. Java clients only; Geyser does not render
  * scaled display backgrounds, Bedrock players see the particles.
  *
- * Geometry: a text display renders 40 text pixels per block. The background of a text that is
- * SPACES spaces wide measures (4 * SPACES + BG_PAD) x BG_HEIGHT pixels, so the scale maps that onto
- * the rectangle's size in blocks. If the sheet shows gaps or overlaps between rectangles in game,
- * BG_PAD / BG_HEIGHT are the knobs to tune.
+ * Geometry (vanilla TextDisplayRenderer): 40 text pixels per block; the text is bottom-anchored at
+ * the entity position and centred horizontally. The background quad spans from x = -1 to the text
+ * width k and from y = -1 to lines * 10, i.e. (k + BG_PAD) x BG_HEIGHT pixels for one line. A text of
+ * SPACES spaces is 4 * SPACES pixels wide. If the sheet shows gaps or overlaps in game, BG_PAD /
+ * BG_HEIGHT are the knobs to tune.
  */
 final class SheetRenderer {
 
@@ -35,8 +36,8 @@ final class SheetRenderer {
 
     private static final int SPACES = 10;
     private static final float PX_PER_BLOCK = 40f;
-    private static final float BG_PAD = 2f;      // background extends 1 px left and right of the text
-    private static final float BG_HEIGHT = 10f;  // one line: 9 px plus 1 px padding
+    private static final float BG_PAD = 1f;      // quad from x = -1 to x = k
+    private static final float BG_HEIGHT = 11f;  // quad from y = -1 to y = 10 for one line
 
     private final CraftedPortals plugin;
     private final Map<Portal, List<TextDisplay>> sheets = new HashMap<>();

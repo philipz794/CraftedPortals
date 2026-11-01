@@ -61,7 +61,7 @@ particles:
     # Hex colour; an item named e.g. 'HomePortal #ff00ff' overrides it for
     # that network (see activation-item above)
     color: "#9B30FF"
-    # Opacity in percent (5-100)
+    # Opacity in percent (5-100); below about 15 the sheet is hard to see
     opacity: 20
 
 # How long a survival player has to stand in the portal (in ticks,
