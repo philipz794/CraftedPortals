@@ -90,9 +90,6 @@ player travels or steps out (`endWaiting`, also for players who vanished from th
 - `DARKNESS`: potion effect refreshed with 100 ticks, removed at the end so it fades.
 - `FROST`: `setFreezeTicks` proportional to progress, capped at 130 (vanilla damages from 140). Vanilla
   thaws 2 ticks per tick, hence the `+2`.
-- `BORDER`: a per-player `WorldBorder` centred on the player with radius 300 (outside render distance,
-  so no wall is visible); the warning distance grows from 300 to 1200, which fades the red vignette in.
-  `setWorldBorder(null)` restores the real border.
 - Particles around the player (`travel-particles`), count scaling with progress; the swelling
   `BLOCK_PORTAL_TRIGGER` sound once at the start (stopped on early exit); a ten-segment progress bar in
   the action bar.

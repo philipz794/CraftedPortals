@@ -8,7 +8,6 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.WorldBorder;
 import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EnderDragon;
@@ -46,8 +45,6 @@ final class TravelTask extends BukkitRunnable {
         this.plugin = plugin;
     }
 
-    /** Per-player world border used by the BORDER travel effect. */
-    private final Map<UUID, WorldBorder> borders = new HashMap<>();
     /** Arrival portal plus the interior cells currently sent as air to that player. */
     private record Hidden(Portal portal, Set<Long> cells) {}
     /** Players who see the portal blocks they stand in as air until they step out of the arrival portal. */
@@ -181,8 +178,6 @@ final class TravelTask extends BukkitRunnable {
 
     /** Full-screen frost without damage: vanilla hurts at 140, so stay below. */
     private static final int MAX_FROST = 130;
-    /** BORDER effect: border radius well outside render distance, warning distance grows over time. */
-    private static final double BORDER_RADIUS = 300;
 
     /** Called every tick while a survival player waits inside a portal (t of delay ticks done). */
     private void showWaiting(Player p, Portal portal, int t, int delay) {
@@ -198,14 +193,6 @@ final class TravelTask extends BukkitRunnable {
             case NAUSEA -> p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0, true, false, false));
             case DARKNESS -> p.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 100, 0, true, false, false));
             case FROST -> p.setFreezeTicks((int) (MAX_FROST * progress) + 2); // +2: vanilla thaws 2 per tick
-            case BORDER -> {
-                WorldBorder wb = borders.computeIfAbsent(p.getUniqueId(), k -> plugin.getServer().createWorldBorder());
-                wb.setCenter(p.getLocation());
-                wb.setSize(BORDER_RADIUS * 2);
-                // vignette alpha = 1 - radius / warning distance -> ramps from 0 to about 0.75
-                wb.setWarningDistance((int) (BORDER_RADIUS * (1 + 3 * progress)));
-                p.setWorldBorder(wb);
-            }
             case NONE -> { }
         }
         if (ts.particles()) {
@@ -234,7 +221,6 @@ final class TravelTask extends BukkitRunnable {
             case NAUSEA -> p.removePotionEffect(PotionEffectType.NAUSEA);
             case DARKNESS -> p.removePotionEffect(PotionEffectType.DARKNESS);
             case FROST -> p.setFreezeTicks(0);
-            case BORDER -> { if (borders.remove(p.getUniqueId()) != null) p.setWorldBorder(null); }
             case NONE -> { }
         }
         if (ts.sound()) p.stopSound(Sound.BLOCK_PORTAL_TRIGGER);

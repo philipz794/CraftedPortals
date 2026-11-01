@@ -36,7 +36,7 @@ public final class CraftedPortals extends JavaPlugin {
                             boolean sheet, Color sheetColor, int sheetOpacity) {}
 
     /** Screen effect shown to a waiting survival player. */
-    enum TravelEffect { VANILLA, NAUSEA, FROST, DARKNESS, BORDER, NONE }
+    enum TravelEffect { VANILLA, NAUSEA, FROST, DARKNESS, NONE }
 
     /** Everything a waiting player sees and hears. */
     record TravelSettings(TravelEffect effect, boolean particles, Particle particleType,

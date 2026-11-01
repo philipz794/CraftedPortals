@@ -74,7 +74,6 @@ player-delay-ticks: 80
 #   NAUSEA   - only the wobble, without the purple tint (nausea effect)
 #   FROST    - icy screen border like powder snow, no damage
 #   DARKNESS - pulsing darkness like the Warden's
-#   BORDER   - red vignette like the world border
 #   NONE     - no screen effect at all
 # With every value except VANILLA the plugin hides the portal blocks the
 # waiting player touches from that player only, so the vanilla overlay

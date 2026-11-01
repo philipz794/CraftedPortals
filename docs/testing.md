@@ -32,7 +32,7 @@ There are no unit tests. Verification happens on a Paper 26.3 test server, prefe
   vanilla Nether teleport and no portal generated in the Nether (regression, fixed via
   `EntityInsideBlockEvent`).
 - Waiting effect: survival player in a networked portal gets nausea, particles, sound and progress bar,
-  then teleports; stepping out early stops everything. Try FROST, DARKNESS, BORDER and NONE via reload.
+  then teleports; stepping out early stops everything. Try FROST, DARKNESS and NONE via reload.
   A 1-of-1 portal shows `no-target` immediately without any waiting effect.
 - PARTICLE sheet: with `effect: PARTICLE`, a translucent sheet fills the portal (check: fills the
   rectangle exactly, no gaps/overlaps between rows of an L-shape, visible from both sides, opacity

@@ -51,7 +51,7 @@ Update it alongside behaviour changes in the code.
 - A portal without destination tells the player immediately (`messages.no-target`), no waiting.
 - While waiting, `travel-effect` decides what the player sees: VANILLA (default) is the real purple
   portal overlay, which the client draws on its own while touching nether portal blocks; NAUSEA, FROST,
-  DARKNESS, BORDER and NONE hide the touched portal blocks from that player (no overlay) and show their
+  DARKNESS and NONE hide the touched portal blocks from that player (no overlay) and show their
   own effect, if any. Independently: `travel-particles` around the player (own type/colour),
   `travel-sound` (swelling portal trigger sound) and `travel-bar` (progress bar in the action bar,
   `messages.travel-bar`). Everything stops when the player teleports or steps out early.
