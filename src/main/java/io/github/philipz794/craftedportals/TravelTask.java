@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -46,8 +47,10 @@ final class TravelTask extends BukkitRunnable {
 
     /** Per-player world border used by the BORDER travel effect. */
     private final Map<UUID, WorldBorder> borders = new HashMap<>();
-    /** Players who see the interior of their arrival portal as air until they step out. */
-    private final Map<UUID, Portal> hiddenInterior = new HashMap<>();
+    /** Arrival portal plus the interior cells currently sent as air to that player. */
+    private record Hidden(Portal portal, Set<Long> cells) {}
+    /** Players who see the portal blocks they stand in as air until they step out of the arrival portal. */
+    private final Map<UUID, Hidden> hiddenInterior = new HashMap<>();
 
     @Override
     public void run() {
@@ -55,6 +58,7 @@ final class TravelTask extends BukkitRunnable {
         PortalManager mgr = plugin.manager();
         if (tick % 10 == 0) maintain(mgr);
         if (plugin.effect() == CraftedPortals.Effect.PARTICLE) emitParticles(mgr);
+        updateHiddenCells();
         Set<UUID> inside = new HashSet<>();
 
         for (Portal portal : mgr.all()) {
@@ -100,10 +104,10 @@ final class TravelTask extends BukkitRunnable {
         // Clear the "arrived" marker once the portal has been left (at least 1 s later)
         justArrived.entrySet().removeIf(en -> {
             if (inside.contains(en.getKey()) || tick - en.getValue() <= 20) return false;
-            Portal hidden = hiddenInterior.remove(en.getKey());
+            Hidden hidden = hiddenInterior.remove(en.getKey());
             if (hidden != null) {
                 Player p = plugin.getServer().getPlayer(en.getKey());
-                if (p != null) sendInterior(p, hidden, false);
+                if (p != null) revealAll(p, hidden);
             }
             return true;
         });
@@ -300,28 +304,50 @@ final class TravelTask extends BukkitRunnable {
     // ------------------------------------------------------------ Arrival portal overlay
 
     /**
-     * The client renders the purple portal overlay on its own as soon as it stands inside nether
-     * portal blocks; vanilla avoids that after a portal trip with a client-side cooldown we cannot
-     * set. So the arriving player is shown the destination interior as air until they step out
-     * (justArrived cleared). Sent twice because chunk data arriving after the teleport could
-     * overwrite the fake blocks.
+     * The client renders the purple portal overlay on its own as soon as its bounding box touches
+     * nether portal blocks; vanilla avoids that after a portal trip with a client-side cooldown we
+     * cannot set. So, until the arriving player steps out (justArrived cleared), the one or two
+     * portal blocks they are standing in are sent to them as air, every tick following their
+     * position. The rest of the portal keeps its texture, and the blocks they left behind pop back.
      */
     private void hideArrivalPortal(Player p, Portal to) {
         if (plugin.effect() != CraftedPortals.Effect.NETHER) return;
-        hiddenInterior.put(p.getUniqueId(), to);
-        for (long d : new long[]{1L, 20L}) {
-            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                if (p.isOnline() && hiddenInterior.get(p.getUniqueId()) == to) sendInterior(p, to, true);
-            }, d);
+        hiddenInterior.put(p.getUniqueId(), new Hidden(to, new HashSet<>()));
+    }
+
+    /** Hidden cells follow the player; every second all hidden cells are re-sent in case chunk data overwrote them. */
+    private void updateHiddenCells() {
+        if (hiddenInterior.isEmpty()) return;
+        boolean refresh = tick % 20 == 0;
+        for (Map.Entry<UUID, Hidden> en : hiddenInterior.entrySet()) {
+            Player p = plugin.getServer().getPlayer(en.getKey());
+            Hidden h = en.getValue();
+            World w = h.portal().world();
+            if (p == null || w == null || !p.getWorld().equals(w)) continue;
+            // Small margin so a cell is hidden slightly before the client would touch it
+            BoundingBox bb = p.getBoundingBox().expand(0.15);
+            for (Block b : h.portal().interior(w)) {
+                long key = FrameDetector.key(b.getX(), b.getY(), b.getZ());
+                boolean touch = bb.overlaps(b.getBoundingBox());
+                boolean hidden = h.cells().contains(key);
+                if (touch && (!hidden || refresh)) {
+                    p.sendBlockChange(b.getLocation(), Material.AIR.createBlockData());
+                    h.cells().add(key);
+                } else if (!touch && hidden) {
+                    p.sendBlockChange(b.getLocation(), b.getBlockData());
+                    h.cells().remove(key);
+                }
+            }
         }
     }
 
-    /** Sends the interior of a portal to one player, either as air or as it really is. */
-    private void sendInterior(Player p, Portal portal, boolean asAir) {
-        World w = portal.world();
+    private void revealAll(Player p, Hidden h) {
+        World w = h.portal().world();
         if (w == null || !p.getWorld().equals(w)) return;
-        for (Block b : portal.interior(w)) {
-            p.sendBlockChange(b.getLocation(), asAir ? Material.AIR.createBlockData() : b.getBlockData());
+        for (Block b : h.portal().interior(w)) {
+            if (h.cells().contains(FrameDetector.key(b.getX(), b.getY(), b.getZ()))) {
+                p.sendBlockChange(b.getLocation(), b.getBlockData());
+            }
         }
     }
 

@@ -72,9 +72,11 @@ Age set high so no beam is rendered.
 The client renders the purple portal overlay by itself whenever it stands inside nether portal blocks,
 independent of the server. After a vanilla trip a client-side portal cooldown suppresses it in the exit
 portal; a plugin cannot set that cooldown. So, with the NETHER effect, the arriving player receives the
-destination interior as fake air via `sendBlockChange` (1 and 20 ticks after the teleport, in case chunk
-data overwrites it) and the real blocks again when `justArrived` is cleared, i.e. once they stepped out.
-Other players are unaffected.
+one or two interior blocks their bounding box touches (expanded by 0.15) as fake air via
+`sendBlockChange`, updated every tick as they move and re-sent every 20 ticks in case chunk data
+overwrote them. Blocks they leave are restored immediately, everything is restored when `justArrived`
+is cleared, i.e. once they stepped out. The rest of the portal keeps its texture; other players are
+unaffected.
 
 ### Waiting effect (TravelTask.showWaiting / endWaiting)
 
