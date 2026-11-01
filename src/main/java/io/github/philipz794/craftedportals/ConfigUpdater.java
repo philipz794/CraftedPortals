@@ -143,34 +143,82 @@ final class ConfigUpdater {
         return new Result(out, added, renamed, removed);
     }
 
-    /** Inserts sub keys of a section that the owner's file lacks at the end of that section. */
+    /**
+     * Inserts keys of a section that the owner's file lacks, at any nesting depth. A missing nested
+     * section is inserted as a whole (with its children and comments) at the end of its parent; a
+     * missing leaf is inserted at the end of its parent section. Existing keys are never touched.
+     */
     private static void addMissingSubKeys(List<String> body, String section, YamlConfiguration cur,
                                           List<String> out, List<String> added) {
-        List<String> missing = new ArrayList<>();
+        // Resolve the full path of every body line from its indentation
+        List<String> pathStack = new ArrayList<>();
+        List<Integer> indentStack = new ArrayList<>();
         List<String> pending = new ArrayList<>();
-        for (String line : body) {
+        for (int i = 0; i < body.size(); i++) {
+            String line = body.get(i);
             if (line.isBlank()) { pending.clear(); continue; }
-            String trimmed = line.stripLeading();
-            if (trimmed.startsWith("#")) { pending.add(line); continue; }
+            if (line.stripLeading().startsWith("#")) { pending.add(line); continue; }
             Matcher m = SUB_KEY.matcher(line);
             if (!m.matches()) { pending.clear(); continue; }
-            if (!cur.contains(section + "." + m.group(2))) {
-                missing.addAll(pending);
-                missing.add(line);
-                added.add(section + "." + m.group(2));
+            int indent = m.group(1).length();
+            while (!indentStack.isEmpty() && indentStack.get(indentStack.size() - 1) >= indent) {
+                indentStack.remove(indentStack.size() - 1);
+                pathStack.remove(pathStack.size() - 1);
+            }
+            String parent = section + (pathStack.isEmpty() ? "" : "." + String.join(".", pathStack));
+            String path = parent + "." + m.group(2);
+            boolean isSection = m.group(3).isBlank();
+            int end = i + 1;
+            while (end < body.size() && (body.get(end).isBlank()
+                    || body.get(end).stripLeading().startsWith("#")
+                    || leadingSpaces(body.get(end)) > indent)) end++;
+            // trim trailing blank/comment lines that belong to the next sibling
+            while (end > i + 1 && (body.get(end - 1).isBlank() || body.get(end - 1).stripLeading().startsWith("#"))) end--;
+            if (!cur.contains(path)) {
+                List<String> block = new ArrayList<>(pending);
+                block.addAll(body.subList(i, end));
+                insertIntoSection(out, parent, block);
+                cur.set(path, isSection ? new java.util.LinkedHashMap<String, Object>() : "added");
+                added.add(path);
+                pending.clear();
+                i = end - 1; // children were inserted with the block
+                continue;
             }
             pending.clear();
+            if (isSection) { pathStack.add(m.group(2)); indentStack.add(indent); }
         }
-        if (missing.isEmpty()) return;
-        int secLine = -1;
-        for (int i = 0; i < out.size(); i++) {
-            Matcher m = TOP_KEY.matcher(out.get(i));
-            if (m.matches() && m.group(1).equals(section)) { secLine = i; break; }
+    }
+
+    private static int leadingSpaces(String s) {
+        int n = 0;
+        while (n < s.length() && (s.charAt(n) == ' ' || s.charAt(n) == '\t')) n++;
+        return n;
+    }
+
+    /** Appends lines at the end of the section with the given dotted path (top-level or nested). */
+    private static void insertIntoSection(List<String> out, String dotted, List<String> block) {
+        String[] parts = dotted.split("\\.");
+        int line = -1, indent = -1;
+        int searchFrom = 0, searchTo = out.size();
+        for (String part : parts) {
+            int found = -1;
+            for (int i = searchFrom; i < searchTo; i++) {
+                String l = out.get(i);
+                int ind = leadingSpaces(l);
+                if (indent >= 0 && !l.isBlank() && !l.stripLeading().startsWith("#") && ind <= indent) break;
+                Matcher m = (indent < 0 ? TOP_KEY : SUB_KEY).matcher(l);
+                String key = m.matches() ? (indent < 0 ? m.group(1) : m.group(2)) : null;
+                if (key != null && key.equals(part) && (indent < 0 || ind > indent)) { found = i; break; }
+            }
+            if (found < 0) return;
+            line = found;
+            indent = leadingSpaces(out.get(found));
+            searchFrom = found + 1;
         }
-        if (secLine < 0) return;
-        int insert = secLine + 1;
-        while (insert < out.size() && (out.get(insert).startsWith(" ") || out.get(insert).startsWith("\t"))) insert++;
-        out.addAll(insert, missing);
+        int insert = line + 1;
+        while (insert < out.size() && (out.get(insert).isBlank() && insert + 1 < out.size() && leadingSpaces(out.get(insert + 1)) > indent
+                || (!out.get(insert).isBlank() && leadingSpaces(out.get(insert)) > indent))) insert++;
+        out.addAll(insert, block);
     }
 
     /** The comment lines directly above a top-level key in the template plus the key line itself. */

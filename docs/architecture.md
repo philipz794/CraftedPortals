@@ -152,7 +152,9 @@ always fall back to safe defaults so the plugin keeps working.
 text, so the owner's comments and ordering survive. Missing top-level options are appended with the
 comment lines directly above them in the template (a blank line separates a comment block from the
 previous option, so the file header is never copied). Missing keys of an existing section are inserted
-at the end of that section. A renamed option is rewritten in place: the old key line and its stale
+at the end of their parent section at any nesting depth; a missing nested section (e.g.
+`particles.sheet`) is inserted as a whole with its children and comments. (An earlier version only
+knew one level and re-added nested leaves on every start.) A renamed option is rewritten in place: the old key line and its stale
 comment block are replaced by the new key with the converted value and the template's comment.
 Additions are logged. Running it twice changes nothing.
 
