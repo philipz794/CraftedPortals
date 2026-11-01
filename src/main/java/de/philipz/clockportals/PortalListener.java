@@ -1,0 +1,230 @@
+package de.philipz.clockportals;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityPortalEvent;
+import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
+import io.papermc.paper.event.entity.EntityPortalReadyEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+final class PortalListener implements Listener {
+
+    private final ClockPortals plugin;
+    private final PortalManager mgr;
+
+    PortalListener(ClockPortals plugin) {
+        this.plugin = plugin;
+        this.mgr = plugin.manager();
+    }
+
+    // ------------------------------------------------------------ Aktivieren
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInteract(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getHand() != EquipmentSlot.HAND) return;
+        Block clicked = e.getClickedBlock();
+        ItemStack item = e.getItem();
+        if (clicked == null || item == null || item.getType() != Material.CLOCK) return;
+        Player p = e.getPlayer();
+
+        ItemMeta meta = item.getItemMeta();
+        String name = null;
+        if (meta != null && meta.hasDisplayName() && meta.displayName() != null) {
+            name = PlainTextComponentSerializer.plainText().serialize(meta.displayName()).trim();
+            if (name.isEmpty()) name = null;
+        }
+
+        Portal existing = mgr.byAny(clicked);
+        if (existing != null) {
+            e.setCancelled(true);
+            p.sendActionBar(plugin.portalMsg("info", existing));
+            return;
+        }
+
+        FrameDetector.Result r = plugin.detector().detect(clicked);
+        if (name == null) {
+            // Unbenannte Uhr: nur melden, wenn es wirklich ein Rahmen ist
+            if (r.ok() || r.error() == FrameDetector.Error.MISSING_KEYS) {
+                e.setCancelled(true);
+                p.sendActionBar(plugin.msg("no-name"));
+            }
+            return;
+        }
+        e.setCancelled(true);
+        switch (r.error()) {
+            case NONE -> {
+                Portal portal = mgr.create(name, clicked.getWorld(), r);
+                if (plugin.consumeClock() && p.getGameMode() != GameMode.CREATIVE) {
+                    item.setAmount(item.getAmount() - 1);
+                }
+                Location c = portal.arrival(clicked.getWorld());
+                clicked.getWorld().playSound(c, plugin.useEndEffect() ? Sound.BLOCK_END_PORTAL_SPAWN
+                        : Sound.BLOCK_PORTAL_TRIGGER, 0.7f, 1.2f);
+                p.sendActionBar(plugin.portalMsg("activated", portal));
+                if (mgr.count(portal) == 1) {
+                    Component hint = plugin.msg("no-target", "%name%", portal.displayName);
+                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> p.sendActionBar(hint), 50L);
+                }
+            }
+            case TOO_BIG -> p.sendActionBar(plugin.msg("too-big", "%max%", plugin.maxSize()));
+            case MISSING_KEYS -> p.sendActionBar(plugin.msg("missing-keys", "%have%", r.keysFound(),
+                    "%need%", plugin.keyCount(),
+                    "%block%", String.valueOf(plugin.keyBlock()).toLowerCase()));
+            default -> p.sendActionBar(plugin.msg("invalid-frame"));
+        }
+    }
+
+    // ------------------------------------------------------------ Zerstoeren
+
+    private void destroy(Portal p) {
+        plugin.destroyWithMessage(p);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBreak(BlockBreakEvent e) {
+        Portal p = mgr.byAny(e.getBlock());
+        if (p != null) destroy(p);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBurn(BlockBurnEvent e) {
+        Portal p = mgr.byFrame(e.getBlock());
+        if (p != null) destroy(p);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityChange(EntityChangeBlockEvent e) {
+        Portal in = mgr.byInterior(e.getBlock());
+        if (in != null) { e.setCancelled(true); return; }
+        Portal fr = mgr.byFrame(e.getBlock());
+        if (fr != null && e.getTo() != e.getBlock().getType()) {
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                if (!FrameDetector.isFullBlock(e.getBlock()) && !fr.isCorner(e.getBlock())) destroy(fr);
+            });
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityExplode(EntityExplodeEvent e) {
+        handleExplosion(e.blockList());
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockExplode(BlockExplodeEvent e) {
+        handleExplosion(e.blockList());
+    }
+
+    private void handleExplosion(List<Block> blocks) {
+        Set<Portal> hit = new HashSet<>();
+        Iterator<Block> it = blocks.iterator();
+        while (it.hasNext()) {
+            Block b = it.next();
+            Portal in = mgr.byInterior(b);
+            if (in != null) { it.remove(); continue; }
+            Portal fr = mgr.byFrame(b);
+            if (fr != null && !fr.isCorner(b)) hit.add(fr);
+        }
+        hit.forEach(this::destroy);
+    }
+
+    // ------------------------------------------------------------ Schuetzen
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPhysics(BlockPhysicsEvent e) {
+        Material t = e.getBlock().getType();
+        if (t != Material.NETHER_PORTAL && t != Material.END_GATEWAY) return;
+        if (mgr.byInterior(e.getBlock()) != null) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onFlow(BlockFromToEvent e) {
+        if (mgr.byInterior(e.getToBlock()) != null) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPistonExtend(BlockPistonExtendEvent e) {
+        if (touches(e.getBlocks()) || mgr.byAny(e.getBlock().getRelative(e.getDirection())) != null) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPistonRetract(BlockPistonRetractEvent e) {
+        if (touches(e.getBlocks())) e.setCancelled(true);
+    }
+
+    private boolean touches(List<Block> blocks) {
+        for (Block b : blocks) {
+            if (mgr.byAny(b) != null) return true;
+        }
+        return false;
+    }
+
+    // ------------------------------------------------------------ Vanilla-Portale unterdruecken
+
+    private boolean inOurPortal(Location loc) {
+        if (loc == null || loc.getWorld() == null) return false;
+        Block b = loc.getBlock();
+        return mgr.byInterior(b) != null || mgr.byInterior(b.getRelative(0, 1, 0)) != null;
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerPortal(PlayerPortalEvent e) {
+        if (inOurPortal(e.getFrom())) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onEntityPortal(EntityPortalEvent e) {
+        if (inOurPortal(e.getFrom())) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerTeleport(PlayerTeleportEvent e) {
+        PlayerTeleportEvent.TeleportCause c = e.getCause();
+        if ((c == PlayerTeleportEvent.TeleportCause.END_GATEWAY || c == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL)
+                && inOurPortal(e.getFrom())) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onGateway(EntityTeleportEndGatewayEvent e) {
+        if (inOurPortal(e.getFrom())) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPortalReady(EntityPortalReadyEvent e) {
+        if (inOurPortal(e.getEntity().getLocation())) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent e) {
+        mgr.reindexWorld(e.getWorld());
+    }
+}

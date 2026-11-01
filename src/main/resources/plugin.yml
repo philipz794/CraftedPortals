@@ -1,0 +1,15 @@
+name: Clock-Portals
+version: '${project.version}'
+main: de.philipz.clockportals.ClockPortals
+api-version: '1.21'
+description: Portale aus beliebigen Bloecken, aktiviert mit einer benannten Uhr.
+author: philipz
+commands:
+  clockportals:
+    description: Liste der Portale / Config neu laden
+    usage: /clockportals <list|reload|create>
+    permission: clockportals.admin
+permissions:
+  clockportals.admin:
+    description: Zugriff auf /clockportals
+    default: op
