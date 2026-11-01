@@ -55,10 +55,9 @@ final class TravelTask extends BukkitRunnable {
         tick++;
         PortalManager mgr = plugin.manager();
         if (tick % 10 == 0) maintain(mgr);
-        if (plugin.effect() == CraftedPortals.Effect.PARTICLE) {
-            emitParticles(mgr);
-            ambientSounds(mgr);
-        }
+        if (plugin.effect() == CraftedPortals.Effect.PARTICLE) emitParticles(mgr);
+        // Nether portal blocks bring their own client-side ambient; the other looks get ours
+        if (plugin.effect() != CraftedPortals.Effect.NETHER) ambientSounds(mgr);
         updateHiddenCells();
         Set<UUID> inside = new HashSet<>();
 
@@ -180,9 +179,9 @@ final class TravelTask extends BukkitRunnable {
      * with a slightly random pitch, so start and end of the clip do not line up audibly.
      */
     private void ambientSounds(PortalManager mgr) {
-        CraftedPortals.ParticleSettings ps = plugin.particles();
-        if (!ps.ambient().enabled()) return;
-        int chance = ps.ambientSeconds() * 20; // one in N ticks per portal
+        CraftedPortals.AmbientSettings as = plugin.ambient();
+        if (!as.sound().enabled()) return;
+        int chance = as.seconds() * 20; // one in N ticks per portal
         for (Portal p : mgr.all()) {
             if (random.nextInt(chance) != 0 || !p.isLoaded()) continue;
             World w = p.world();
@@ -190,7 +189,7 @@ final class TravelTask extends BukkitRunnable {
             if (w.getNearbyPlayers(centre, PARTICLE_RANGE).isEmpty()) continue;
             List<Block> cells = p.interior(w);
             Location at = cells.get(random.nextInt(cells.size())).getLocation().add(0.5, 0.5, 0.5);
-            ps.ambient().play(w, at, 0.9f + random.nextFloat() * 0.2f);
+            as.sound().play(w, at, 0.9f + random.nextFloat() * 0.2f);
         }
     }
 

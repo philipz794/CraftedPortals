@@ -104,22 +104,6 @@ particles:
   per-block: 1
   # Ticks between particle bursts (1-40); lower = denser, more traffic
   interval-ticks: 5
-  # Ambient sound of a portal, played like vanilla does it: at random moments
-  # on random interior blocks with slightly varying pitch. true = the nether
-  # portal ambient, false = off, or any sound: game names such as
-  # BLOCK_BEACON_AMBIENT, or a key from a resource pack such as
-  # mypack:portal_hum (the client needs that pack). Good steady candidates:
-  #   BLOCK_PORTAL_AMBIENT        - classic whoosh
-  #   BLOCK_BEACON_AMBIENT        - deep soft hum
-  #   BLOCK_CONDUIT_AMBIENT       - calm underwater shimmer
-  #   BLOCK_RESPAWN_ANCHOR_AMBIENT - eerie warble
-  #   BLOCK_AMETHYST_BLOCK_CHIME  - short crystal chimes
-  #   BLOCK_END_PORTAL_FRAME_FILL - short magical accent
-  sound: true
-  sound-volume: 0.3
-  sound-pitch: 1.0
-  # Average seconds between two sounds per portal (randomised, 1-60)
-  sound-interval: 4
   # Translucent coloured sheet filling the portal, built from display
   # entities. Java clients only; Bedrock players see just the particles.
   sheet:
@@ -129,6 +113,24 @@ particles:
     color: "#4169E1"
     # Opacity in percent (5-100); below about 15 the sheet is hard to see
     opacity: 50
+
+# Ambient sound of portals with the PARTICLE or END look (nether portal
+# blocks bring their own). Played like vanilla does it: at random moments on
+# random interior blocks with slightly varying pitch. true = the nether
+# portal ambient, false = off, or any sound: game names such as
+# BLOCK_BEACON_AMBIENT, or a key from a resource pack such as
+# mypack:portal_hum (the client needs that pack). Good steady candidates:
+#   BLOCK_PORTAL_AMBIENT         - classic whoosh
+#   BLOCK_BEACON_AMBIENT         - deep soft hum
+#   BLOCK_CONDUIT_AMBIENT        - calm underwater shimmer
+#   BLOCK_RESPAWN_ANCHOR_AMBIENT - eerie warble
+#   BLOCK_AMETHYST_BLOCK_CHIME   - short crystal chimes
+#   BLOCK_END_PORTAL_FRAME_FILL  - short magical accent
+ambient-sound: true
+ambient-sound-volume: 0.3
+ambient-sound-pitch: 1.0
+# Average seconds between two sounds per portal (randomised, 1-60)
+ambient-sound-interval: 4
 
 # How long a survival player has to stand in the portal (in ticks,
 # 20 ticks = 1 second). Vanilla nether portal: 80. Creative: always instant.

@@ -74,9 +74,11 @@ Update it alongside behaviour changes in the code.
   into the centre.
 - `effect: END` → end gateway blocks, teleport always instant.
 - `effect: PARTICLE` → the interior stays air and is filled with particles (`particles.*`: any type of
-  the game except block-texture particles, with its options `color`, `color-to`, `item`, `value`; density, interval, ambient sound (`sound`: true/false or any sound name, with `sound-volume`, `sound-pitch`, `sound-interval`; played at random moments on random interior blocks)) plus, if `particles.sheet.enabled`, a translucent coloured
+  the game except block-texture particles, with its options `color`, `color-to`, `item`, `value`; density, interval,) plus, if `particles.sheet.enabled`, a translucent coloured
   sheet (`color`, `opacity` in percent; Java clients only). Players cannot place blocks into the interior.
   Normal player delay applies. No vanilla portal logic is involved at all.
+- `ambient-sound` (true/false or any sound name, with volume, pitch and interval) plays for PARTICLE and
+  END portals at random moments on random interior blocks; NETHER blocks bring vanilla's own ambient.
 - All effects can be switched live with `/craftedportals reload`.
 
 ## Destruction & Protection

@@ -32,7 +32,8 @@ final class ConfigUpdater {
 
     /** Options that no longer exist; their line and comment block are deleted from the owner's file. */
     private static final java.util.Set<String> REMOVED = java.util.Set.of(
-            "travel-nausea-peak", "particles.block", "travel-particles.block");
+            "travel-nausea-peak", "particles.block", "travel-particles.block",
+            "particles.sound", "particles.sound-volume", "particles.sound-pitch", "particles.sound-interval");
 
     private static final Pattern TOP_KEY = Pattern.compile("^([A-Za-z0-9_-]+):(.*)$");
     private static final Pattern SUB_KEY = Pattern.compile("^(\\s+)([A-Za-z0-9_-]+):(.*)$");
