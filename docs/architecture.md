@@ -82,11 +82,10 @@ unaffected.
 Applied every tick to a survival player waiting inside a portal with a destination, removed when the
 player travels or steps out (`endWaiting`, also for players who vanished from the portal):
 
-- `VANILLA`: nothing is applied; the client's own overlay shows because the portal blocks stay visible.
-  Without nether portal blocks (END, PARTICLE) there is nothing to show, so `activeEffect()` maps
-  VANILLA to NAUSEA.
-- Every other value first hides the touched portal blocks (same mechanism as on arrival), so the
-  vanilla overlay never builds up.
+- With NETHER blocks, the touched portal blocks are hidden from the waiting player first (same
+  mechanism as on arrival), so the vanilla overlay never builds up. A VANILLA value that kept the
+  overlay existed briefly and was dropped: it only worked with NETHER blocks, and the owner preferred
+  effects that behave the same with every portal look.
 - `NAUSEA`: potion effect refreshed with 100 ticks, no icon or particles, removed at the end; the client
   fades the wobble quickly after removal (verified in-game).
 - `DARKNESS`: potion effect refreshed with 100 ticks, removed at the end so it fades.

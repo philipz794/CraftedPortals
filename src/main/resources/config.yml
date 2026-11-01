@@ -69,20 +69,16 @@ particles:
 # With the END effect teleportation is always instant.
 player-delay-ticks: 80
 
-# What a survival player sees while waiting inside a portal:
-#   VANILLA  - the purple nether portal overlay with its wobble, exactly as
-#              in vanilla (default). The game client draws it by itself as
-#              soon as the player stands in nether portal blocks, so it only
-#              exists with effect: NETHER. With END or PARTICLE visuals,
-#              VANILLA behaves like NAUSEA.
-#   NAUSEA   - only the wobble, without the purple tint (nausea effect)
+# Screen effect a survival player sees while waiting inside a portal.
+# Works the same with every portal look (effect: NETHER, END, PARTICLE).
+#   NAUSEA   - screen wobble like a nether portal (default)
 #   FROST    - icy screen border like powder snow, no damage
 #   DARKNESS - pulsing darkness like the Warden's
 #   NONE     - no screen effect at all
-# With every value except VANILLA the plugin hides the portal blocks the
-# waiting player touches from that player only, so the vanilla overlay
-# cannot appear. Other players still see the full portal.
-travel-effect: VANILLA
+# Vanilla's purple portal overlay is never shown: the plugin hides the portal
+# blocks the waiting player touches from that player only, so the client
+# cannot draw it. Other players still see the full portal.
+travel-effect: NAUSEA
 
 # Particles around the waiting player, independent of the portal visuals
 travel-particles:

@@ -19,8 +19,8 @@ plugin without dependencies.
   can be switched off.
 - **Three looks.** Nether portal blocks, end gateway blocks, or particles with a translucent coloured sheet.
   Name a clock `Home #3366FF` and that network gets its own colour.
-- **Travel effect of your choice.** While a survival player waits: the vanilla purple overlay, nausea,
-  frost, darkness or nothing, plus particles, a swelling sound and a progress bar. All optional.
+- **Travel effect of your choice.** While a survival player waits: nausea, frost, darkness or nothing,
+  plus particles, a swelling sound and a progress bar. All optional and independent of the portal look.
 - **Sturdy.** Frames are protected from pistons and fluids. Breaking a frame block removes only that
   portal; the rest of the network keeps its order. Zombified piglins do not spawn from portal blocks
   unless you allow it.
@@ -70,7 +70,7 @@ See [`config.yml`](src/main/resources/config.yml) for all options and messages. 
 | `max-blocks` | `200` | Maximum number of air blocks inside a portal (hard limit 1000) |
 | `effect` | `NETHER` | `NETHER`, `END` or `PARTICLE` visuals (`particles.*` for the latter, see [docs/particles.md](docs/particles.md)) |
 | `player-delay-ticks` | `80` | Time a survival player has to stand in the portal |
-| `travel-effect` | `VANILLA` | Screen effect while waiting: `VANILLA` (purple overlay), `NAUSEA`, `FROST`, `DARKNESS` or `NONE` |
+| `travel-effect` | `NAUSEA` | Screen effect while waiting: `NAUSEA`, `FROST`, `DARKNESS` or `NONE` |
 | `travel-particles` / `travel-sound` / `travel-bar` | on | Particles around the player, swelling sound, progress bar |
 | `consume-item` | `true` | Consume the item on activation (never in creative) |
 | `teleport-mobs` / `teleport-items` / `leashed-follow` | `true` | Who else may travel |

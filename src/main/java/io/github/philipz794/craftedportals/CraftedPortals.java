@@ -36,7 +36,7 @@ public final class CraftedPortals extends JavaPlugin {
                             boolean sheet, Color sheetColor, int sheetOpacity) {}
 
     /** Screen effect shown to a waiting survival player. */
-    enum TravelEffect { VANILLA, NAUSEA, FROST, DARKNESS, NONE }
+    enum TravelEffect { NAUSEA, FROST, DARKNESS, NONE }
 
     /** Everything a waiting player sees and hears. */
     record TravelSettings(TravelEffect effect, boolean particles, Particle particleType,
@@ -197,13 +197,13 @@ public final class CraftedPortals extends JavaPlugin {
     }
 
     private TravelSettings loadTravelSettings() {
-        String name = getConfig().getString("travel-effect", "VANILLA");
+        String name = getConfig().getString("travel-effect", "NAUSEA");
         TravelEffect eff;
         try {
             eff = TravelEffect.valueOf(name.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ex) {
-            warn("Unknown travel-effect '" + name + "', using VANILLA");
-            eff = TravelEffect.VANILLA;
+            warn("Unknown travel-effect '" + name + "', using NAUSEA");
+            eff = TravelEffect.NAUSEA;
         }
         ConfigurationSection tp = getConfig().getConfigurationSection("travel-particles");
         boolean particlesOn = tp != null && tp.getBoolean("enabled", true);

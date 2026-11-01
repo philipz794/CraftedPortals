@@ -49,11 +49,9 @@ Update it alongside behaviour changes in the code.
 - Creative: instant. Mobs and items: instant.
 - `effect: END`: always instant.
 - A portal without destination tells the player immediately (`messages.no-target`), no waiting.
-- While waiting, `travel-effect` decides what the player sees: VANILLA (default) is the real purple
-  portal overlay, which the client draws on its own while touching nether portal blocks (so it needs
-  `effect: NETHER`; with END or PARTICLE visuals VANILLA falls back to NAUSEA); NAUSEA, FROST,
-  DARKNESS and NONE hide the touched portal blocks from that player (no overlay) and show their
-  own effect, if any. Independently: `travel-particles` around the player (own type/colour),
+- While waiting, `travel-effect` decides what the player sees: NAUSEA (default), FROST, DARKNESS or
+  NONE, independent of the portal look. Vanilla's purple overlay is never shown: with NETHER blocks the
+  touched portal blocks are hidden from that player, so the client cannot draw it. Independently: `travel-particles` around the player (own type/colour),
   `travel-sound` (swelling portal trigger sound) and `travel-bar` (progress bar in the action bar,
   `messages.travel-bar`). Everything stops when the player teleports or steps out early.
 - After arriving, players see `messages.arrived` (name, #X of Y) in the action bar.
