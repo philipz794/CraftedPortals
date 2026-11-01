@@ -1,4 +1,4 @@
-package de.philipz.clockportals;
+package io.github.philipz794.clockportals;
 
 import org.bukkit.Axis;
 import org.bukkit.GameMode;

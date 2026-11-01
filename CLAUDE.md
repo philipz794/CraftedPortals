@@ -14,7 +14,7 @@ real name anywhere.
 
 ## Layout
 
-- `src/main/java/de/philipz/clockportals/` – all classes (main, FrameDetector, Portal, PortalManager, PortalListener, TravelTask)
+- `src/main/java/io/github/philipz794/clockportals/` – all classes (main, FrameDetector, Portal, PortalManager, PortalListener, TravelTask)
 - `src/main/resources/` – `plugin.yml`, `config.yml` (defaults and messages)
 - `docs/` – developer documentation. New knowledge goes there, not into this file.
 

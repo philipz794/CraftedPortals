@@ -1,6 +1,6 @@
 name: Clock-Portals
 version: '${project.version}'
-main: de.philipz.clockportals.ClockPortals
+main: io.github.philipz794.clockportals.ClockPortals
 api-version: '1.21'
 description: Portals made of any blocks, activated with a named clock.
 author: philipz794

@@ -1,4 +1,4 @@
-package de.philipz.clockportals;
+package io.github.philipz794.clockportals;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;

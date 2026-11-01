@@ -31,7 +31,7 @@ Output: `target/clockportals-1.0.0.jar`. `target/` is gitignored.
 
 - `name: Clock-Portals` → data folder `plugins/Clock-Portals/`
 - `api-version: '1.21'`
-- Main class: `de.philipz.clockportals.ClockPortals`
+- Main class: `io.github.philipz794.clockportals.ClockPortals`
 - Resources are filtered by Maven (`${project.version}` in plugin.yml).
 
 ## Deployment

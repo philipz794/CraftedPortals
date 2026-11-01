@@ -1,6 +1,6 @@
 # Architecture & Classes
 
-Package: `de.philipz.clockportals`
+Package: `io.github.philipz794.clockportals`
 
 ## Classes
 
