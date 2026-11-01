@@ -2,6 +2,12 @@
 
 <img src="assets/icon.png" alt="CraftedPortals icon" width="128" align="right">
 
+[![Modrinth](https://img.shields.io/badge/Modrinth-CraftedPortals-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/project/craftedplugins)
+[![GitHub release](https://img.shields.io/github/v/release/philipz794/CraftedPortals?label=release)](https://github.com/philipz794/CraftedPortals/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+![An arched deepslate frame with emerald blocks, filled with a translucent blue sheet and particles](assets/screenshots/craftedportals_1.jpg)
+
 A server-side [Paper](https://papermc.io) plugin that lets players build portals out of **any full blocks**
 in **any shape** and link them with a **renamed item**, a clock by default. No client mods required;
 works for Java and Bedrock players (via Geyser/Floodgate). Inspired by
@@ -27,6 +33,12 @@ plugin without dependencies.
 - **Painless updates.** New options are added to your existing `config.yml` with their comments; your
   values and translations stay untouched.
 
+## Screenshots
+
+| Any shape | Any blocks |
+|---|---|
+| ![A narrow, asymmetric frame with an offset top](assets/screenshots/craftedportals_2.jpg) | ![A wide frame of sculk and deepslate with emerald key blocks](assets/screenshots/craftedportals_3.jpg) |
+
 ## Requirements
 
 - Paper 26.3 or newer (API version 1.21)
@@ -34,7 +46,8 @@ plugin without dependencies.
 
 ## Installation
 
-1. Download `craftedportals-<version>.jar` or build it yourself (see below).
+1. Download `craftedportals-<version>.jar` from [Modrinth](https://modrinth.com/project/craftedplugins) or the
+   [GitHub releases](https://github.com/philipz794/CraftedPortals/releases), or build it yourself (see below).
 2. Drop it into your server's `plugins/` folder and start the server.
 3. Adjust `plugins/CraftedPortals/config.yml` as needed, then run `/cp reload`.
 
