@@ -59,9 +59,30 @@ final class SheetRenderer {
         }
         remove(p);
         list = new ArrayList<>();
-        for (int[] r : p.rectangles()) list.add(spawn(w, p, r, argb));
+        List<int[]> rects = p.rectangles();
+        try {
+            for (int[] r : rects) list.add(spawn(w, p, r, argb));
+        } catch (RuntimeException ex) {
+            plugin.getLogger().log(java.util.logging.Level.WARNING, "Could not spawn the colour sheet for portal "
+                    + p.displayName + " at " + p.minX + " " + p.minY + " " + p.minZ, ex);
+            sheets.put(p, list); // keep what we have; retried on the next maintain run
+            return;
+        }
+        long invalid = list.stream().filter(d -> !d.isValid()).count();
+        if (invalid > 0) {
+            plugin.getLogger().warning("Colour sheet for portal " + p.displayName + ": " + invalid + " of " + list.size()
+                    + " display entities were not added to the world (spawn cancelled by the server or another plugin?)");
+        } else if (!logged.contains(p)) {
+            plugin.getLogger().info("Colour sheet for portal " + p.displayName + ": " + list.size() + " display entit"
+                    + (list.size() == 1 ? "y" : "ies") + " for " + rects.size() + " rectangle(s) at "
+                    + p.minX + " " + p.minY + " " + p.minZ + " (" + p.cells() + " cells)");
+            logged.add(p);
+        }
         sheets.put(p, list);
     }
+
+    /** Portals whose sheet creation has been logged once, to keep the console quiet. */
+    private final java.util.Set<Portal> logged = new java.util.HashSet<>();
 
     private TextDisplay spawn(World w, Portal p, int[] r, Color argb) {
         int u0 = r[0], u1 = r[1], y0 = r[2], y1 = r[3];
@@ -90,6 +111,7 @@ final class SheetRenderer {
     }
 
     void remove(Portal p) {
+        logged.remove(p);
         List<TextDisplay> list = sheets.remove(p);
         if (list != null) for (TextDisplay d : list) if (d.isValid()) d.remove();
     }
