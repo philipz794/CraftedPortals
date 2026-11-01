@@ -33,9 +33,18 @@ plugin without dependencies.
 
 ## Screenshots
 
-| Any shape, not just rectangles | Classic frame, corners left out | Mix any blocks, just include the key blocks |
-|---|---|---|
-| ![An arched deepslate frame with emerald key blocks](assets/screenshots/craftedportals_1.jpg) | ![A nether-portal-sized frame without corner blocks](assets/screenshots/craftedportals_2.jpg) | ![A frame mixing sculk, deepslate and emerald blocks](assets/screenshots/craftedportals_3.jpg) |
+<table>
+  <tr>
+    <td width="33%"><img src="assets/screenshots/craftedportals_1.jpg" alt="An arched deepslate frame with emerald key blocks"></td>
+    <td width="33%"><img src="assets/screenshots/craftedportals_2.jpg" alt="A nether-portal-sized frame without corner blocks"></td>
+    <td width="33%"><img src="assets/screenshots/craftedportals_3.jpg" alt="A frame mixing sculk, deepslate and emerald blocks"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Any shape, not just rectangles</sub></td>
+    <td align="center"><sub>Classic frame, corners left out</sub></td>
+    <td align="center"><sub>Mix any blocks, just include the key blocks</sub></td>
+  </tr>
+</table>
 
 ## Requirements
 
