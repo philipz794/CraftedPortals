@@ -147,9 +147,9 @@ public final class CraftedPortals extends JavaPlugin {
 
     private ParticleSettings loadParticles() {
         ConfigurationSection sec = getConfig().getConfigurationSection("particles");
-        ParticleSpec spec = ParticleSpec.load(sec, "particles", "PORTAL", this::warn);
-        int perBlock = sec == null ? 2 : Math.max(0, Math.min(10, sec.getInt("per-block", 2)));
-        int interval = sec == null ? 2 : Math.max(1, Math.min(40, sec.getInt("interval-ticks", 2)));
+        ParticleSpec spec = ParticleSpec.load(sec, "particles", "TRAIL", Color.fromRGB(0x4682B4), this::warn);
+        int perBlock = sec == null ? 1 : Math.max(0, Math.min(10, sec.getInt("per-block", 1)));
+        int interval = sec == null ? 5 : Math.max(1, Math.min(40, sec.getInt("interval-ticks", 5)));
         boolean sound = sec == null || sec.getBoolean("sound", true);
         ConfigurationSection sh = sec == null ? null : sec.getConfigurationSection("sheet");
         boolean sheet = sh == null || sh.getBoolean("enabled", true);
@@ -170,7 +170,7 @@ public final class CraftedPortals extends JavaPlugin {
         }
         ConfigurationSection tp = getConfig().getConfigurationSection("travel-particles");
         boolean particlesOn = tp != null && tp.getBoolean("enabled", true);
-        ParticleSpec spec = ParticleSpec.load(tp, "travel-particles", "ENCHANT", this::warn);
+        ParticleSpec spec = ParticleSpec.load(tp, "travel-particles", "ENCHANT", ParticleSpec.DEFAULT_COLOR, this::warn);
         int amount = tp == null ? 10 : Math.max(1, Math.min(30, tp.getInt("amount", 10)));
         boolean sound = getConfig().getBoolean("travel-sound", true);
         boolean bar = getConfig().getBoolean("travel-bar", true);

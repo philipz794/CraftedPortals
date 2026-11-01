@@ -64,7 +64,8 @@ record ParticleSpec(Particle type, Color color, Color colorTo, BlockData block, 
     }
 
     /** Reads a spec from a config section; problems go to {@code warn} and fall back to safe values. */
-    static ParticleSpec load(ConfigurationSection sec, String path, String defaultType, Consumer<String> warn) {
+    static ParticleSpec load(ConfigurationSection sec, String path, String defaultType, Color defaultColor,
+                             Consumer<String> warn) {
         String typeName = sec == null ? defaultType : sec.getString("type", defaultType);
         Particle type;
         try {
@@ -77,7 +78,7 @@ record ParticleSpec(Particle type, Color color, Color colorTo, BlockData block, 
             warn.accept(path + ".type " + type + " needs data this plugin cannot provide, using PORTAL");
             type = Particle.PORTAL;
         }
-        Color color = parseColor(sec == null ? null : sec.getString("color"), DEFAULT_COLOR, path + ".color", warn);
+        Color color = parseColor(sec == null ? null : sec.getString("color"), defaultColor, path + ".color", warn);
         Color colorTo = parseColor(sec == null ? null : sec.getString("color-to"), Color.WHITE, path + ".color-to", warn);
         float value = sec == null ? 1.0f : (float) sec.getDouble("value", 1.0);
 

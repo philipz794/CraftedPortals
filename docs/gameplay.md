@@ -69,7 +69,8 @@ Update it alongside behaviour changes in the code.
 ## Visuals
 
 - `effect: NETHER` → nether portal blocks in the interior.
-- Default is `effect: PARTICLE` with a royal-blue sheet at 50 % and PORTAL particles.
+- Default is `effect: PARTICLE` with a royal-blue sheet at 50 % and steel-blue TRAIL particles streaking
+  into the centre.
 - `effect: END` → end gateway blocks, teleport always instant.
 - `effect: PARTICLE` → the interior stays air and is filled with particles (`particles.*`: any type of
   the game with its options `color`, `color-to`, `block`, `item`, `value`; density, interval, ambient sound) plus, if `particles.sheet.enabled`, a translucent coloured

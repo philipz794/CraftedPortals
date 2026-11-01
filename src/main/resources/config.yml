@@ -94,9 +94,9 @@ particles:
   # Particle type, see the list above. Good portal looks: PORTAL,
   # REVERSE_PORTAL, END_ROD, SOUL, SOUL_FIRE_FLAME, WITCH, ENCHANT,
   # ELECTRIC_SPARK, DUST (own colour), TRAIL (streaks into the centre)
-  type: PORTAL
+  type: TRAIL
   # Hex colour for colourable types
-  color: "#9B30FF"
+  color: "#4682B4"
   # Second colour for DUST_COLOR_TRANSITION
   color-to: "#FFFFFF"
   # Block for block-based types, item for ITEM, value for the rest (see list)
@@ -104,9 +104,9 @@ particles:
   item: EMERALD
   value: 1.0
   # Particles per interior block and interval (0-10)
-  per-block: 2
+  per-block: 1
   # Ticks between particle bursts (1-40); lower = denser, more traffic
-  interval-ticks: 2
+  interval-ticks: 5
   # Play the quiet nether portal ambient sound every 5 seconds
   sound: true
   # Translucent coloured sheet filling the portal, built from display
