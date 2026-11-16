@@ -1,6 +1,5 @@
 # CraftedPortals
 
-[![Modrinth downloads](https://img.shields.io/modrinth/dt/craftedplugins?logo=modrinth&logoColor=white&label=Modrinth%20downloads&color=1bd96a)](https://modrinth.com/project/craftedplugins)
 [![GitHub release](https://img.shields.io/github/v/release/philipz794/CraftedPortals?label=release)](https://github.com/philipz794/CraftedPortals/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -60,7 +59,7 @@ plugin without dependencies.
 
 ## Installation
 
-1. Download `craftedportals-<version>.jar` from [Modrinth](https://modrinth.com/project/craftedplugins) or the
+1. Download `craftedportals-<version>.jar` from the
    [GitHub releases](https://github.com/philipz794/CraftedPortals/releases), or build it yourself (see below).
 2. Drop it into your server's `plugins/` folder and start the server.
 3. Adjust `plugins/CraftedPortals/config.yml` as needed, then run `/cp reload`.

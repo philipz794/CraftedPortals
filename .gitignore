@@ -19,10 +19,10 @@ target/
 # Design sources stay local (not part of the public repo)
 *.sketch
 
-# Full-size screenshot originals stay local (used for Modrinth uploads)
+# Full-size screenshot originals stay local (used for store pages)
 assets/screenshots/originals/
 
-# Project icon stays local (used for Modrinth)
+# Project icon stays local (used for store pages)
 assets/icon.png
 
 # Secrets — nie committen (lokale Env-Dateien, Stand 2026-11-07)
